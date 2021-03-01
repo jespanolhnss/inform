@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  <Configuration status="warn">-->
+<Configuration status="info">
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                pattern="%d{YYYY-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %msg%n" />
+        </Console>
+        <!--  filename="/opt/tomcat/logs/lopd.log"  -->
+        <!--
+    <RollingFile name="RollingFile" filename="/opt/tomcat/logs/continuidad.log"
+                 filepattern="${logPath}/%d{YYYYMMddHHmmss}-continuidad.log">
+        -->
+        <RollingFile name="RollingFile" filename= "${sys:catalina.home}/logs/inform"
+                            filepattern="${sys:catalina.home}/logs/%d{YYYYMMdd}-continuidad.log">
+           
+            <PatternLayout
+                pattern="%d{YYYY-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %msg%n" />
+
+            <Policies>
+                <SizeBasedTriggeringPolicy size="500MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="20" />
+        </RollingFile>
+        <SMTP name="LogToMail" subject="Inform notificacion de errores"
+              from="avisos.hnss@saludcastillayleon.es"
+              to="jnieto@saludcastillayleon.es"
+              smtpHost="smtp.saludcastillayleon.es"
+              smtpPort="25"
+              smtpUsername="grs.root/avisos.hnss"
+              smtpPassword="12345678"
+              bufferSize="100">
+              <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+        </SMTP>
+
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+            <AppenderRef ref="LogToMail"/>
+        </Root>
+        <!--
+         <Root level="debug" additivity="false">
+             <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+              <AppenderRef ref="LogToMail"/>
+        </Root>
+                -->
+    </Loggers>
+</Configuration>
