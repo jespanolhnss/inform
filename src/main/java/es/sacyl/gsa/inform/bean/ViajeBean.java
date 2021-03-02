@@ -1,7 +1,7 @@
 package es.sacyl.gsa.inform.bean;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class ViajeBean implements Serializable {
@@ -9,9 +9,9 @@ public class ViajeBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
-    private LocalDate fecha;
-    private int horaSalida;
-    private int horaLlegada;
+    private LocalDateTime salida;
+    private LocalDateTime llegada;
+
     private String matricula;
     private ArrayList<ViajeCentroBean> listaCentros = new ArrayList<>();
     private ArrayList<ViajeTecnicoBean> listaTecnicos = new ArrayList<>();
@@ -28,28 +28,20 @@ public class ViajeBean implements Serializable {
         this.id = id;
     }
 
-    public LocalDate getFecha() {
-        return fecha;
+    public LocalDateTime getSalida() {
+        return salida;
     }
 
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
+    public void setSalida(LocalDateTime salida) {
+        this.salida = salida;
     }
 
-    public int getHoraSalida() {
-        return horaSalida;
+    public LocalDateTime getLlegada() {
+        return llegada;
     }
 
-    public void setHoraSalida(int horaSalida) {
-        this.horaSalida = horaSalida;
-    }
-
-    public int getHoraLlegada() {
-        return horaLlegada;
-    }
-
-    public void setHoraLlegada(int horaLlegada) {
-        this.horaLlegada = horaLlegada;
+    public void setLlegada(LocalDateTime llegada) {
+        this.llegada = llegada;
     }
 
     public String getMatricula() {

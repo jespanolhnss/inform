@@ -39,9 +39,8 @@ public class ViajesDao extends ConexionDao implements Serializable {
         ViajeBean viajeBean = new ViajeBean();
         try {
             viajeBean.setId(rs.getLong("id"));
-            viajeBean.setFecha(Utilidades.getFechaLocalDate(rs.getLong("fecha")));
-            viajeBean.setHoraSalida(rs.getInt("horasalida"));
-            viajeBean.setHoraLlegada(rs.getInt("horaLlegada"));
+            viajeBean.setSalida(Utilidades.getFechaHoraLocalDateTime(rs.getLong("fecha"), rs.getInt("horasalida")));
+            viajeBean.setLlegada(Utilidades.getFechaHoraLocalDateTime(rs.getLong("fecha"), rs.getInt("horaLlegada")));
             viajeBean.setMatricula(rs.getString("matricula"));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
@@ -76,7 +75,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
                      * evitan sentencias select innecesarias
                      */
                     if (viajeCompleto == Boolean.FALSE) {
-                        viajeBean.setListaCentros(getViajeCentros(id));
+                        viajeBean.setListaCentros(getViajeCentros(viajeBean));
                         viajeBean.setListaTecnicos(getViajeTecnicos(viajeBean));
                     }
                 }
@@ -118,8 +117,9 @@ public class ViajesDao extends ConexionDao implements Serializable {
             connection = super.getConexionBBDD();
             viajeBean.setId(this.getSiguienteId("viajes"));
             sql = " INSERT INTO  viajes  (id,fecha,horasalida,horallegada,matricula,estado,usucambio,fechacambio) " + " VALUES "
-                    + "(" + viajeBean.getId() + ",'" + Utilidades.getFechaLong(viajeBean.getFecha()) + "','"
-                    + viajeBean.getHoraSalida() + "','" + viajeBean.getHoraLlegada() + "','" + viajeBean.getMatricula() + "'"
+                    + "(" + viajeBean.getId() + ",'" + Utilidades.getFechaLong(viajeBean.getSalida()) + "','"
+                    + Utilidades.getHoraInt(viajeBean.getSalida())
+                    + "','" + Utilidades.getHoraInt(viajeBean.getLlegada()) + "','" + viajeBean.getMatricula() + "'"
                     + ", '" + ConexionDao.BBDD_ACTIVOSI + "','"
                     + usuarioBean.getId() + "','" + Utilidades.getFechaActualLong() + "')";
             try (Statement statement = connection.createStatement()) {
@@ -144,8 +144,9 @@ public class ViajesDao extends ConexionDao implements Serializable {
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE   viajes  SET fecha='" + Utilidades.getFechaLong(viajeBean.getFecha()) + "'"
-                    + ",horasalida='" + viajeBean.getHoraSalida() + "', horallegada=" + viajeBean.getHoraLlegada()
+            sql = " UPDATE   viajes  SET fecha='" + Utilidades.getFechaLong(viajeBean.getSalida()) + "'"
+                    + ",horasalida='" + Utilidades.getHoraInt(viajeBean.getSalida()) + "', horallegada="
+                    + Utilidades.getHoraInt(viajeBean.getLlegada())
                     + ",matricula='" + viajeBean.getMatricula() + "'"
                     + ",estado='" + ConexionDao.BBDD_ACTIVOSI + "'"
                     + ",usucambio='" + usuarioBean.getId() + "'"
@@ -229,7 +230,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
             ResultSet resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {
                 ViajeBean viajeBean = getRegistroResulset(resulSet);
-                viajeBean.setListaCentros(getViajeCentros(viajeBean.getId()));
+                viajeBean.setListaCentros(getViajeCentros(viajeBean));
                 viajeBean.setListaTecnicos(getViajeTecnicos(viajeBean));
                 listaViajes.add(viajeBean);
             }
@@ -250,12 +251,12 @@ public class ViajesDao extends ConexionDao implements Serializable {
      * @param id Id del viaje del cual se quieren recuperar los datos
      * @return Un rrayList<ViajeCentroBean> con los datos asociados a viaje.
      */
-    public ArrayList<ViajeCentroBean> getViajeCentros(Long id) {
+    public ArrayList<ViajeCentroBean> getViajeCentros(ViajeBean viajeBean) {
         ArrayList<ViajeCentroBean> listaCentros = new ArrayList<>();
         Connection connection = null;
         try {
             connection = super.getConexionBBDD();
-            sql = "   SELECT  * FROM viajescentros  WHERE idviaje= " + id;
+            sql = "   SELECT  * FROM viajescentros  WHERE idviaje= " + viajeBean.getId();
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {

@@ -5,9 +5,11 @@ import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Page;
 import es.sacyl.gsa.inform.bean.LopdIncidenciaBean;
 import es.sacyl.gsa.inform.bean.LopdTipoBean;
 import es.sacyl.gsa.inform.bean.UbicacionBean;
+import es.sacyl.gsa.inform.ctrl.SesionCtrl;
 import es.sacyl.gsa.inform.ui.covid.FrmTarjetasCribado;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaGestionar;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaNueva;
@@ -189,7 +191,9 @@ public class Menu extends MenuBar {
 
         this.addItem("Salir", e -> {
             this.removeAll();
-
+            SesionCtrl.doDestruyeSesionUsuario();
+            Page page = new Page(getUI().get());
+            page.open("http://localhost:8080/inform");
         });
     }
 

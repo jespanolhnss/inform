@@ -21,6 +21,8 @@ public abstract class MasterBean {
         this.id = new Long(0);
         this.setValoresAut();
         this.estado = ConexionDao.BBDD_ACTIVOSI;
+        this.fechacambio = LocalDate.now();
+        this.usucambio = ((UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME));
     }
 
     public Long getId() {

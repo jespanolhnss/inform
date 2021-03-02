@@ -14,18 +14,25 @@ import es.sacyl.gsa.inform.util.Constantes;
  * @author 06551256M
  */
 public class SesionCtrl {
- /**
-  * 
-  * @param usuarioBean 
-  */
-    public static void doCreaSesionUsuario(UsuarioBean  usuarioBean){
-         VaadinSession.getCurrent().setAttribute(Constantes.SESSION_USERNAME, usuarioBean);
-    }
+
     /**
-     * 
-     * @return 
+     *
+     * @param usuarioBean
      */
-    public static UsuarioBean getSesionUsuario(){
-      return  (UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME);
+    public static void doCreaSesionUsuario(UsuarioBean usuarioBean) {
+        VaadinSession.getCurrent().setAttribute(Constantes.SESSION_USERNAME, usuarioBean);
     }
+
+    public static void doDestruyeSesionUsuario() {
+        VaadinSession.getCurrent().setAttribute(Constantes.SESSION_USERNAME, null);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static UsuarioBean getSesionUsuario() {
+        return (UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME);
+    }
+
 }

@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class FrmViajesCentrosRegistrar extends FrmMasterVentana {
+public final class FrmViajesCentrosRegistrar extends FrmMasterVentana {
 
     private static final long serialVersionUID = 1L;
 
@@ -68,7 +68,7 @@ public class FrmViajesCentrosRegistrar extends FrmMasterVentana {
         super(ancho);
         this.viajeCentrosBean = viajeCentrosBean;
         viajeCentrosBinder.setBean(viajeCentrosBean);
-        botonGrabar.setEnabled(false);
+        botonGrabar.setVisible(false);
         modificarButton.addClickListener(e -> doActualizar());
         doComponentesOrganizacion();
         doGrid();
@@ -85,6 +85,7 @@ public class FrmViajesCentrosRegistrar extends FrmMasterVentana {
             if (new ViajesDao().doInsertaUnCentros(viajeCentrosBean) == true) {
                 (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                 doLimpiar();
+                this.close();
             } else {
                 (new Notification(FrmMensajes.AVISODATOERRORBBDD, 1000, Notification.Position.MIDDLE)).open();
             }
@@ -106,6 +107,7 @@ public class FrmViajesCentrosRegistrar extends FrmMasterVentana {
             if (new ViajesDao().doActualizaUnCentro(viajeCentrosBean) == true) {
                 (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                 doLimpiar();
+                this.close();
             } else {
                 (new Notification(FrmMensajes.AVISODATOERRORBBDD, 1000, Notification.Position.MIDDLE)).open();
             }

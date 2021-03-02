@@ -394,7 +394,7 @@ public class LopdIncidenciaDao extends ConexionDao {
 
             incidencia.setSujeto(LopdSujetoBean.getTipoSujeto(incidencia.getTipo()));
 
-            incidencia.setFechaHora(Utilidades.getFechaHora(rs.getLong("fecha"), rs.getInt("hora")));
+            incidencia.setFechaHora(Utilidades.getFechaHoraLocalDateTime(rs.getLong("fecha"), rs.getInt("hora")));
 
             if (paciente == null) {
                 if (rs.getString("numerohc") != null) {
@@ -405,7 +405,7 @@ public class LopdIncidenciaDao extends ConexionDao {
             }
 
             incidencia.setIdDocumento(rs.getString("iddocumento"));
-            incidencia.setFechaHoraDocumento(Utilidades.getFechaHora(rs.getLong("fechadocu"), rs.getInt("horadocu")));
+            incidencia.setFechaHoraDocumento(Utilidades.getFechaHoraLocalDateTime(rs.getLong("fechadocu"), rs.getInt("horadocu")));
             if (rs.getLong("servicio") != 0) {
                 incidencia.setServicio(new GfhDao().getPorId(rs.getLong("servicio")));
             }

@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.Blob;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -217,7 +218,19 @@ public class Utilidades {
         return hh + ":" + mm;
     }
 
-    public static LocalDateTime getFechaHora(Long fecha, Integer hora) {
+    public static Integer getHoraInt(LocalDateTime fecha) {
+        Integer unaHecha = null;
+        int hh, mm, ss;
+        if (fecha != null) {
+            hh = fecha.getHour();
+            mm = fecha.getMinute();
+            ss = fecha.getSecond();
+            unaHecha = new Integer(hh * 10000 + mm * 100 + ss);
+        }
+        return unaHecha;
+    }
+
+    public static LocalDateTime getFechaHoraLocalDateTime(Long fecha, Integer hora) {
         if (fecha == null || hora == null) {
             return null;
         }
@@ -403,7 +416,47 @@ public class Utilidades {
         return date;
     }
 
+    public static LocalDateTime getFechaHoraLas15horas() {
+        try {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyy-MM-dd");
+            String str = LocalDate.now() + " 15:00:00";
+            LocalDateTime localDateTime = LocalDateTime.parse(str, dtf);
+            return localDateTime;
+        } catch (Exception e) {
+
+        }
+        return null;
+        /*
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MMMM-dd HH:mm:ss a")
+                                        .withLocale(Locale.FRENCH);
+            LocalDateTime date = LocalDateTime.parse("2019-mai-29 10:15:30 AM", formatter);
+         */
+    }
+
+    /**
+     *
+     * @param fecha
+     * @return
+     */
     public static Long getFechaLong(LocalDate fecha) {
+        Long unaFecha = null;
+        int dd, mm, yyyy;
+        if (fecha != null) {
+            dd = fecha.getDayOfMonth();
+            mm = fecha.getMonthValue();
+            yyyy = fecha.getYear();
+            unaFecha = new Long(yyyy * 10000 + mm * 100 + dd);
+        }
+        return unaFecha;
+    }
+
+    /**
+     *
+     * @param fecha
+     * @return
+     */
+    public static Long getFechaLong(LocalDateTime fecha) {
         Long unaFecha = null;
         int dd, mm, yyyy;
         if (fecha != null) {

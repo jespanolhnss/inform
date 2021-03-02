@@ -7,7 +7,6 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
@@ -17,15 +16,14 @@ import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
-import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServlet;
-import com.vaadin.flow.server.VaadinServletRequest;
+import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.ctrl.LlamdasExternas;
 import es.sacyl.gsa.inform.ctrl.SesionCtrl;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.ui.Menu;
-import java.util.Enumeration;
+import es.sacyl.gsa.inform.util.Constantes;
 
 /**
  * The main view contains a button and a click listener.
@@ -47,47 +45,43 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
 
     private Location currentLocation = null;
 
-    //  private static final Logger LOGGER = LogManager.getLogger(MainView.class);
-    private final HorizontalLayout contenedorMenu = new HorizontalLayout();
-    private final VerticalLayout contenedorFormularios = new VerticalLayout();
+    private HorizontalLayout contenedorMenu = new HorizontalLayout();
+    private VerticalLayout contenedorFormularios = new VerticalLayout();
     QueryParameters qm = null;
 
     public MainView() {
-        Image image = new Image("icons/fondo.jpg", "DummyImage");
+        Image image = new Image("icons/fondo.jpg", "Imagen");
         add(image);
-        //  LOGGER.info(" Inicio mainview " + LocalDateTime.now());
 
         System.out.println(System.getProperty("user.dir"));
         System.out.println(System.getProperty("catalina.base"));
         System.out.println(VaadinServlet.getCurrent().getServletInfo());
-        //  System.out.println(  VaadinServlet.getCurrent().getInitParameterNames());
-        /* Pruebas 11-02-2021 */
-        Notification.show("hola");
+
+        /*
         VaadinServletRequest req = (VaadinServletRequest) VaadinService.getCurrentRequest();
         String parametro = req.getParameter("nhc");
         String u = VaadinService.getCurrentRequest().getParameter("nhc");
-        /* fin de las pruebas */
+
         Enumeration<String> enumerar = VaadinServlet.getCurrent().getInitParameterNames();
         while (enumerar.hasMoreElements()) {
             System.out.println(enumerar.nextElement());
         }
-
-        System.out.println(System.getProperty("catalina.base"));
-        System.out.println(VaadinServlet.getCurrent().getServletInfo());
-        //  System.out.println(  VaadinServlet.getCurrent().getInitParameterNames());
-
+         */
         this.setMargin(false);
         this.setSpacing(false);
         this.setAlignItems(Alignment.CENTER);
-
-        this.doLogin();
+        if (((UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME)) == null) {
+            this.doLogin();
+        } else {
+            domuestraMenu();
+        }
 
     }
 
     @Override
     /**
-     * Este método no se como funciona pero se usa para recuperar parámetros en
-     * la llamada
+     * Este método no se como funciona pero se usa para recuperar parámetros
+     * request en la llamada
      */
     public void setParameter(BeforeEvent event,
             @OptionalParameter String parameter
@@ -150,7 +144,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         final LoginI18n i18n = LoginI18n.createDefault();
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("Informática");
-        i18n.getHeader().setDescription("Aplicaciones interna del servicio ");
+        i18n.getHeader().setDescription("Aplicaciones internas del servicio ");
         i18n.getForm().setUsername("Usuario");
         i18n.getForm().setTitle("Informática GSA");
         i18n.getForm().setSubmit("Conectar");
@@ -160,7 +154,24 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         i18n.getErrorMessage()
                 .setMessage("Registra de nuevo el dato del usuario y la clave");
         i18n.setAdditionalInformation(
-                " Informática 2021");
+                " Informática 01-03-2021");
         return i18n;
     }
+
+    public HorizontalLayout getContenedorMenu() {
+        return contenedorMenu;
+    }
+
+    public void setContenedorMenu(HorizontalLayout contenedorMenu) {
+        this.contenedorMenu = contenedorMenu;
+    }
+
+    public VerticalLayout getContenedorFormularios() {
+        return contenedorFormularios;
+    }
+
+    public void setContenedorFormularios(VerticalLayout contenedorFormularios) {
+        this.contenedorFormularios = contenedorFormularios;
+    }
+
 }

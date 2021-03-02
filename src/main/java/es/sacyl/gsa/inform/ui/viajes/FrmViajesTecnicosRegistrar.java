@@ -1,7 +1,5 @@
 package es.sacyl.gsa.inform.ui.viajes;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -29,7 +27,7 @@ import java.util.stream.Collectors;
  *
  * @author 06532775Q
  */
-public class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
+public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
 
     /* Campos del formulario */
     TextField id = new ObjetosComunes().getTextField("id");
@@ -37,7 +35,6 @@ public class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
     ComboBox<UsuarioBean> tecnicosComboBox = new CombosUi().getInformaticosCombo(null);
 
     Icon icon = new Icon(VaadinIcon.BUTTON);
-    Button modificarButton = new ObjetosComunes().getBoton("Modificar", ButtonVariant.LUMO_PRIMARY, icon);
 
     /* Componentes */
     ViajeBean viajeBean = new ViajeBean();
@@ -64,6 +61,7 @@ public class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
             if (new ViajesDao().doInsertaUnTecnico(viajeBean, informaticos) == true) {
                 (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                 doLimpiar();
+                this.close();
             } else {
                 (new Notification(FrmMensajes.AVISODATOERRORBBDD, 1000, Notification.Position.MIDDLE)).open();
             }
@@ -145,11 +143,13 @@ public class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
     public void doComponenesAtributos() {
         idViaje.setValue(viajeBean.getId().toString());
         botonCancelar.setText("Salir");
+        botonAyuda.setVisible(false);
+        botonLimpiar.setVisible(false);
+        botonBorrar.setVisible(false);
     }
 
     @Override
     public void doComponentesOrganizacion() {
-        contenedorBotones.add(modificarButton);
         contenedorFormulario.add(id, idViaje, tecnicosComboBox);
     }
 
