@@ -28,7 +28,7 @@ public class FrmUsuariosPedir extends FrmMasterPantalla {
     TextField nifUsuario = new ObjetosComunes().getTextField("NIF", "teclea el NIF", 25, "50px", "30px");
     TextField correoUsuario = new ObjetosComunes().getTextField("Correo Electrónico", "teclea el correo electrónico", 25, "100px", "30px");
     ComboBox<String> categoriaUsuario = new CombosUi().getStringCombo("Categoria", null, ObjetosComunes.Categorias, "50px");
-    CheckboxGroup<String> aplicacionesUsuario = new CheckboxGroup<String>();
+    CheckboxGroup<String> aplicacionesUsuario = new CheckboxGroup<>();
 
     /* Campos para el Grid */
     ComboBox<String> camposFiltro = new CombosUi().getStringCombo("Buscar por campo: ", null, ObjetosComunes.FiltroBusquedaUsuarios, "150px");
@@ -160,23 +160,23 @@ public class FrmUsuariosPedir extends FrmMasterPantalla {
             usuarioBinder.readBean(usuarioBean);
         });
 
-        buscador.addBlurListener(event -> {
-            if (buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
-                arrayListUsuarios = new UsuarioDao().getLista(null);
-            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
-                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), camposFiltro.getValue());
-            } else if (buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
-                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(null, camposFiltro.getValue());
-            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
-                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), null);
-            }
-            usuariosGrid.setItems(arrayListUsuarios);
-        });
+//        buscador.addBlurListener(event -> {
+//            if (buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
+//                arrayListUsuarios = new UsuarioDao().getLista(null);
+//            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
+//                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), camposFiltro.getValue());
+//            } else if (buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
+//                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(null, camposFiltro.getValue());
+//            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
+//                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), null);
+//            }
+//            usuariosGrid.setItems(arrayListUsuarios);
+//        });
     }
 
     @Override
     public void doImprimir() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
 }
