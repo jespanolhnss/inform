@@ -192,4 +192,10 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
         );
     }
 
+    /*
+
+    WebApplicationContext appCtx = ((WebApplicationContext) this.getContext());
+    ServletContext servletCtx = appCtx.getHttpSession().getServletContext();
+
+     */
 }

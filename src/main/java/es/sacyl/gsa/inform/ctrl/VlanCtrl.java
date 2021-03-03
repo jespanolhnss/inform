@@ -93,7 +93,7 @@ public class VlanCtrl {
      *
      * En decimal 220.100.100.0
      */
-    public static String getCalcualPuertaEnlace(String direccion, String mascara) {
+    public static String getCalculaPuertaEnlace(String direccion, String mascara) {
         String[] ips = direccion.split("\\.");
         String[] mask = mascara.split("\\.");
         String dirMascara1, dirMascara2, dirMascara3, dirMascara4;
@@ -121,6 +121,57 @@ public class VlanCtrl {
 
         return Utilidades.binarioToDecimalString(dirMascara1) + "." + Utilidades.binarioToDecimalString(dirMascara2) + "."
                 + Utilidades.binarioToDecimalString(dirMascara3) + "." + Utilidades.binarioToDecimalString(dirMascara4) + 1;
+    }
+
+    /**
+     *
+     * @param direccion
+     * @param mascara
+     * @return
+     *
+     * La dirección broadcast se obtiene poniendo a uno todos los bits de host.
+     * Ejemplo 10.36.64.1/22
+     *
+     * 10.36.67.255	> >	00001010.00100100.01000011.11111111
+     */
+    public static String getCalculaBroadcast(String dirIp, String unos) {
+        String dirBroadcast1, dirBroadcast2, dirBroadcast3, dirBroadcast4;
+        String[] ips = dirIp.split("\\.");
+
+        NumeroBinario ipBinario = new NumeroBinario(
+                new NumeroBinario(Integer.parseInt(ips[0])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR)
+                        .concat(new NumeroBinario(Integer.parseInt(ips[1])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+                        .concat(new NumeroBinario(Integer.parseInt(ips[2])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+                        .concat(new NumeroBinario(Integer.parseInt(ips[3])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+        );
+
+        if (Utilidades.isNumeric(unos)) {
+            int numerodeUnos = Integer.parseInt(unos);
+            int numerodeCeros = 32 - numerodeUnos;
+            NumeroBinario dirHost = new NumeroBinario(numerodeCeros, NumeroBinario.ONE_CHAR);
+
+            String cadenaBinaio = ipBinario.getNumero().substring(0, 22) + dirHost.getNumero();
+
+            dirBroadcast1 = cadenaBinaio.substring(0, 8);
+            dirBroadcast2 = cadenaBinaio.substring(8, 16);
+            dirBroadcast3 = cadenaBinaio.substring(16, 24);
+            dirBroadcast4 = cadenaBinaio.substring(24, 32);
+
+            return Utilidades.binarioToDecimalString(dirBroadcast1) + "." + Utilidades.binarioToDecimalString(dirBroadcast2) + "."
+                    + Utilidades.binarioToDecimalString(dirBroadcast3) + "." + Utilidades.binarioToDecimalString(dirBroadcast4);
+        } else {
+            return "";
+        }
+    }
+
+    public static String getCalculaUltimaIp(String dirIp, String unos) {
+        String ip = getCalculaBroadcast(dirIp, unos);
+
+        String[] ips = ip.split("\\.");
+        ips[3] = Integer.toString(Integer.parseInt(ips[3]) - 1);
+
+        return ips[0] + "." + ips[1] + "." + ips[2] + "." + ips[3];
+
     }
 
     /**

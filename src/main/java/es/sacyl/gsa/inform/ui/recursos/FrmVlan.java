@@ -14,6 +14,7 @@ import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import es.sacyl.gsa.inform.bean.VlanBean;
 import es.sacyl.gsa.inform.ctrl.IpCtrl;
+import es.sacyl.gsa.inform.ctrl.VlanCtrl;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.VlanDao;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
@@ -39,6 +40,8 @@ public final class FrmVlan extends FrmMasterPantalla {
     private final TextField nombre = new ObjetosComunes().getTextField("Nombre");
     private final TextField puertaenlace = new ObjetosComunes().getTextField("Puerta enlace");
     private final TextField mascara = new ObjetosComunes().getTextField("Mascara");
+    private final TextField ultimaip = new ObjetosComunes().getTextField("Ultima direccion");
+    private final TextField broadcast = new ObjetosComunes().getTextField("Broadcast");
     private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
 
     private VlanBean vlanBean = null;
@@ -189,7 +192,7 @@ public final class FrmVlan extends FrmMasterPantalla {
 
     @Override
     public void doComponentesOrganizacion() {
-        contenedorFormulario.add(id, nombre, direccion, mascara, puertaenlace, estadoRadio);
+        contenedorFormulario.add(id, nombre, direccion, mascara, puertaenlace, ultimaip, broadcast, estadoRadio);
         contenedorDerecha.add(vlanGrid);
     }
 
@@ -201,8 +204,11 @@ public final class FrmVlan extends FrmMasterPantalla {
                 direccion.focus();
             } else {
                 String[] valores = direccion.getValue().split("/");
-                mascara.setValue(getCalculaMascara(valores[0], valores[1]));
-                puertaenlace.setValue(this.getCalcualPuertaEnlace(valores[0], mascara.getValue()));
+                mascara.setValue(VlanCtrl.getCalculaMascara(valores[0], valores[1]));
+                // puertaenlace.setValue(this.getCalcualPuertaEnlace(valores[0], mascara.getValue()));
+                puertaenlace.setValue(VlanCtrl.getCalculaPuertaEnlace(valores[0], mascara.getValue()));
+                broadcast.setValue(VlanCtrl.getCalculaBroadcast(valores[0], valores[1]));
+                ultimaip.setValue(VlanCtrl.getCalculaUltimaIp(valores[0], valores[1]));
             }
         });
         vlanGrid.addItemClickListener(new ComponentEventListener<ItemClickEvent<VlanBean>>() {
@@ -257,7 +263,7 @@ public final class FrmVlan extends FrmMasterPantalla {
      * 8 los pasamos cada grupo a a decimal
      *
      */
-    public String getCalculaMascara(String dirIp, String unos) {
+    public String zzgetCalculaMascara(String dirIp, String unos) {
         String dirMascara1, dirMascara2, dirMascara3, dirMascara4;
         //     String[] valores = direcion.split("/");
         String[] ip = dirIp.split("\\.");
@@ -299,7 +305,7 @@ public final class FrmVlan extends FrmMasterPantalla {
      *
      * En decimal 220.100.100.0
      */
-    public String getCalcualPuertaEnlace(String direccion, String mascara) {
+    public String xxxgetCalcualPuertaEnlace(String direccion, String mascara) {
         String[] ips = direccion.split("\\.");
         String[] mask = mascara.split("\\.");
         String dirMascara1, dirMascara2, dirMascara3, dirMascara4;

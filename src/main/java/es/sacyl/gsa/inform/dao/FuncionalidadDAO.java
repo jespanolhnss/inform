@@ -40,9 +40,9 @@ public class FuncionalidadDAO extends ConexionDao {
             funcionalidad.setEstado(rs.getBoolean("estado"));
             funcionalidad.setUsucambio(new UsuarioDao().getPorId(rs.getLong("usucambio")));
             try {
-                LocalDate date = LocalDate.parse(Long.toString(rs.getLong("fechacambio")), formatterdd_mm_yyyy);
+                LocalDate date = Utilidades.getFechaLocalDate(rs.getLong("fechacambio"));
                 funcionalidad.setFechacambio(date);
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 logger.error(Utilidades.getStackTrace(e));
             }
         } catch (SQLException e) {

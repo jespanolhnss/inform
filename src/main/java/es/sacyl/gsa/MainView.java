@@ -185,4 +185,8 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         this.contenedorFormularios = contenedorFormularios;
     }
 
+    public void init() {
+
+    }
+
 }
