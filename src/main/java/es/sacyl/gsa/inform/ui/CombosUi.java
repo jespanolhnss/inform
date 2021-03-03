@@ -529,7 +529,7 @@ public class CombosUi {
 
     public ComboBox<VlanBean> getVlanCombo(String texto, VlanBean valor
     ) {
-        ComboBox<VlanBean> combo = new ComboBox<>("Valn  ");
+        ComboBox<VlanBean> combo = new ComboBox<>("Vlan  ");
         combo.setItems(new VlanDao().getLista(texto));
         combo.setItemLabelGenerator(VlanBean::getNombre);
         if (valor != null) {

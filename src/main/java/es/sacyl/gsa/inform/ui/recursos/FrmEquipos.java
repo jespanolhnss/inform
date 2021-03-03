@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -17,6 +18,7 @@ import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
 import es.sacyl.gsa.inform.bean.ComboBean;
+import es.sacyl.gsa.inform.bean.EquipoAplicacionBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
@@ -24,6 +26,7 @@ import es.sacyl.gsa.inform.bean.UbicacionBean;
 import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
+import es.sacyl.gsa.inform.dao.EquipoAplicacionDao;
 import es.sacyl.gsa.inform.dao.EquipoDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
 import es.sacyl.gsa.inform.dao.UbicacionDao;
@@ -47,8 +50,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final ComboBox<ProvinciaBean> provinciaComboBuscador = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null, AutonomiaBean.AUTONOMIADEFECTO);
     private final ComboBox<CentroTipoBean> centroTipoComboBuscador = new CombosUi().getCentroTipoCombo(null);
     private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPOCENTROSALUD, null, null);
-    private final Button ayudaUbicacion = new ObjetosComunes().getBoton(null, null, VaadinIcon.QUESTION_CIRCLE.create());
-    private final Button ayudaIp = new ObjetosComunes().getBoton(null, null, VaadinIcon.QUESTION_CIRCLE.create());
+    private final Button ayudaUbicacion = new ObjetosComunes().getBotonMini();
+    private final Button ayudaIp = new ObjetosComunes().getBotonMini();
+    private final Button aplicacionButton = new ObjetosComunes().getBoton("App", null, VaadinIcon.FILE_TABLE.create());
 
     private final ComboBox<String> equipoTipoComboBuscador = new CombosUi().getEquipoTipoCombo(null, 50);
 
@@ -74,6 +78,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final PaginatedGrid<EquipoBean> equipoGrid = new PaginatedGrid<>();
     private ArrayList<EquipoBean> equipoArrayList = new ArrayList<>();
 
+    private final Grid<EquipoAplicacionBean> equipoAplicacionGrid = new Grid<>();
+
     public FrmEquipos() {
         super();
         this.equipoBean = new EquipoBean();
@@ -82,6 +88,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         doComponenesAtributos();
         doBinderPropiedades();
         doCompentesEventos();
+        doControlBotones(null);
     }
 
     /**
@@ -92,9 +99,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
     public void doControlBotones(Object obj) {
         super.doControlBotones(obj);
         if (obj == null) {
-
+            aplicacionButton.setEnabled(false);
         } else {
-
+            aplicacionButton.setEnabled(true);
         }
     }
 
@@ -153,6 +160,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         equipoBean.setModelo(modelo.getValue());
         equipoBinder.readBean(equipoBean);
         doControlBotones(null);
+        doActualizaGridApp();
     }
 
     @Override
@@ -170,6 +178,13 @@ public final class FrmEquipos extends FrmMasterPantalla {
         equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
         equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
         doActualizaGrid();
+
+        // grid eqipo aplicación
+        equipoAplicacionGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        equipoAplicacionGrid.setHeightByRows(true);
+        equipoAplicacionGrid.addColumn(EquipoAplicacionBean::getApliacacionString).setAutoWidth(true).setHeader(new Html("<b>Aplicación</b>")).setWidth("70px");
+        equipoAplicacionGrid.addColumn(EquipoAplicacionBean::getApliacacionString).setAutoWidth(true).setHeader(new Html("<b>Fecha</b>")).setWidth("70px");
+
     }
 
     @Override
@@ -177,6 +192,13 @@ public final class FrmEquipos extends FrmMasterPantalla {
         equipoArrayList = new EquipoDao().getLista(buscador.getValue(), equipoTipoComboBuscador.getValue(),
                 centroComboBuscador.getValue(), null, null);
         equipoGrid.setItems(equipoArrayList);
+    }
+
+    public void doActualizaGridApp() {
+        ArrayList<EquipoAplicacionBean> equipoAplicacionArrayList = new EquipoAplicacionDao().getLista(null, equipoBean, null);
+        equipoAplicacionGrid.setItems(equipoAplicacionArrayList);
+        equipoAplicacionGrid.setHeightByRows(true);
+        equipoAplicacionGrid.setPageSize(equipoAplicacionArrayList.size());
     }
 
     @Override
@@ -246,6 +268,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     @Override
     public void doComponentesOrganizacion() {
+        contenedorBotones.add(aplicacionButton);
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
                 new FormLayout.ResponsiveStep("50px", 2),
@@ -257,6 +280,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorDerecha.removeAll();
         contenedorBuscadores.add(equipoTipoComboBuscador, autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador);
         contenedorDerecha.add(this.contenedorBuscadores, equipoGrid);
+
         contenedorFormulario.add(id, 2);
         contenedorFormulario.add(equipoTipoCombo, 2);
         contenedorFormulario.add(equipoMarcaCombo, 2);
@@ -274,6 +298,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorFormulario.add(ubicacionCombo, 5);
         contenedorFormulario.add(ayudaUbicacion);
         contenedorFormulario.add(comentario, 6);
+
+        contenedorIzquierda.add(equipoAplicacionGrid);
     }
 
     @Override
@@ -303,6 +329,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
             equipoBean = event.getItem();
             equipoBinder.readBean(event.getItem());
             doControlBotones(equipoBean);
+            doActualizaGridApp();
         }
         );
 
@@ -336,6 +363,23 @@ public final class FrmEquipos extends FrmMasterPantalla {
             }
         }
         );
+
+        aplicacionButton.addClickListener(event -> {
+            EquipoAplicacionBean equipoAplicacionBean = new EquipoAplicacionBean();
+            equipoAplicacionBean.setEquipo(equipoBean);
+            FrmEquipoAplicacion frmEquipoAplicacion = new FrmEquipoAplicacion("500px", equipoAplicacionBean);
+            frmEquipoAplicacion.addDialogCloseActionListener(eventAyuda -> {
+                ip.setValue(equipoBean.getIpsCadena());
+                doActualizaGrid();
+            });
+            frmEquipoAplicacion.addDetachListener(eventAyuda -> {
+                ip.setValue(equipoBean.getIpsCadena());
+                doActualizaGrid();
+            });
+            frmEquipoAplicacion.open();
+
+        });
+
     }
 
     public void doActualizaComboProvinicas(ComboBox<ProvinciaBean> combo, AutonomiaBean autonomia) {

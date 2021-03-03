@@ -165,28 +165,26 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
 
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE  ips  SET  ip=?, equipo=?,vlan=?,estado=?"
+            sql = " UPDATE  ips  SET   equipo=?,estado=?"
                     + ",usucambio=? , fechacambio=?"
                     + " WHERE id=?  ";
             PreparedStatement statement = connection.prepareStatement(sql);
 
-            statement.setString(1, ipBean.getIp());
-            statement.setLong(2, ipBean.getVlan().getId());
             if (ipBean.getEquipo() != null && ipBean.getEquipo().getId() != null) {
-                statement.setLong(3, ipBean.getEquipo().getId());
+                statement.setLong(1, ipBean.getEquipo().getId());
+            } else {
+                statement.setNull(1, Types.INTEGER);
+            }
+            statement.setInt(2, ipBean.getEstado());
+
+            if (ipBean.getUsucambio() != null && ipBean.getUsucambio().getId() != null) {
+                statement.setLong(3, ipBean.getUsucambio().getId());
             } else {
                 statement.setNull(3, Types.INTEGER);
             }
-            statement.setInt(4, ipBean.getEstado());
+            statement.setLong(4, Utilidades.getFechaLong(ipBean.getFechacambio()));
 
-            if (ipBean.getUsucambio() != null && ipBean.getUsucambio().getId() != null) {
-                statement.setLong(5, ipBean.getUsucambio().getId());
-            } else {
-                statement.setNull(5, Types.INTEGER);
-            }
-            statement.setLong(6, Utilidades.getFechaLong(ipBean.getFechacambio()));
-
-            statement.setLong(7, ipBean.getId());
+            statement.setLong(5, ipBean.getId());
             insertado = statement.executeUpdate() > 0;
             statement.close();
             LOGGER.debug(sql);

@@ -129,8 +129,10 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             equipoBean.setEstado(rs.getInt("equipoestado"));
             equipoBean.setFechacambio(Utilidades.getFechaLocalDate(rs.getLong("equipofechacambio")));
             equipoBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("equipousucambio")));
-
+// actualiza ip
             equipoBean.setListaIps(new IpDao().getLista(null, null, equipoBean, null, null));
+            // actualiza app instaladas
+            equipoBean.setAplicacinesArrayList(new EquipoAplicacionDao().getLista(null, equipoBean, null));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         }

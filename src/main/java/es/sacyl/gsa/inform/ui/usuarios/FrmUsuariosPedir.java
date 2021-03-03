@@ -161,6 +161,7 @@ public class FrmUsuariosPedir extends FrmMasterPantalla {
         });
 
         buscador.addBlurListener(event -> {
+            /*
             if (buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
                 arrayListUsuarios = new UsuarioDao().getLista(null);
             } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
@@ -170,6 +171,7 @@ public class FrmUsuariosPedir extends FrmMasterPantalla {
             } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
                 arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), null);
             }
+             */
             usuariosGrid.setItems(arrayListUsuarios);
         });
     }

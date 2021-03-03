@@ -25,29 +25,40 @@ public class FuncionalidadDAO extends ConexionDao {
         super();
     }
 
+    /**
+     *
+     * @param rs
+     * @return
+     */
     public FuncionalidadBean getRegistroResulset(ResultSet rs) {
         FuncionalidadBean funcionalidad = new FuncionalidadBean();
-
         try {
-            LocalDate date = LocalDate.parse(Long.toString(rs.getLong("fechacambio")), formatterdd_mm_yyyy);
+
             funcionalidad.setId(rs.getLong("id"));
             funcionalidad.setDescripcion(rs.getString("descripcion"));
             funcionalidad.setTextomenu(rs.getString("textomenu"));
             funcionalidad.setEstado(rs.getBoolean("estado"));
-            funcionalidad.setFechacambio(date);
             funcionalidad.setUsucambio(new UsuarioDao().getPorId(rs.getLong("usucambio")));
-
+            try {
+                LocalDate date = LocalDate.parse(Long.toString(rs.getLong("fechacambio")), formatterdd_mm_yyyy);
+                funcionalidad.setFechacambio(date);
+            } catch (Exception e) {
+                logger.error(Utilidades.getStackTrace(e));
+            }
         } catch (SQLException e) {
             logger.error(Utilidades.getStackTrace(e));
         }
-
         return funcionalidad;
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     public FuncionalidadBean getPorId(Long id) {
         Connection connection = null;
         FuncionalidadBean funcionalidad = null;
-
         try {
             connection = super.getConexionBBDD();
             sql = " SELECT * FROM funcionalidad WHERE   id=	" + id;
@@ -69,6 +80,11 @@ public class FuncionalidadDAO extends ConexionDao {
         return funcionalidad;
     }
 
+    /**
+     *
+     * @param descString
+     * @return
+     */
     public FuncionalidadBean getPorDescripcion(String descString) {
         Connection connection = null;
         FuncionalidadBean funcionalidad = null;
@@ -93,10 +109,13 @@ public class FuncionalidadDAO extends ConexionDao {
         return funcionalidad;
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<FuncionalidadBean> getListaFuncionalidad() {
         Connection connection = null;
         ArrayList<FuncionalidadBean> lista = new ArrayList<>();
-
         try {
             connection = super.getConexionBBDD();
             sql = " SELECT * FROM  funcionalidad WHERE estado= " + ConexionDao.BBDD_ACTIVOSI;
@@ -121,6 +140,10 @@ public class FuncionalidadDAO extends ConexionDao {
         return lista;
     }
 
+    /**
+     *
+     * @return
+     */
     public Set<FuncionalidadBean> getListaFuncionalidadSet() {
         Connection connection = null;
         Set<FuncionalidadBean> lista = new HashSet<FuncionalidadBean>();
@@ -149,6 +172,10 @@ public class FuncionalidadDAO extends ConexionDao {
         return lista;
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<String> getListaFuncionalidadString() {
         Connection connection = null;
         ArrayList<String> lista = new ArrayList<String>();
@@ -177,6 +204,11 @@ public class FuncionalidadDAO extends ConexionDao {
         return lista;
     }
 
+    /**
+     *
+     * @param funcionalidad
+     * @return
+     */
     public boolean grabaDatos(FuncionalidadBean funcionalidad) {
         boolean actualizado = false;
 
@@ -188,6 +220,11 @@ public class FuncionalidadDAO extends ConexionDao {
         return actualizado;
     }
 
+    /**
+     *
+     * @param funcionalidad
+     * @return
+     */
     public boolean insertaDatos(FuncionalidadBean funcionalidad) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
@@ -215,6 +252,11 @@ public class FuncionalidadDAO extends ConexionDao {
         return insertadoBoolean;
     }
 
+    /**
+     *
+     * @param funcionalidad
+     * @return
+     */
     public boolean actualizaDatos(FuncionalidadBean funcionalidad) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
@@ -241,6 +283,11 @@ public class FuncionalidadDAO extends ConexionDao {
         return insertadoBoolean;
     }
 
+    /**
+     *
+     * @param funcionalidad
+     * @return
+     */
     public boolean borraDatos(FuncionalidadBean funcionalidad) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
@@ -266,10 +313,14 @@ public class FuncionalidadDAO extends ConexionDao {
         return insertadoBoolean;
     }
 
+    /**
+     *
+     * @param usuario
+     * @return
+     */
     public Set<FuncionalidadBean> getListaFuncioUsuario(UsuarioBean usuario) {
         Connection connection = null;
         Set<FuncionalidadBean> lista = new HashSet<FuncionalidadBean>();
-
         try {
             connection = super.getConexionBBDD();
 
@@ -296,13 +347,16 @@ public class FuncionalidadDAO extends ConexionDao {
         return lista;
     }
 
+    /**
+     *
+     * @param usuario
+     * @return
+     */
     public ArrayList<FuncionalidadBean> getListaFuncioUsuarioAl(UsuarioBean usuario) {
         Connection connection = null;
         ArrayList<FuncionalidadBean> lista = new ArrayList<FuncionalidadBean>();
-
         try {
             connection = super.getConexionBBDD();
-
             if (usuario.getEstado() == UsuarioBean.USUARIO_ADMINISTRADOR) {
                 sql = "SELECT f.*	" + " FROM funcionalidad f 	" + "   WHERE f.estado=" + ConexionDao.BBDD_ACTIVOSI
                         + " ORDER BY textomenu ";
@@ -329,13 +383,16 @@ public class FuncionalidadDAO extends ConexionDao {
         return lista;
     }
 
+    /**
+     *
+     * @param usuario
+     * @return
+     */
     public ArrayList<String> getListaFuncioUsuarioString(UsuarioBean usuario) {
         Connection connection = null;
         ArrayList<String> lista = new ArrayList<String>();
-
         try {
             connection = super.getConexionBBDD();
-
             sql = "SELECT f.*	" + " FROM funcionalidad f 	"
                     + "  JOIN us_funcionalidad  u ON  f.id=u.idfuncionalidad  and u.permitida=1 AND u.estado="
                     + ConexionDao.BBDD_ACTIVOSI + " AND u.idusuario=" + usuario.getId() + " WHERE f.estado="

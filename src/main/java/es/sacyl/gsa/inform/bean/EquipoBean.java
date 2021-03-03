@@ -19,6 +19,7 @@ public class EquipoBean extends MasterBean {
     private GfhBean servicio;
     private String comentario;
     private ArrayList<IpBean> listaIps = new ArrayList<>();
+    private ArrayList<EquipoAplicacionBean> aplicacinesArrayList = new ArrayList<>();
 
     public EquipoBean() {
         super();
@@ -102,6 +103,14 @@ public class EquipoBean extends MasterBean {
 
     public void setListaIps(ArrayList<IpBean> listaIps) {
         this.listaIps = listaIps;
+    }
+
+    public ArrayList<EquipoAplicacionBean> getAplicacinesArrayList() {
+        return aplicacinesArrayList;
+    }
+
+    public void setAplicacinesArrayList(ArrayList<EquipoAplicacionBean> aplicacinesArrayList) {
+        this.aplicacinesArrayList = aplicacinesArrayList;
     }
 
     public String getIpsCadena() {

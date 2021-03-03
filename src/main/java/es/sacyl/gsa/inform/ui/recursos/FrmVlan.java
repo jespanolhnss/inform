@@ -11,6 +11,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToLongConverter;
+import com.vaadin.flow.data.validator.StringLengthValidator;
 import es.sacyl.gsa.inform.bean.VlanBean;
 import es.sacyl.gsa.inform.ctrl.IpCtrl;
 import es.sacyl.gsa.inform.dao.ConexionDao;
@@ -147,16 +148,22 @@ public final class FrmVlan extends FrmMasterPantalla {
         vlanBinder.forField(nombre)
                 .withNullRepresentation("")
                 .asRequired()
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 20))
                 .bind(VlanBean::getNombre, VlanBean::setNombre);
 
         vlanBinder.forField(mascara)
                 .withNullRepresentation("")
                 .asRequired()
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 20))
                 .bind(VlanBean::getMascara, VlanBean::setMascara);
 
         vlanBinder.forField(direccion)
                 .withNullRepresentation("")
                 .asRequired()
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 20))
                 .bind(VlanBean::getDireccion, VlanBean::setDireccion);
 
         vlanBinder.forField(puertaenlace)
@@ -165,6 +172,8 @@ public final class FrmVlan extends FrmMasterPantalla {
                 .withValidator(
                         ip -> IpCtrl.siValid(ip),
                         "Dirección no válida")
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 20))
                 .bind(VlanBean::getPuertaenlace, VlanBean::setPuertaenlace);
 
     }
@@ -173,6 +182,9 @@ public final class FrmVlan extends FrmMasterPantalla {
     public void doComponenesAtributos() {
         titulo.setText("VLAN's");
         estadoRadio.setValue("S");
+        nombre.setMaxLength(20);
+        direccion.setMinLength(20);
+        mascara.setMaxLength(20);
     }
 
     @Override

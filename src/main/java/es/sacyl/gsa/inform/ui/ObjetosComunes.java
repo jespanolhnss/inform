@@ -6,7 +6,9 @@ import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -87,6 +89,13 @@ public class ObjetosComunes {
         }
         radioGroup.setItems("S", "N");
         return radioGroup;
+    }
+
+    public Details getDetails() {
+        Details details = new Details();
+        details.setEnabled(true);
+        details.setOpened(true);
+        return details;
     }
 
     /**
@@ -178,6 +187,18 @@ public class ObjetosComunes {
             boton.setIcon(icon);
         }
         boton.setHeight("35px");
+        return boton;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Button getBotonMini() {
+        Button boton = getBoton(null, null, VaadinIcon.QUESTION_CIRCLE.create());
+        boton.setWidth("30px");
+        boton.setMaxWidth("30px");
+        boton.setMinWidth("30px");
         return boton;
     }
 

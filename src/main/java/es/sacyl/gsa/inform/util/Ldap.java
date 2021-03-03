@@ -36,7 +36,7 @@ public class Ldap {
 
     }
 
-    static UsuarioBean loginActiveDirectory(String user, String password) throws LoginException {
+    public static UsuarioBean loginActiveDirectory(String user, String password) throws LoginException {
 
         UsuarioBean usuario = new UsuarioBean();
 
@@ -161,7 +161,7 @@ public class Ldap {
 
     /*
     para ldap no se usa
-    
+
     static UsuarioBean loginLDAP(String user, String password) throws LoginException {
         UsuarioBean usuario = new UsuarioBean();
         String url = "ldaps://ldap.hnss.sacyl.es:636/dc=sacyl,dc=es";
@@ -295,21 +295,21 @@ public class Ldap {
             NamingEnumeration answerInicial = ctxInicial.search("", filterInicial, ctlsInicial);
             while (answerInicial.hasMore()) {
 
- 
+
 
                 SearchResult searchResult = (SearchResult) answerInicial.next();
 
                 userDN = searchResult.getNameInNamespace();
 
- 
+
 
             }
 
- 
+
 
             ctxInicial.close();
 
- 
+
 
             if (userDN == null) {
 
@@ -317,12 +317,12 @@ public class Ldap {
 
             }
 
- 
+
 
 
             Hashtable<String, String> envUser = new Hashtable<String, String>();
 
- 
+
 
             envUser.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 
@@ -334,21 +334,21 @@ public class Ldap {
 
             envUser.put(Context.SECURITY_CREDENTIALS, password);
 
- 
+
 
             logger.debug("Conectando con url: " + url);
 
             logger.debug("Conectando con cadena: " + userDN);
 
- 
+
 
             DirContext ctxUsuario = new InitialDirContext(envUser);
 
- 
+
 
             int counter = 0;
 
- 
+
 
             // Comenzamos a buscar
 
@@ -382,11 +382,11 @@ public class Ldap {
 
             }
 
- 
+
 
             ctxUsuario.close();
 
- 
+
 
             if (counter == 0) {
 
@@ -398,7 +398,7 @@ public class Ldap {
 
             }
 
- 
+
 
         } catch (AuthenticationException e) {
 
@@ -412,7 +412,7 @@ public class Ldap {
 
         }
 
- 
+
 
     }
 

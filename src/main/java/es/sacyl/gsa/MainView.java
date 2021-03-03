@@ -22,8 +22,12 @@ import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.ctrl.LlamdasExternas;
 import es.sacyl.gsa.inform.ctrl.SesionCtrl;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
+import es.sacyl.gsa.inform.exceptiones.LoginException;
 import es.sacyl.gsa.inform.ui.Menu;
 import es.sacyl.gsa.inform.util.Constantes;
+import es.sacyl.gsa.inform.util.Ldap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The main view contains a button and a click listener.
@@ -115,9 +119,16 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         contenedorMenu.add(new Menu(contenedorFormularios));
     }
 
-    public boolean authenticate(String user, String passe3) {
-        UsuarioBean usuario = new UsuarioDao().getUsuarioDni(user, Boolean.FALSE);
-        if (usuario != null) {
+    public boolean authenticate(String user, String pass) {
+        //UsuarioBean usuario = new UsuarioDao().getUsuarioDni(user, Boolean.FALSE);
+        UsuarioBean usuario = null;
+        try {
+            usuario = Ldap.loginActiveDirectory(user, pass);
+        } catch (LoginException ex) {
+            Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (usuario != null || usuario.getDni() == null) {
+            usuario = new UsuarioDao().getUsuarioDni(user, Boolean.TRUE);
             SesionCtrl.doCreaSesionUsuario(usuario);
         } else {
             SesionCtrl.doCreaSesionUsuario(usuario);

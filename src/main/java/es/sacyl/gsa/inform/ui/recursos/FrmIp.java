@@ -1,6 +1,11 @@
 package es.sacyl.gsa.inform.ui.recursos;
 
+import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.details.Details;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
@@ -9,6 +14,7 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
+import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.IpBean;
 import es.sacyl.gsa.inform.bean.VlanBean;
 import es.sacyl.gsa.inform.dao.ConexionDao;
@@ -38,6 +44,9 @@ public final class FrmIp extends FrmMasterPantalla {
     private final ComboBox<VlanBean> vlanCombo = new CombosUi().getVlanCombo(null, null);
     private final TextField ip = new ObjetosComunes().getTextField("IP");
     private final TextField equipo = new ObjetosComunes().getTextField("Id Equipo");
+    private Details equipoDetalle = new Details();
+
+    private final Button ayudaEquipo = new ObjetosComunes().getBotonMini();
 
     private IpBean ipBean = null;
     private final Binder<IpBean> ipBinder = new Binder<>();
@@ -54,13 +63,12 @@ public final class FrmIp extends FrmMasterPantalla {
         doCompentesEventos();
     }
 
-    @Override
-    public void doControlBotones(Object obj) {
-        super.doControlBotones(obj);
-        if (obj == null) {
+    public void doControlBotones(EquipoBean equipoBean) {
+        super.doControlBotones(equipoBean);
+        if (equipoBean == null) {
 
         } else {
-
+            this.setDetalleEquipo(equipoBean);
         }
     }
 
@@ -110,6 +118,9 @@ public final class FrmIp extends FrmMasterPantalla {
     public void doLimpiar() {
         ipBean = new IpBean();
         ipBinder.readBean(ipBean);
+        id.clear();
+        equipoDetalle.setSummaryText(" ");
+        equipoDetalle.setContent(new Span(" "));
         doControlBotones(null);
     }
 
@@ -156,7 +167,10 @@ public final class FrmIp extends FrmMasterPantalla {
 
     @Override
     public void doComponentesOrganizacion() {
-        contenedorFormulario.add(id, vlanCombo, ip, equipo);
+        contenedorFormulario.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("150px", 1),
+                new FormLayout.ResponsiveStep("150px", 2));
+        contenedorFormulario.add(id, vlanCombo, ip, equipo, ayudaEquipo, equipoDetalle);
         contenedorBuscadores.add(buscador, vlanComoboBuscador, ipLibre);
         contenedorDerecha.add(contenedorBuscadores, ipGrid);
     }
@@ -187,12 +201,44 @@ public final class FrmIp extends FrmMasterPantalla {
         ipGrid.addItemClickListener(event -> {
             ipBean = event.getItem();
             ipBinder.readBean(event.getItem());
+            if (ipBean.getEquipo() != null) {
+                setDetalleEquipo(ipBean.equipo);
+                ip.setValue(ipBean.getEquipo().getId().toString());
+            }
             doControlBotones(ipBean);
         }
         );
+
         vlanComoboBuscador.addValueChangeListener(e -> {
             doActualizaGrid();
         });
+
+        ayudaEquipo.addClickListener(event -> {
+            if (ip != null && ip.getId() != null && !ip.getId().equals(new Long(0))) {
+                FrmBuscaEquipo frmBuscaEquipo = new FrmBuscaEquipo();
+                frmBuscaEquipo.addDialogCloseActionListener(eventAyuda -> {
+                    EquipoBean equipoBean = frmBuscaEquipo.getEquipoBean();
+                    this.setDetalleEquipo(equipoBean);
+                    ipBean.setEquipo(equipoBean);
+                    equipo.setValue(equipoBean.getId().toString(0));
+                });
+                frmBuscaEquipo.addDetachListener(eventAyuda -> {
+                    EquipoBean equipoBean1 = frmBuscaEquipo.getEquipoBean();
+                    this.setDetalleEquipo(equipoBean1);
+                    ipBean.setEquipo(equipoBean1);
+                    equipo.setValue(equipoBean1.getId().toString());
+                });
+                frmBuscaEquipo.open();
+            }
+        });
     }
 
+    public void setDetalleEquipo(EquipoBean equipoBean) {
+
+        equipoDetalle.setContent(new Html(equipoBean.toHtml()));
+        equipoDetalle.setSummaryText(equipoBean.getTipo());
+        equipoDetalle.setEnabled(true);
+        equipoDetalle.setOpened(true);
+
+    }
 }
