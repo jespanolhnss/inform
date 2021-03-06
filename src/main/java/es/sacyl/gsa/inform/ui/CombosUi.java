@@ -87,6 +87,14 @@ public class CombosUi {
         return combo;
     }
 
+    /**
+     *
+     * @param label
+     * @param valor
+     * @param grupo
+     * @param anchoCadema
+     * @return
+     */
     public ComboBox<String> getCombodeTabla(String label, String valor, String grupo, Integer anchoCadema) {
         ComboBox<String> combo;
         combo = new ComboBox<>(label);

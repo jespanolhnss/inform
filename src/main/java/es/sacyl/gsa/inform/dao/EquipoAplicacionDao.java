@@ -105,7 +105,31 @@ public class EquipoAplicacionDao extends ConexionDao implements Serializable, Co
         EquipoAplicacionBean equipoappBean = null;
         try {
             connection = super.getConexionBBDD();
-            sql = sql.concat(" AND e.id='" + id + "'");
+            sql = sql.concat(" AND eqap.id='" + id + "'");
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sql);
+                if (resulSet.next()) {
+                    equipoappBean = getRegistroResulset(resulSet, null, null);
+                }
+                statement.close();
+            }
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return equipoappBean;
+    }
+
+    public EquipoAplicacionBean getPorEquipoAppId(EquipoBean equipoBean, AplicacionBean aplicacionBean) {
+        Connection connection = null;
+        EquipoAplicacionBean equipoappBean = null;
+        try {
+            connection = super.getConexionBBDD();
+            sql = sql.concat(" AND eqap.idequipo='" + equipoBean.getId() + "' AND  eqap.idaplicacion=" + aplicacionBean.getId());
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
@@ -210,6 +234,28 @@ public class EquipoAplicacionDao extends ConexionDao implements Serializable, Co
             sql = " DELETE FROM    equipoaplicacion WHERE id=?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setLong(1, equipoAplicacionBean.getId());
+            insertadoBoolean = statement.executeUpdate() > 0;
+            statement.close();
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return insertadoBoolean;
+    }
+
+    public boolean doBorraDatos(EquipoBean equipoBean, AplicacionBean aplicacionBean) {
+        Connection connection = null;
+        Boolean insertadoBoolean = false;
+        try {
+            connection = super.getConexionBBDD();
+            sql = " DELETE FROM    equipoaplicacion WHERE idequipo=?  AND idaplicacion=?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setLong(1, equipoBean.getId());
+            statement.setLong(2, aplicacionBean.getId());
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
             LOGGER.debug(sql);

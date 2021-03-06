@@ -41,7 +41,7 @@ public class AutonomiaDao extends ConexionDao implements Serializable, ConexionI
         AutonomiaBean autonomiaBean = new AutonomiaBean();
         try {
             autonomiaBean.setCodigo(rs.getString("autonomiacodigo"));
-            autonomiaBean.setNombre(rs.getString("autonomianombre").trim());
+            autonomiaBean.setNombre(rs.getString("autonomianombre"));
             autonomiaBean.setEstado(rs.getInt("autonomiaestado"));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));

@@ -29,9 +29,11 @@ public class CentroBean {
     private CentroTipoBean tipocentro;
     private NivelesAtencionBean nivatencion;
     private Integer estado;
-        private String mapgoogle;
-    
+    private String mapgoogle;
+
     private ArrayList<CentroFicheroBean> centroFicheroArrayList = new ArrayList<>();
+
+    private ArrayList<CentroUsuarioBean> centroUsuarioArrayList = new ArrayList<>();
 
     public CentroBean() {
         this.id = new Long(0);
@@ -245,13 +247,20 @@ public class CentroBean {
         this.mapgoogle = mapgoogle;
     }
 
-    
     public ArrayList<CentroFicheroBean> getCentroFicheroArrayList() {
         return centroFicheroArrayList;
     }
 
     public void setCentroFicheroArrayList(ArrayList<CentroFicheroBean> centroFicheroArrayList) {
         this.centroFicheroArrayList = centroFicheroArrayList;
+    }
+
+    public ArrayList<CentroUsuarioBean> getCentroUsuarioArrayList() {
+        return centroUsuarioArrayList;
+    }
+
+    public void setCentroUsuarioArrayList(ArrayList<CentroUsuarioBean> centroUsuarioArrayList) {
+        this.centroUsuarioArrayList = centroUsuarioArrayList;
     }
 
     public ArrayList<CentroFicheroBean> getCentroFicheroArrayListImg() {

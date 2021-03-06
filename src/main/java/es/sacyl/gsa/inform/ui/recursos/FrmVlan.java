@@ -42,6 +42,7 @@ public final class FrmVlan extends FrmMasterPantalla {
     private final TextField mascara = new ObjetosComunes().getTextField("Mascara");
     private final TextField ultimaip = new ObjetosComunes().getTextField("Ultima direccion");
     private final TextField broadcast = new ObjetosComunes().getTextField("Broadcast");
+    private final TextField numeroDirecciones = new ObjetosComunes().getTextField("NºDirecciones");
     private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
 
     private VlanBean vlanBean = null;
@@ -192,7 +193,7 @@ public final class FrmVlan extends FrmMasterPantalla {
 
     @Override
     public void doComponentesOrganizacion() {
-        contenedorFormulario.add(id, nombre, direccion, mascara, puertaenlace, ultimaip, broadcast, estadoRadio);
+        contenedorFormulario.add(id, nombre, direccion, mascara, puertaenlace, ultimaip, broadcast, numeroDirecciones, estadoRadio);
         contenedorDerecha.add(vlanGrid);
     }
 
@@ -209,6 +210,7 @@ public final class FrmVlan extends FrmMasterPantalla {
                 puertaenlace.setValue(VlanCtrl.getCalculaPuertaEnlace(valores[0], mascara.getValue()));
                 broadcast.setValue(VlanCtrl.getCalculaBroadcast(valores[0], valores[1]));
                 ultimaip.setValue(VlanCtrl.getCalculaUltimaIp(valores[0], valores[1]));
+                numeroDirecciones.setValue(VlanCtrl.getCalculaNumeroDirecciones(valores[1]).toString());
             }
         });
         vlanGrid.addItemClickListener(new ComponentEventListener<ItemClickEvent<VlanBean>>() {

@@ -37,7 +37,7 @@ public class FrmBuscaEquipo extends Dialog {
     private final ComboBox<ProvinciaBean> provinciaComboBuscador = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null, AutonomiaBean.AUTONOMIADEFECTO);
     private final ComboBox<CentroTipoBean> centroTipoComboBuscador = new CombosUi().getCentroTipoCombo(null);
     private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPOCENTROSALUD, null, null);
-    private final PaginatedGrid<EquipoBean> equipoGrid = new GridUi().getEquipoGrid();
+    private final PaginatedGrid<EquipoBean> equipoGrid = new GridUi().getEquipoGridPaginado();
 
     private final Button botonCancelar = new ObjetosComunes().getBoton("Cancelar", null, VaadinIcon.CLOSE_CIRCLE.create());
 

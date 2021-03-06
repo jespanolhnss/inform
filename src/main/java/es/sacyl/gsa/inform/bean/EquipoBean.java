@@ -21,6 +21,8 @@ public class EquipoBean extends MasterBean {
     private ArrayList<IpBean> listaIps = new ArrayList<>();
     private ArrayList<EquipoAplicacionBean> aplicacinesArrayList = new ArrayList<>();
 
+    public static String TIPOCPU = "Cpu";
+
     public EquipoBean() {
         super();
     }

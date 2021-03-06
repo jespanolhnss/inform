@@ -107,9 +107,13 @@ public abstract class FrmMasterPantalla extends HorizontalLayout {
 
         contenedorIzquierda.setMargin(false);
         contenedorIzquierda.setSpacing(false);
+        contenedorIzquierda.getStyle().set("overflow-y", "auto");
+        contenedorIzquierda.setHeight("100%");
 
         contenedorDerecha.setMargin(false);
         contenedorDerecha.setSpacing(false);
+        contenedorDerecha.getStyle().set("overflow-y", "auto");
+        contenedorDerecha.setHeight("100%");
 
         /**
          * Añade los objetos botones al contenedor de botones

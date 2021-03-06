@@ -54,6 +54,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
     QueryParameters qm = null;
 
     public MainView() {
+        this.getStyle().set("overflow-y", "yes");
         Image image = new Image("icons/fondo.jpg", "Imagen");
         add(image);
 

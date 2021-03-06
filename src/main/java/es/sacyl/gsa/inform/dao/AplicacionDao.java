@@ -79,7 +79,8 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
             aplicacionesBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("aplicacionusucambio")));
             // lista de perfiles
             aplicacionesBean.setListaPerfiles(new AplicacionPerfilDao().getLista(null, aplicacionesBean));
-
+            // lista equipos
+            //  aplicacionesBean.setListaEquipoBeans(new EquipoAplicacionDao().getLista(null, null, aplicacionesBean));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         }

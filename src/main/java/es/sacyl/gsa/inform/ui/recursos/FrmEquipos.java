@@ -1,13 +1,17 @@
 package es.sacyl.gsa.inform.ui.recursos;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -34,8 +38,11 @@ import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
+import es.sacyl.gsa.inform.ui.GridUi;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.vaadin.klaudeta.PaginatedGrid;
@@ -75,10 +82,18 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     private EquipoBean equipoBean = null;
     private final Binder<EquipoBean> equipoBinder = new Binder<>();
-    private final PaginatedGrid<EquipoBean> equipoGrid = new PaginatedGrid<>();
+    private final PaginatedGrid<EquipoBean> equipoGrid = new GridUi().getEquipoGridPaginado();
     private ArrayList<EquipoBean> equipoArrayList = new ArrayList<>();
 
     private final Grid<EquipoAplicacionBean> equipoAplicacionGrid = new Grid<>();
+
+    // componentes para gestionar los tabs de la parte inferior
+    private final Tab aplicacionesTab = new Tab("Aplicaciones");
+    private final Tab intervencinesTab = new Tab("Intervenciones");
+    private final Tabs tabs = new Tabs(aplicacionesTab, intervencinesTab);
+    private final Map<Tab, Component> tabsToPages = new HashMap<>();
+    private final Div page1 = new Div();
+    private final Div page2 = new Div();
 
     public FrmEquipos() {
         super();
@@ -95,13 +110,21 @@ public final class FrmEquipos extends FrmMasterPantalla {
      *
      * @param obj
      */
-    @Override
-    public void doControlBotones(Object obj) {
+    public void doControlBotones(EquipoBean obj) {
         super.doControlBotones(obj);
         if (obj == null) {
             aplicacionButton.setEnabled(false);
+            aplicacionesTab.setEnabled(false);
+            page1.setVisible(false);
         } else {
-            aplicacionButton.setEnabled(true);
+            if (obj.getTipo().equals(EquipoBean.TIPOCPU)) {
+                aplicacionButton.setEnabled(true);
+                aplicacionesTab.setEnabled(true);
+            } else {
+                aplicacionButton.setEnabled(false);
+                aplicacionesTab.setEnabled(false);
+                page1.setVisible(false);
+            }
         }
     }
 
@@ -169,14 +192,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     @Override
     public void doGrid() {
-        equipoGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        equipoGrid.setHeightByRows(true);
-        equipoGrid.setPageSize(14);
-        equipoGrid.addColumn(EquipoBean::getTipo).setAutoWidth(true).setHeader(new Html("<b>Tipo</b>")).setWidth("70px");
-        equipoGrid.addColumn(EquipoBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Est</b>")).setWidth("20px");
-        equipoGrid.addColumn(EquipoBean::getInventario).setAutoWidth(true).setHeader(new Html("<b>Invent</b>")).setWidth("70px");
-        equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
-        equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
+
         doActualizaGrid();
 
         // grid eqipo aplicación
@@ -261,9 +277,15 @@ public final class FrmEquipos extends FrmMasterPantalla {
         autonomiaComboBuscador.setVisible(Boolean.FALSE);
         ubicacionCombo.setLabel("Ubicación");
         buscador.setLabel("Valores a buscar");
-        equipoTipoCombo.addValueChangeListener(event -> {
-            equipoMarcaCombo.setItems(new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPOMARCA, event.getValue(), 100));
-        });
+
+        page1.setWidthFull();
+        page2.setWidthFull();
+
+        aplicacionesTab.setVisible(true);
+        intervencinesTab.setVisible(true);
+
+        page1.setVisible(false);
+        page2.setVisible(false);
     }
 
     @Override
@@ -276,6 +298,14 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 new FormLayout.ResponsiveStep("50px", 4),
                 new FormLayout.ResponsiveStep("50px", 5),
                 new FormLayout.ResponsiveStep("50px", 6));
+
+        page1.add(equipoAplicacionGrid);
+        //  page2.add(equipoGrid);
+
+        tabsToPages.put(aplicacionesTab, page1);
+        tabsToPages.put(intervencinesTab, page2);
+
+        contenedorIzquierda.add(tabs, page1, page2);
 
         contenedorDerecha.removeAll();
         contenedorBuscadores.add(equipoTipoComboBuscador, autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador);
@@ -299,7 +329,6 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorFormulario.add(ayudaUbicacion);
         contenedorFormulario.add(comentario, 6);
 
-        contenedorIzquierda.add(equipoAplicacionGrid);
     }
 
     @Override
@@ -310,6 +339,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
         });
         equipoTipoComboBuscador.addValueChangeListener(evetn -> {
             doActualizaGrid();
+        });
+        equipoTipoCombo.addValueChangeListener(event -> {
+            equipoMarcaCombo.setItems(new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPOMARCA, event.getValue(), 100));
         });
         provinciaComboBuscador.addValueChangeListener(event -> {
             doActualizaComboCentro();
@@ -329,7 +361,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
             equipoBean = event.getItem();
             equipoBinder.readBean(event.getItem());
             doControlBotones(equipoBean);
+
             doActualizaGridApp();
+            page1.setVisible(true);
         }
         );
 
@@ -378,6 +412,12 @@ public final class FrmEquipos extends FrmMasterPantalla {
             });
             frmEquipoAplicacion.open();
 
+        });
+
+        tabs.addSelectedChangeListener(event -> {
+            tabsToPages.values().forEach(page -> page.setVisible(false));
+            Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+            selectedPage.setVisible(true);
         });
 
     }

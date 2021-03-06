@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.sacyl.gsa.inform.ui.recursos;
 
 import com.vaadin.flow.component.Html;
@@ -38,6 +33,7 @@ public final class FrmEquipoAplicacion extends FrmMasterVentana {
     private final ComboBox<AplicacionBean> aplicacionCombo = new CombosUi().getAplicacionCombo(null, null, null, null);
     private final DatePicker fecha = new ObjetosComunes().getDatePicker("Fecha instalación", null, null);
     private final TextArea comentario = new TextArea();
+
     private final Details equipoDetalle = new ObjetosComunes().getDetails();
 
     private EquipoAplicacionBean equipoAplicacionBean = new EquipoAplicacionBean();
@@ -53,6 +49,8 @@ public final class FrmEquipoAplicacion extends FrmMasterVentana {
         doComponenesAtributos();
         doBinderPropiedades();
         doCompentesEventos();
+        equipoDetalle.setContent(new Html(equipoAplicacionBean.getEquipo().toHtml()));
+        equipoAplicacionBinder.readBean(equipoAplicacionBean);
     }
 
     @Override
@@ -93,10 +91,12 @@ public final class FrmEquipoAplicacion extends FrmMasterVentana {
 
     @Override
     public void doCancelar() {
+        this.close();
     }
 
     @Override
     public void doCerrar() {
+        this.close();
     }
 
     @Override

@@ -40,13 +40,16 @@ public abstract class FrmMasterVentana extends Dialog {
     protected HorizontalLayout contenedorBotones = new HorizontalLayout();
     protected HorizontalLayout contenedorFiltros = new HorizontalLayout();
     protected FormLayout contenedorFormulario = new FormLayout();
+
+    protected HorizontalLayout contenedorVentana = new HorizontalLayout();
     protected VerticalLayout contenedorIzquierda = new VerticalLayout();
     protected VerticalLayout contenedorDerecha = new VerticalLayout();
 
     public FrmMasterVentana(String ancho) {
         this.setWidth(ancho);
         this.setSizeUndefined();
-        this.add(contenedorIzquierda, contenedorDerecha);
+        this.add(contenedorVentana);
+        contenedorVentana.add(contenedorIzquierda, contenedorDerecha);
 
         botonGrabar = new ObjetosComunes().getBoton("Graba", null, VaadinIcon.CHECK_CIRCLE.create());
 

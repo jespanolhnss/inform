@@ -202,9 +202,11 @@ public class FrmProveedor extends FrmMasterPantalla {
                 .bind(ProveedorBean::getMail, ProveedorBean::setMail);
 
         proveedorBinder.forField(provinciaCombo)
+                .asRequired()
                 .bind(ProveedorBean::getProvincia, ProveedorBean::setProvincia);
 
         proveedorBinder.forField(localidadCombo)
+                .asRequired()
                 .bind(ProveedorBean::getLocalidad, ProveedorBean::setLocalidad);
 
     }

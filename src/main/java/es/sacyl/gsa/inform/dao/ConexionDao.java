@@ -163,6 +163,8 @@ public class ConexionDao implements Serializable {
         try {
             connection = this.getConexionBBDD();
             sql = " SELECT max(id) +1  as id FROM  " + tabla;
+            //   sql = " select SEC_ID_" + tabla + ".nextval from dual ";
+
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {

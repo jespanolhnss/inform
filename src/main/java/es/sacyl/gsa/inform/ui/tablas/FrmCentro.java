@@ -1,10 +1,13 @@
 package es.sacyl.gsa.inform.ui.tablas;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -12,6 +15,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -24,6 +29,7 @@ import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroFicheroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
+import es.sacyl.gsa.inform.bean.CentroUsuarioBean;
 import es.sacyl.gsa.inform.bean.GerenciaBean;
 import es.sacyl.gsa.inform.bean.LocalidadBean;
 import es.sacyl.gsa.inform.bean.NivelesAtencionBean;
@@ -32,6 +38,7 @@ import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.bean.ZonaBean;
 import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.CentroFicheroDao;
+import es.sacyl.gsa.inform.dao.CentroUsuarioDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.LocalidadDao;
 import es.sacyl.gsa.inform.dao.NivelesAtencionDao;
@@ -40,9 +47,12 @@ import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
+import es.sacyl.gsa.inform.ui.GridUi;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
 import es.sacyl.gsa.inform.util.Constantes;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.vaadin.klaudeta.PaginatedGrid;
@@ -53,7 +63,8 @@ import org.vaadin.klaudeta.PaginatedGrid;
  */
 public final class FrmCentro extends FrmMasterPantalla {
 
-    private final Button ficheroboton = new ObjetosComunes().getBoton(null, null, VaadinIcon.CAMERA.create());
+    private final Button ficheroBoton = new ObjetosComunes().getBoton(null, null, VaadinIcon.CAMERA.create());
+    private final Button usuarioBoton = new ObjetosComunes().getBoton(null, null, VaadinIcon.USERS.create());
     private final VerticalLayout contenedorFotos = new VerticalLayout();
     private final HorizontalLayout contenedorBuscador1 = new HorizontalLayout();
     private final ComboBox<AutonomiaBean> autonomiaComboBuscador = new CombosUi().getAutonomiaCombo(AutonomiaBean.AUTONOMIADEFECTO, null);
@@ -88,7 +99,9 @@ public final class FrmCentro extends FrmMasterPantalla {
     private CentroBean centroBean = null;
     private final Binder<CentroBean> centroBinder = new Binder<>();
     private final PaginatedGrid<CentroBean> centroGrid = new PaginatedGrid<>();
+    //  private final PaginatedGrid<CentroFicheroBean> centroFicheroGrid = new PaginatedGrid<>();
     private final PaginatedGrid<CentroFicheroBean> centroFicheroGrid = new PaginatedGrid<>();
+    private final PaginatedGrid<CentroUsuarioBean> centroUsuarioGrid = new GridUi().getCentroUsuarioPaginateGrid();
 
     private ArrayList<CentroBean> centroTArrayList = new ArrayList<>();
 
@@ -101,6 +114,16 @@ public final class FrmCentro extends FrmMasterPantalla {
     private final String miniaturaHeight = "150px";
     private final String miniaturaWidth = "150px";
 
+    // componentes para gestionar los tabs de la parte inferior
+    private final Tab miniaturasTab = new Tab("Miniaturas");
+    private final Tab ficherosTab = new Tab("Ficheros");
+    private final Tab usuariosTab = new Tab("Usuarios");
+    private final Tabs tabs = new Tabs(miniaturasTab, ficherosTab, usuariosTab);
+    private final Map<Tab, Component> tabsToPages = new HashMap<>();
+    private final Div page1 = new Div();
+    private final Div page2 = new Div();
+    private final Div page3 = new Div();
+
     public FrmCentro() {
         super();
         this.centroBean = new CentroBean();
@@ -110,6 +133,7 @@ public final class FrmCentro extends FrmMasterPantalla {
         doComponentesOrganizacion();
         doGrid();
         doGridCentroFichero();
+        doGridCentroUsuarios();
         doComponenesAtributos();
         doBinderPropiedades();
         doCompentesEventos();
@@ -120,10 +144,14 @@ public final class FrmCentro extends FrmMasterPantalla {
         super.doControlBotones(obj);
         if (obj == null) {
             codigo.setEnabled(true);
+            ficheroBoton.setEnabled(false);
+            usuarioBoton.setEnabled(false);
             codigo.focus();
         } else {
             // codigo.setEnabled(false);
             codigo.setReadOnly(true);
+            ficheroBoton.setEnabled(true);
+            usuarioBoton.setEnabled(true);
         }
     }
 
@@ -200,11 +228,31 @@ public final class FrmCentro extends FrmMasterPantalla {
         doActualizaGrid();
     }
 
+    public void doGridCentroUsuarios() {
+        centroUsuarioGrid.addComponentColumn(item -> createRemoveButtonU(centroUsuarioGrid, item))
+                .setHeader("Borra");
+    }
+
+    private Button createRemoveButtonU(Grid<CentroUsuarioBean> grid, CentroUsuarioBean item) {
+        @SuppressWarnings("unchecked")
+        Button button = new Button(VaadinIcon.MINUS_CIRCLE.create(), clickEvent -> {
+            final ConfirmDialog dialog = new ConfirmDialog(
+                    FrmMensajes.AVISOCONFIRMACIONACCION,
+                    FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
+                    FrmMensajes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
+                        new CentroUsuarioDao().doBorraDatos(item);
+                        doActualizaGridCentroUsuario();
+                    });
+            dialog.open();
+        });
+        return button;
+    }
+
     public void doGridCentroFichero() {
         centroFicheroGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         centroFicheroGrid.setHeightByRows(true);
         centroFicheroGrid.setPageSize(6);
-        centroFicheroGrid.setPaginatorSize(6);
+        centroFicheroGrid.setPaginatorSize(16);
         centroFicheroGrid.addColumn(CentroFicheroBean::getFechaCambioFormato).setAutoWidth(true).setHeader(new Html("<b>Fecha</b>"));
         centroFicheroGrid.addColumn(CentroFicheroBean::getDescripcionCorta).setAutoWidth(true).setHeader(new Html("<b>Descripción</b>"));
         centroFicheroGrid.addColumn(CentroFicheroBean::getExtensionFichero).setAutoWidth(true).setHeader(new Html("<b>Tipo</b>"));
@@ -233,9 +281,9 @@ public final class FrmCentro extends FrmMasterPantalla {
                 .setHeader("Borra");
     }
 
-    private Button createRemoveButton(PaginatedGrid<CentroFicheroBean> grid, CentroFicheroBean item) {
+    private Button createRemoveButton(Grid<CentroFicheroBean> grid, CentroFicheroBean item) {
         @SuppressWarnings("unchecked")
-        Button button = new Button("Borra", clickEvent -> {
+        Button button = new Button(VaadinIcon.MINUS_CIRCLE.create(), clickEvent -> {
             final ConfirmDialog dialog = new ConfirmDialog(
                     FrmMensajes.AVISOCONFIRMACIONACCION,
                     FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
@@ -250,10 +298,19 @@ public final class FrmCentro extends FrmMasterPantalla {
     }
 
     public void doActualizaGridCentroFichero() {
-        centroBean.setCentroFicheroArrayList(new CentroFicheroDao().getLista(centroBean));
-        centroFicheroGrid.setItems(centroBean.getCentroFicheroArrayList());
+        ArrayList<CentroFicheroBean> centroFicheroBeans = new CentroFicheroDao().getLista(centroBean);
+        centroBean.setCentroFicheroArrayList(centroFicheroBeans);
+        centroFicheroGrid.setItems(centroFicheroBeans);
         doMuestraMiniaturas();
-        //  doMuestraMiniaturas1();
+        ficherosTab.setLabel("Ficheros (" + Integer.toString(centroFicheroBeans.size()) + ")");
+    }
+
+    public void doActualizaGridCentroUsuario() {
+        ArrayList<CentroUsuarioBean> centroUsuarioBeans = new CentroUsuarioDao().getLista(centroBean);
+        centroBean.setCentroUsuarioArrayList(centroUsuarioBeans);
+        centroUsuarioGrid.setItems(centroUsuarioBeans);
+        doMuestraMiniaturas();
+        usuariosTab.setLabel("Usuario (" + Integer.toString(centroUsuarioBeans.size()) + ")");
     }
 
     @Override
@@ -357,6 +414,19 @@ public final class FrmCentro extends FrmMasterPantalla {
     public void doComponenesAtributos() {
         this.titulo.setText("Centros");
         buscador.setLabel(" Valores a buscar");
+
+        googleMapsImage.setVisible(false);
+        page1.setWidthFull();
+        page2.setWidthFull();
+        page3.setWidthFull();
+
+        miniaturasTab.setVisible(true);
+        ficherosTab.setVisible(true);
+        usuariosTab.setVisible(true);
+
+        page1.setVisible(false);
+        page2.setVisible(false);
+        page3.setVisible(false);
     }
 
     @Override
@@ -369,9 +439,22 @@ public final class FrmCentro extends FrmMasterPantalla {
                 new FormLayout.ResponsiveStep("50px", 5),
                 new FormLayout.ResponsiveStep("50px", 6));
 
+        page1.add(contenedorFotos);
+        page2.add(centroFicheroGrid);
+        page3.add(centroUsuarioGrid);
+
+        tabsToPages.put(miniaturasTab, page1);
+        tabsToPages.put(ficherosTab, page2);
+        tabsToPages.put(usuariosTab, page3);
+        //   Div pages = new Div(page1, page2, page3);
+        page1.add(miniaturasHorizontalLayout);
+        page2.add(centroFicheroGrid);
+        page3.add(centroUsuarioGrid);
+
         this.contenedorIzquierda.removeAll();
-        this.contenedorIzquierda.add(contenedorBotones, contenedorFormulario, centroFicheroGrid, contenedorFotos);
-        this.contenedorBotones.add(botonImprimir, ficheroboton);
+        this.contenedorIzquierda.add(contenedorBotones, contenedorFormulario, tabs, page1, page2, page3);
+        this.contenedorBotones.add(botonImprimir, ficheroBoton, usuarioBoton);
+
         // fila 1
         contenedorFormulario.add(id);
         contenedorFormulario.add(autonomiaCombo, 3);
@@ -398,7 +481,8 @@ public final class FrmCentro extends FrmMasterPantalla {
 
         contenedorFormulario.add(mapgoogle, 3);
         contenedorFormulario.add(googleMapsImage);
-// Elementos del buscador y grid
+
+        // Elementos del buscador y grid
         this.contenedorDerecha.removeAll();
         this.contenedorBuscadores.add(buscador, autonomiaComboBuscador, provinciaComboBuscador);
         this.contenedorBuscador1.add(centroTipoComboBuscador, nivelAtencionTipoComboBuscador);
@@ -444,6 +528,7 @@ public final class FrmCentro extends FrmMasterPantalla {
         centroGrid.addItemClickListener(event -> {
             centroBean = event.getItem();
             centroBinder.readBean(centroBean);
+
             if (centroBean.getMapgoogle() != null && !centroBean.getMapgoogle().isEmpty()) {
                 googleMapsImage.setVisible(true);
                 googleMapsImage.addClickListener(eventimg -> {
@@ -459,11 +544,27 @@ public final class FrmCentro extends FrmMasterPantalla {
             //los ficheros s asociados no se cargan en la lista
             centroBean.setCentroFicheroArrayList(new CentroFicheroDao().getLista(centroBean));
             doActualizaGridCentroFichero();
+            doActualizaGridCentroUsuario();
+            page1.setVisible(true);
         }
         );
 
-        ficheroboton.addClickListener(event -> {
+        ficheroBoton.addClickListener(event -> {
             doVentanaFicheros(null);
+        });
+
+        usuarioBoton.addClickListener(event -> {
+            FrmCentroUsuario frmCentroUsuario = new FrmCentroUsuario(centroBean);
+            frmCentroUsuario.setCloseOnEsc(true);
+            frmCentroUsuario.setCloseOnOutsideClick(true);
+            frmCentroUsuario.setModal(true);
+            frmCentroUsuario.addDialogCloseActionListener(e -> {
+                doActualizaGridCentroUsuario();
+            });
+            frmCentroUsuario.addDetachListener(e -> {
+                doActualizaGridCentroUsuario();
+            });
+            frmCentroUsuario.open();
         });
 
         centroFicheroGrid.addItemClickListener(event -> {
@@ -472,6 +573,13 @@ public final class FrmCentro extends FrmMasterPantalla {
             //  getMinitaura(centroFicheroBean);
         }
         );
+
+        tabs.addSelectedChangeListener(event -> {
+            tabsToPages.values().forEach(page -> page.setVisible(false));
+            Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+            selectedPage.setVisible(true);
+        });
+
     }
 
     public void doVentanaFicheros(CentroFicheroBean centroFicheroBean) {

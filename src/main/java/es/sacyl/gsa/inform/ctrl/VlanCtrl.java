@@ -164,6 +164,14 @@ public class VlanCtrl {
         }
     }
 
+    /**
+     *
+     * @param dirIp
+     * @param unos
+     * @return
+     *
+     * A partir de la direccion de BoradCast resta uno al la ultima ip
+     */
     public static String getCalculaUltimaIp(String dirIp, String unos) {
         String ip = getCalculaBroadcast(dirIp, unos);
 
@@ -172,6 +180,25 @@ public class VlanCtrl {
 
         return ips[0] + "." + ips[1] + "." + ips[2] + "." + ips[3];
 
+    }
+
+    /**
+     *
+     * @param dirIp
+     * @param unos
+     * @return
+     *
+     * A partir de la direccion de BoradCast resta uno al la ultima ip
+     */
+    public static Integer getCalculaNumeroDirecciones(String unos) {
+        Integer numero = 0;
+        if (Utilidades.isNumeric(unos)) {
+            int numerodeUnos = Integer.parseInt(unos);
+            int numerodeCeros = 32 - numerodeUnos;
+            NumeroBinario nb = new NumeroBinario(numerodeCeros, NumeroBinario.ONE_CHAR);
+            numero = Utilidades.binarioToDecimal(nb.getNumero());
+        }
+        return numero;
     }
 
     /**

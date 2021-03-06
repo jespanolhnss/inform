@@ -10,10 +10,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 public class ConfirmDialog extends Dialog {
 
+    final VerticalLayout content = new VerticalLayout();
+    final HorizontalLayout buttons = new HorizontalLayout();
+
     public ConfirmDialog(String caption, String text, String confirmButtonText,
             Runnable confirmListener) {
 
-        final VerticalLayout content = new VerticalLayout();
         content.setPadding(false);
         content.setWidth("400px");
         add(content);
@@ -21,13 +23,11 @@ public class ConfirmDialog extends Dialog {
         add(new H3(caption));
         add(new Span(text));
 
-        final HorizontalLayout buttons = new HorizontalLayout();
         buttons.setPadding(false);
         add(buttons);
 
         final Button confirm = new Button(confirmButtonText, e -> {
             confirmListener.run();
-
             this.close();
         });
         confirm.setWidth("100%");
