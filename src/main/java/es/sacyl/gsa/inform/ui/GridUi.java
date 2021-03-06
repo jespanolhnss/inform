@@ -10,6 +10,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Image;
 import es.sacyl.gsa.inform.bean.CentroUsuarioBean;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.IpBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
@@ -42,6 +43,16 @@ public class GridUi {
         centroUsuarioGrid.addColumn(CentroUsuarioBean::getUsuarioNombre).setAutoWidth(true).setHeader(new Html("<b>Nombre</b>"));
         centroUsuarioGrid.addColumn(CentroUsuarioBean::getCargo).setAutoWidth(true).setHeader(new Html("<b>Cargo</b>"));
         return centroUsuarioGrid;
+    }
+
+    public PaginatedGrid<DatoGenericoBean> getDatosGenericosGridPaginado() {
+        PaginatedGrid<DatoGenericoBean> equipoGrid = new PaginatedGrid<>();
+        equipoGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        equipoGrid.setHeightByRows(true);
+        equipoGrid.setPageSize(14);
+        equipoGrid.addColumn(DatoGenericoBean::getTipoDato).setAutoWidth(true).setHeader(new Html("<b>Datos</b>"));
+        equipoGrid.addColumn(DatoGenericoBean::getValor).setAutoWidth(true).setHeader(new Html("<b>Valor</b>"));
+        return equipoGrid;
     }
 
     public PaginatedGrid<EquipoBean> getEquipoGridPaginado() {

@@ -5,7 +5,6 @@ import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -22,6 +21,7 @@ import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
 import es.sacyl.gsa.inform.bean.ComboBean;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoAplicacionBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
@@ -60,6 +60,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final Button ayudaUbicacion = new ObjetosComunes().getBotonMini();
     private final Button ayudaIp = new ObjetosComunes().getBotonMini();
     private final Button aplicacionButton = new ObjetosComunes().getBoton("App", null, VaadinIcon.FILE_TABLE.create());
+    private final Button datosGenericosButton = new ObjetosComunes().getBoton("Dat", null, VaadinIcon.TABLE.create());
 
     private final ComboBox<String> equipoTipoComboBuscador = new CombosUi().getEquipoTipoCombo(null, 50);
 
@@ -71,6 +72,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     //  private final TextField marca = new ObjetosComunes().getTextField("Marca");
     private final TextField modelo = new ObjetosComunes().getTextField("Modelo");
     private final TextField numeroSerie = new ObjetosComunes().getTextField("N.Serie");
+    private final TextField macAdress = new ObjetosComunes().getTextField("Mac");
 
     private final ComboBox<CentroBean> centroCombo = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPOCENTROSALUD, null, null);
     private final ComboBox<UbicacionBean> ubicacionCombo = new CombosUi().getUbicacionCombo(null, centroCombo.getValue(), null, null);
@@ -85,15 +87,19 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final PaginatedGrid<EquipoBean> equipoGrid = new GridUi().getEquipoGridPaginado();
     private ArrayList<EquipoBean> equipoArrayList = new ArrayList<>();
 
-    private final Grid<EquipoAplicacionBean> equipoAplicacionGrid = new Grid<>();
+    private final PaginatedGrid<EquipoAplicacionBean> equipoAplicacionGrid = new PaginatedGrid<>();
+    private final PaginatedGrid<DatoGenericoBean> datosGenericosGrid = new GridUi().getDatosGenericosGridPaginado();
 
     // componentes para gestionar los tabs de la parte inferior
+    private final Tab datosGenericosTab = new Tab("Datos");
     private final Tab aplicacionesTab = new Tab("Aplicaciones");
     private final Tab intervencinesTab = new Tab("Intervenciones");
-    private final Tabs tabs = new Tabs(aplicacionesTab, intervencinesTab);
+
+    private final Tabs tabs = new Tabs(datosGenericosTab, aplicacionesTab, intervencinesTab);
     private final Map<Tab, Component> tabsToPages = new HashMap<>();
     private final Div page1 = new Div();
     private final Div page2 = new Div();
+    private final Div page3 = new Div();
 
     public FrmEquipos() {
         super();
@@ -114,9 +120,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
         super.doControlBotones(obj);
         if (obj == null) {
             aplicacionButton.setEnabled(false);
+            datosGenericosButton.setEnabled(false);
             aplicacionesTab.setEnabled(false);
             page1.setVisible(false);
         } else {
+            datosGenericosButton.setEnabled(true);
             if (obj.getTipo().equals(EquipoBean.TIPOCPU)) {
                 aplicacionButton.setEnabled(true);
                 aplicacionesTab.setEnabled(true);
@@ -183,7 +191,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         equipoBean.setModelo(modelo.getValue());
         equipoBinder.readBean(equipoBean);
         doControlBotones(null);
-        doActualizaGridApp();
+        doActualizaGridAplicacion();
     }
 
     @Override
@@ -192,15 +200,33 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     @Override
     public void doGrid() {
-
         doActualizaGrid();
-
         // grid eqipo aplicación
         equipoAplicacionGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         equipoAplicacionGrid.setHeightByRows(true);
         equipoAplicacionGrid.addColumn(EquipoAplicacionBean::getApliacacionString).setAutoWidth(true).setHeader(new Html("<b>Aplicación</b>")).setWidth("70px");
-        equipoAplicacionGrid.addColumn(EquipoAplicacionBean::getApliacacionString).setAutoWidth(true).setHeader(new Html("<b>Fecha</b>")).setWidth("70px");
+        equipoAplicacionGrid.addColumn(EquipoAplicacionBean::getFecha).setAutoWidth(true).setHeader(new Html("<b>Fecha</b>")).setWidth("70px");
+        equipoAplicacionGrid.addComponentColumn(item -> createRemoveButton(equipoAplicacionGrid, item))
+                .setHeader("Borra");
+    }
 
+    public void doGridDatosGenericos() {
+
+    }
+
+    private Button createRemoveButton(PaginatedGrid<EquipoAplicacionBean> grid, EquipoAplicacionBean item) {
+        @SuppressWarnings("unchecked")
+        Button button = new Button(VaadinIcon.MINUS_CIRCLE.create(), clickEvent -> {
+            final ConfirmDialog dialog = new ConfirmDialog(
+                    FrmMensajes.AVISOCONFIRMACIONACCION,
+                    FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
+                    FrmMensajes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
+                        new EquipoAplicacionDao().doBorraDatos(item);
+                        doActualizaGridAplicacion();
+                    });
+            dialog.open();
+        });
+        return button;
     }
 
     @Override
@@ -210,7 +236,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         equipoGrid.setItems(equipoArrayList);
     }
 
-    public void doActualizaGridApp() {
+    public void doActualizaGridAplicacion() {
         ArrayList<EquipoAplicacionBean> equipoAplicacionArrayList = new EquipoAplicacionDao().getLista(null, equipoBean, null);
         equipoAplicacionGrid.setItems(equipoAplicacionArrayList);
         equipoAplicacionGrid.setHeightByRows(true);
@@ -256,6 +282,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
                 .bind(EquipoBean::getNumeroSerie, EquipoBean::setNumeroSerie);
 
+        equipoBinder.forField(macAdress)
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 17))
+                .bind(EquipoBean::getMacadress, EquipoBean::setMacadress);
+
         equipoBinder.forField(ip)
                 .withNullRepresentation("")
                 .bind(EquipoBean::getIpsCadena, null);
@@ -280,17 +311,20 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         page1.setWidthFull();
         page2.setWidthFull();
+        page3.setWidthFull();
 
+        datosGenericosTab.setVisible(true);
         aplicacionesTab.setVisible(true);
         intervencinesTab.setVisible(true);
 
         page1.setVisible(false);
         page2.setVisible(false);
+        page3.setVisible(false);
     }
 
     @Override
     public void doComponentesOrganizacion() {
-        contenedorBotones.add(aplicacionButton);
+        contenedorBotones.add(aplicacionButton, datosGenericosButton);
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
                 new FormLayout.ResponsiveStep("50px", 2),
@@ -299,13 +333,15 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 new FormLayout.ResponsiveStep("50px", 5),
                 new FormLayout.ResponsiveStep("50px", 6));
 
-        page1.add(equipoAplicacionGrid);
-        //  page2.add(equipoGrid);
+        page1.add(datosGenericosGrid);
+        page2.add(equipoAplicacionGrid);
+        page3.add(equipoAplicacionGrid);
 
-        tabsToPages.put(aplicacionesTab, page1);
-        tabsToPages.put(intervencinesTab, page2);
+        tabsToPages.put(datosGenericosTab, page1);
+        tabsToPages.put(aplicacionesTab, page2);
+        tabsToPages.put(intervencinesTab, page3);
 
-        contenedorIzquierda.add(tabs, page1, page2);
+        contenedorIzquierda.add(tabs, page1, page2, page3);
 
         contenedorDerecha.removeAll();
         contenedorBuscadores.add(equipoTipoComboBuscador, autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador);
@@ -319,8 +355,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorFormulario.add(modelo, 2);
         contenedorFormulario.add(numeroSerie, 2);
 
-        contenedorFormulario.add(ip, 5);
+        contenedorFormulario.add(ip, 3);
         contenedorFormulario.add(ayudaIp);
+        contenedorFormulario.add(macAdress, 2);
 
         contenedorFormulario.add(centroCombo, 3);
         contenedorFormulario.add(servicioCombo, 3);
@@ -361,8 +398,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
             equipoBean = event.getItem();
             equipoBinder.readBean(event.getItem());
             doControlBotones(equipoBean);
-
-            doActualizaGridApp();
+            doActualizaGridAplicacion();
             page1.setVisible(true);
         }
         );
@@ -411,7 +447,20 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 doActualizaGrid();
             });
             frmEquipoAplicacion.open();
+        });
 
+        datosGenericosButton.addClickListener(event -> {
+            equipoBean.setDatosGenericoBeans(new EquipoDao().listaDatosGenericos(equipoBean));
+            FrmDatosGenerico FrmDatosGenerico = new FrmDatosGenerico("500px", equipoBean);
+            FrmDatosGenerico.addDialogCloseActionListener(eventAyuda -> {
+                ip.setValue(equipoBean.getIpsCadena());
+                doActualizaGrid();
+            });
+            FrmDatosGenerico.addDetachListener(eventAyuda -> {
+                ip.setValue(equipoBean.getIpsCadena());
+                doActualizaGrid();
+            });
+            FrmDatosGenerico.open();
         });
 
         tabs.addSelectedChangeListener(event -> {

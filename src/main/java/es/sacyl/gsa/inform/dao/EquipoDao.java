@@ -1,6 +1,8 @@
 package es.sacyl.gsa.inform.dao;
 
 import es.sacyl.gsa.inform.bean.CentroBean;
+import es.sacyl.gsa.inform.bean.ComboBean;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.util.Utilidades;
@@ -437,6 +439,106 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             this.doCierraConexion(connection);
         }
         return lista;
+    }
+
+    public ArrayList<DatoGenericoBean> listaDatosGenericos(EquipoBean equipoBean) {
+        ArrayList<DatoGenericoBean> lista = new ArrayList<>();
+        ArrayList<String> listaTipoDatos = new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPODATOS, equipoBean.getTipo(), 50);
+        for (String tipo : listaTipoDatos) {
+            DatoGenericoBean dato = new DatoGenericoBean();
+            dato.setIdDatoEqipo(equipoBean.getId());
+            dato.setTipoDato(tipo);
+            dato.setValor(this.getValorDatoGenerico(dato));
+            lista.add(dato);
+        }
+        return lista;
+    }
+
+    public String getValorDatoGenerico(DatoGenericoBean dato) {
+        String valor = "";
+        Connection connection = null;
+        try {
+            connection = super.getConexionBBDD();
+            String sqlValor = " SELECT * FORM equiposdatos WHERE idequipo=" + dato.getIdDatoEqipo() + " AND "
+                    + " tipo='" + dato.getTipoDato() + "'";
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(sql);
+            if (resulSet.next()) {
+                valor = resulSet.getString("valor");
+            }
+            statement.close();
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return valor;
+    }
+
+    public Boolean grabatValorDatoGenerico(DatoGenericoBean dato) {
+        String valor = "";
+        Connection connection = null;
+        Boolean insertadoBoolean = false;
+        try {
+            connection = super.getConexionBBDD();
+            String sqlValor = " SELECT * FORM equiposdatos WHERE idequipo=" + dato.getIdDatoEqipo() + " AND "
+                    + " tipo='" + dato.getTipoDato() + "'";
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(sql);
+            if (resulSet.next()) {
+                sqlValor = " UPDATE equiposdatos SET valor=? WHERE idequipo=? AND tipo=? ";
+                PreparedStatement statementInsert = connection.prepareStatement(sqlValor);
+                statementInsert.setString(1, dato.getValor());
+                statementInsert.setLong(2, dato.getIdDatoEqipo());
+                statementInsert.setString(3, dato.getTipoDato());
+                insertadoBoolean = statementInsert.executeUpdate() > 0;
+                statementInsert.close();
+                LOGGER.debug(sqlValor);
+            } else {
+                sqlValor = " INSERT INTO  equiposdatos (id, valor, idequipo, tipo) VALUES (?,?,,?,,?,?) ";
+                PreparedStatement statementUpdate = connection.prepareStatement(sqlValor);
+                statementUpdate.setString(1, dato.getValor());
+                statementUpdate.setLong(2, dato.getIdDatoEqipo());
+                statementUpdate.setString(3, dato.getTipoDato());
+                insertadoBoolean = statementUpdate.executeUpdate() > 0;
+                statementUpdate.close();
+                LOGGER.debug(sqlValor);
+            }
+            statement.close();
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return insertadoBoolean;
+    }
+
+    public Boolean borraValorDatoGenerico(DatoGenericoBean dato) {
+        Connection connection = null;
+        Boolean insertadoBoolean = false;
+        try {
+            connection = super.getConexionBBDD();
+            String sqlValor = " DELETE FROM  equiposdatos WHERE idequipo=? AND  tipo=? ";
+            PreparedStatement statement = connection.prepareStatement(sqlValor);
+            statement.setLong(1, dato.getEstado());
+            statement.setString(2, dato.getValor());
+            insertadoBoolean = statement.executeUpdate() > 0;
+            statement.close();
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return insertadoBoolean;
     }
 
 }

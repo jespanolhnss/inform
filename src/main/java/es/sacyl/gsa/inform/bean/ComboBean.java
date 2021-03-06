@@ -20,6 +20,8 @@ public class ComboBean implements Serializable {
     private final static String titulo = "Combos ";
 
     public final static String TIPOEQUIPOMARCA = "TIPOEQUIPOMARCA";
+    public final static String TIPOEQUIPODATOS = "TIPOEQUIPODATOS";
+
     public final static String APPAMBITO = "APPAMBITO";
     public final static String APPGESTIONUSUARIOS = "APPGESTIONUSUARIOS";
     public final static String CARGOSCENTROS = "CARGOSCENTROS";
