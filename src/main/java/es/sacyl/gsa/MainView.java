@@ -54,7 +54,6 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
     QueryParameters qm = null;
 
     public MainView() {
-        this.getStyle().set("overflow-y", "yes");
         Image image = new Image("icons/fondo.jpg", "Imagen");
         add(image);
 
@@ -110,6 +109,9 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         this.removeAll();
         this.setMargin(false);
         this.setAlignItems(Alignment.START);
+        this.setHeightFull();
+        // para que ponga barra de desplazamiento vertical
+        this.getStyle().set("overflow", "auto");
         contenedorMenu.setMargin(false);
         contenedorMenu.setSpacing(false);
         contenedorMenu.setHeight("18px");

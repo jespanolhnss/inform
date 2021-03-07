@@ -243,6 +243,12 @@ public final class FrmEquipos extends FrmMasterPantalla {
         equipoAplicacionGrid.setPageSize(equipoAplicacionArrayList.size());
     }
 
+    public void doActualizaGridDatosGenericos() {
+        datosGenericosGrid.setItems(equipoBean.getDatosGenericoBeans());
+        equipoAplicacionGrid.setHeightByRows(true);
+        equipoAplicacionGrid.setPageSize(equipoBean.getDatosGenericoBeans().size());
+    }
+
     @Override
     public void doBinderPropiedades() {
         equipoBinder.forField(id)
@@ -335,7 +341,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         page1.add(datosGenericosGrid);
         page2.add(equipoAplicacionGrid);
-        page3.add(equipoAplicacionGrid);
+        //  page3.add(equipoAplicacionGrid);
 
         tabsToPages.put(datosGenericosTab, page1);
         tabsToPages.put(aplicacionesTab, page2);
@@ -397,8 +403,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
         equipoGrid.addItemClickListener(event -> {
             equipoBean = event.getItem();
             equipoBinder.readBean(event.getItem());
+            // Estos datos sólo los carga cuando hace clic en el grid
+            equipoBean.setDatosGenericoBeans(new EquipoDao().getListaDatosGenericos(equipoBean));
             doControlBotones(equipoBean);
             doActualizaGridAplicacion();
+            doActualizaGridDatosGenericos();
             page1.setVisible(true);
         }
         );
@@ -449,20 +458,27 @@ public final class FrmEquipos extends FrmMasterPantalla {
             frmEquipoAplicacion.open();
         });
 
+        /**
+         * Cuando hace clic en el botó de datos genéricos abre la ventana para
+         * editar los campos
+         */
         datosGenericosButton.addClickListener(event -> {
-            equipoBean.setDatosGenericoBeans(new EquipoDao().listaDatosGenericos(equipoBean));
-            FrmDatosGenerico FrmDatosGenerico = new FrmDatosGenerico("500px", equipoBean);
-            FrmDatosGenerico.addDialogCloseActionListener(eventAyuda -> {
-                ip.setValue(equipoBean.getIpsCadena());
-                doActualizaGrid();
+            FrmDatosGenerico frmDatosGenerico = new FrmDatosGenerico("500px", equipoBean);
+            frmDatosGenerico.addDialogCloseActionListener(eventAyuda -> {
+                equipoBean.setDatosGenericoBeans(frmDatosGenerico.getDatosGenericoBeans());
+                doActualizaGridDatosGenericos();
             });
-            FrmDatosGenerico.addDetachListener(eventAyuda -> {
-                ip.setValue(equipoBean.getIpsCadena());
-                doActualizaGrid();
+            frmDatosGenerico.addDetachListener(eventAyuda -> {
+                equipoBean.setDatosGenericoBeans(frmDatosGenerico.getDatosGenericoBeans());
+                doActualizaGridDatosGenericos();
             });
-            FrmDatosGenerico.open();
+            frmDatosGenerico.open();
         });
 
+        /**
+         * Gestiona los clic en los tabs ocultando todos y mostrando el del
+         * click
+         */
         tabs.addSelectedChangeListener(event -> {
             tabsToPages.values().forEach(page -> page.setVisible(false));
             Component selectedPage = tabsToPages.get(tabs.getSelectedTab());

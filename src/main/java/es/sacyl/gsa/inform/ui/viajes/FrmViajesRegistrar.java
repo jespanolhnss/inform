@@ -5,6 +5,7 @@
  */
 package es.sacyl.gsa.inform.ui.viajes;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -13,10 +14,13 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -26,9 +30,9 @@ import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
+import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.bean.ViajeBean;
 import es.sacyl.gsa.inform.bean.ViajeCentroBean;
-import es.sacyl.gsa.inform.bean.ViajeTecnicoBean;
 import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
@@ -43,6 +47,8 @@ import es.sacyl.gsa.inform.util.Utilidades;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import org.vaadin.klaudeta.PaginatedGrid;
 
 public final class FrmViajesRegistrar extends FrmMasterPantalla {
@@ -76,7 +82,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
     ViajeCentroBean viajeCentroBean = new ViajeCentroBean();
     String tituloGridCentros = "CENTROS ASOCIADOS AL VIAJE";
     PaginatedGrid<ViajeCentroBean> viajeCentroGrid = new PaginatedGrid<>();
-    PaginatedGrid<ViajeTecnicoBean> viajeTecnicoGrid = new PaginatedGrid<>();
+    PaginatedGrid<UsuarioBean> viajeTecnicoGrid = new PaginatedGrid<>();
 
     ArrayList<ViajeCentroBean> viajeCentrosArrayList = new ArrayList<>();
 
@@ -85,6 +91,15 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
     Button lanzarVentana = new ObjetosComunes().getBoton("Centros", ButtonVariant.LUMO_PRIMARY, icon);
     Icon tecnicosIcon = new Icon(VaadinIcon.USER);
     Button tecnicosButton = new ObjetosComunes().getBoton("Técnicos", ButtonVariant.LUMO_PRIMARY, tecnicosIcon);
+
+    // componentes para gestionar los tabs de la parte inferior
+    private final Tab centrosTab = new Tab("Centros");
+    private final Tab tecnicoxTab = new Tab("Tecnicos");
+
+    private final Tabs tabs = new Tabs(centrosTab, tecnicoxTab);
+    private final Map<Tab, Component> tabsToPages = new HashMap<>();
+    private final Div page1 = new Div();
+    private final Div page2 = new Div();
 
     public FrmViajesRegistrar() {
         super();
@@ -103,11 +118,13 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
             botonImprimir.setEnabled(true);
             lanzarVentana.setEnabled(true);
             tecnicosButton.setEnabled(true);
+            page1.setVisible(true);
         } else {
             botonBorrar.setEnabled(false);
             botonImprimir.setEnabled(false);
             lanzarVentana.setEnabled(false);
             tecnicosButton.setEnabled(false);
+            page1.setVisible(false);
         }
     }
 
@@ -174,22 +191,24 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
     @Override
     public void doGrid() {
         // grid viaje
+        viajesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         viajesGrid.addColumn(ViajeBean::getSalida).setHeader("Salida");
         viajesGrid.addColumn(ViajeBean::getLlegada).setHeader("Llegada");
         viajesGrid.addColumn(ViajeBean::getMatricula).setHeader("Matrícula");
         viajesGrid.setWidthFull();
 
         // grid centro
+        viajeCentroGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         viajeCentroGrid.addColumn(ViajeCentroBean::getIdViaje).setHeader("IdViaje").setAutoWidth(true);
         viajeCentroGrid.addColumn(ViajeCentroBean::getNombreCentro).setHeader("Centro").setAutoWidth(true);
         viajeCentroGrid.addColumn(ViajeCentroBean::getPreparacion).setHeader("Preparación").setAutoWidth(true);
         viajeCentroGrid.addColumn(ViajeCentroBean::getActuacion).setHeader("Actuación").setAutoWidth(true);
+
 //grid tecnico
         viajeTecnicoGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         viajeTecnicoGrid.setHeightByRows(true);
         viajeTecnicoGrid.setPageSize(14);
-
-        viajeTecnicoGrid.addColumn(ViajeTecnicoBean::getTecnicoApellidos).setAutoWidth(true).setHeader(new Html("<b>Usuario</b>"));
+        viajeTecnicoGrid.addColumn(UsuarioBean::getApellidosNombre).setAutoWidth(true).setHeader(new Html("<b>Usuario</b>"));
         viajeTecnicoGrid.addComponentColumn(item -> createRemoveButton(viajeTecnicoGrid, item))
                 .setHeader("Borra");
         doActualizaGrid();
@@ -197,14 +216,14 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         doActualizaGridTecnicos(viajeBean);
     }
 
-    private Button createRemoveButton(PaginatedGrid<ViajeTecnicoBean> grid, ViajeTecnicoBean item) {
+    private Button createRemoveButton(PaginatedGrid<UsuarioBean> grid, UsuarioBean item) {
         @SuppressWarnings("unchecked")
-        Button button = new Button("Borra", clickEvent -> {
+        Button button = new Button(VaadinIcon.MINUS_CIRCLE.create(), clickEvent -> {
             final ConfirmDialog dialog = new ConfirmDialog(
                     FrmMensajes.AVISOCONFIRMACIONACCION,
                     FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
                     FrmMensajes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
-                        new ViajesDao().doBorraUnTecnico(item);
+                        new ViajesDao().doBorraUnTecnico(viajeBean, item);
                         doActualizaGridTecnicos(viajeBean);
                     });
             dialog.open();
@@ -238,10 +257,9 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
 
     @Override
     public void doComponenesAtributos() {
+        contenedorIzquierda.setWidth("50%");
+        contenedorDerecha.setWidth("50%");
         autonomiaComboBuscador.setVisible(false);
-        id.setWidth("100px");
-        id.setMaxWidth("100px");
-        id.setMinWidth("100px");
 
         id.setWidth("150px");
         id.setMaxWidth("150px");
@@ -249,24 +267,29 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
 
         matricula.setMaxLength(8);
 
+        page1.setWidthFull();
+        page2.setWidthFull();
+
+        centrosTab.setVisible(true);
+        tecnicoxTab.setVisible(true);
+
+        page1.setVisible(false);
+        page2.setVisible(false);
     }
 
     @Override
     public void doComponentesOrganizacion() {
         contenedorIzquierda.setWidth("50%");
         contenedorIzquierda.removeAll();
-        contenedorIzquierda.add(contenedorBotones);
-        contenedorIzquierda.add(contenedorBotones2);
-        contenedorIzquierda.add(contenedorFormulario);
-        contenedorIzquierda.add(viajeTecnicoGrid);
 
-        contenedorIzquierda.add(tituloGridCentros);
-        contenedorIzquierda.add(viajeCentroGrid);
+        page1.add(viajeCentroGrid);
+        page2.add(viajeTecnicoGrid);
 
-        /*
-        contenedorIzquierda.addComponentAtIndex(3, tecnicoGrid);
-        contenedorIzquierda.addComponentAtIndex(2, contenedorBotones2);
-         */
+        tabsToPages.put(centrosTab, page1);
+        tabsToPages.put(tecnicoxTab, page2);
+
+        contenedorIzquierda.add(contenedorBotones, contenedorBotones2, contenedorFormulario, tabs, page1, page2);
+
         lanzarVentana.setEnabled(false);
         tecnicosButton.setEnabled(false);
         contenedorBotones2.add(lanzarVentana, tecnicosButton);
@@ -328,6 +351,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
             doActualizaGridCentros(viajeBean);
             doActualizaGridTecnicos(viajeBean);
             doControlBotones(viajeBean);
+            page1.setVisible(true);
         });
 
         viajeCentroGrid.addItemClickListener(event -> {
@@ -363,6 +387,16 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
             nuevo.open();
         }
         );
+
+        /**
+         * Gestiona los clic en los tabs ocultando todos y mostrando el del
+         * click
+         */
+        tabs.addSelectedChangeListener(event -> {
+            tabsToPages.values().forEach(page -> page.setVisible(false));
+            Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+            selectedPage.setVisible(true);
+        });
     }
 
     public void doActualizaComboProvinicas(ComboBox<ProvinciaBean> combo, AutonomiaBean autonomia) {

@@ -7,12 +7,18 @@ package es.sacyl.gsa.inform.ctrl;
 
 import es.sacyl.gsa.inform.util.NumeroBinario;
 import es.sacyl.gsa.inform.util.Utilidades;
+import java.io.Serializable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author 06551256M
  */
-public class VlanCtrl {
+public class VlanCtrl implements Serializable {
+
+    private static final Logger LOGGER = LogManager.getLogger(VlanCtrl.class);
+    private static final long serialVersionUID = 1L;
 
     public static String ERROVALIDACION1 = "Error composición máscara. El formatro es direccion /valor ";
     public static String ERROVALIDACION2 = "Error direccin IP";
@@ -43,7 +49,6 @@ public class VlanCtrl {
      */
     public static String getCalculaMascara(String dirIp, String unos) {
         String dirMascara1, dirMascara2, dirMascara3, dirMascara4;
-        //     String[] valores = direcion.split("/");
         String[] ip = dirIp.split("\\.");
         if (Utilidades.isNumeric(unos)) {
             int numerodeUnos = Integer.parseInt(unos);
@@ -97,30 +102,43 @@ public class VlanCtrl {
         String[] ips = direccion.split("\\.");
         String[] mask = mascara.split("\\.");
         String dirMascara1, dirMascara2, dirMascara3, dirMascara4;
+        try {
+            NumeroBinario ipBinario = new NumeroBinario(
+                    new NumeroBinario(Integer.parseInt(ips[0])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR)
+                            .concat(new NumeroBinario(Integer.parseInt(ips[1])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+                            .concat(new NumeroBinario(Integer.parseInt(ips[2])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+                            .concat(new NumeroBinario(Integer.parseInt(ips[3])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+            );
 
-        NumeroBinario ipBinario = new NumeroBinario(
-                new NumeroBinario(Integer.parseInt(ips[0])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR)
-                        .concat(new NumeroBinario(Integer.parseInt(ips[1])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
-                        .concat(new NumeroBinario(Integer.parseInt(ips[2])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
-                        .concat(new NumeroBinario(Integer.parseInt(ips[3])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
-        );
+            NumeroBinario maskBinario = new NumeroBinario(
+                    new NumeroBinario(Integer.parseInt(mask[0])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR)
+                            .concat(new NumeroBinario(Integer.parseInt(mask[1])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+                            .concat(new NumeroBinario(Integer.parseInt(mask[2])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+                            .concat(new NumeroBinario(Integer.parseInt(mask[3])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+            );
 
-        NumeroBinario maskBinario = new NumeroBinario(
-                new NumeroBinario(Integer.parseInt(mask[0])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR)
-                        .concat(new NumeroBinario(Integer.parseInt(mask[1])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
-                        .concat(new NumeroBinario(Integer.parseInt(mask[2])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
-                        .concat(new NumeroBinario(Integer.parseInt(mask[3])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
-        );
+            String direccionBase = ipBinario.andLogica(maskBinario).getNumero();
 
-        String direccionBase = ipBinario.andLogica(maskBinario).getNumero();
+            dirMascara1 = direccionBase.substring(0, 8);
+            dirMascara2 = direccionBase.substring(8, 16);
+            dirMascara3 = direccionBase.substring(16, 24);
+            dirMascara4 = direccionBase.substring(24, 32);
+            return Utilidades.binarioToDecimalString(dirMascara1) + "." + Utilidades.binarioToDecimalString(dirMascara2) + "."
+                    + Utilidades.binarioToDecimalString(dirMascara3) + "." + Utilidades.binarioToDecimalString(dirMascara4) + 1;
+        } catch (Exception ex) {
+            LOGGER.error(Utilidades.getStackTrace(ex));
+        }
+        return "";
+    }
 
-        dirMascara1 = direccionBase.substring(0, 8);
-        dirMascara2 = direccionBase.substring(8, 16);
-        dirMascara3 = direccionBase.substring(16, 24);
-        dirMascara4 = direccionBase.substring(24, 32);
-
-        return Utilidades.binarioToDecimalString(dirMascara1) + "." + Utilidades.binarioToDecimalString(dirMascara2) + "."
-                + Utilidades.binarioToDecimalString(dirMascara3) + "." + Utilidades.binarioToDecimalString(dirMascara4) + 1;
+    /**
+     *
+     * @param direccion en formato 10.36.64.1/22
+     * @return
+     */
+    public static String getCalculaPuertaEnlace(String direccion) {
+        String[] valores = direccion.split("/");
+        return getCalculaPuertaEnlace(valores[0], valores[1]);
     }
 
     /**
@@ -137,31 +155,44 @@ public class VlanCtrl {
     public static String getCalculaBroadcast(String dirIp, String unos) {
         String dirBroadcast1, dirBroadcast2, dirBroadcast3, dirBroadcast4;
         String[] ips = dirIp.split("\\.");
+        try {
+            NumeroBinario ipBinario = new NumeroBinario(
+                    new NumeroBinario(Integer.parseInt(ips[0])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR)
+                            .concat(new NumeroBinario(Integer.parseInt(ips[1])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+                            .concat(new NumeroBinario(Integer.parseInt(ips[2])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+                            .concat(new NumeroBinario(Integer.parseInt(ips[3])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+            );
 
-        NumeroBinario ipBinario = new NumeroBinario(
-                new NumeroBinario(Integer.parseInt(ips[0])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR)
-                        .concat(new NumeroBinario(Integer.parseInt(ips[1])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
-                        .concat(new NumeroBinario(Integer.parseInt(ips[2])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
-                        .concat(new NumeroBinario(Integer.parseInt(ips[3])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
-        );
+            if (Utilidades.isNumeric(unos)) {
+                int numerodeUnos = Integer.parseInt(unos);
+                int numerodeCeros = 32 - numerodeUnos;
+                NumeroBinario dirHost = new NumeroBinario(numerodeCeros, NumeroBinario.ONE_CHAR);
 
-        if (Utilidades.isNumeric(unos)) {
-            int numerodeUnos = Integer.parseInt(unos);
-            int numerodeCeros = 32 - numerodeUnos;
-            NumeroBinario dirHost = new NumeroBinario(numerodeCeros, NumeroBinario.ONE_CHAR);
+                String cadenaBinaio = ipBinario.getNumero().substring(0, numerodeUnos) + dirHost.getNumero();
 
-            String cadenaBinaio = ipBinario.getNumero().substring(0, 22) + dirHost.getNumero();
+                dirBroadcast1 = cadenaBinaio.substring(0, 8);
+                dirBroadcast2 = cadenaBinaio.substring(8, 16);
+                dirBroadcast3 = cadenaBinaio.substring(16, 24);
+                dirBroadcast4 = cadenaBinaio.substring(24, 32);
 
-            dirBroadcast1 = cadenaBinaio.substring(0, 8);
-            dirBroadcast2 = cadenaBinaio.substring(8, 16);
-            dirBroadcast3 = cadenaBinaio.substring(16, 24);
-            dirBroadcast4 = cadenaBinaio.substring(24, 32);
-
-            return Utilidades.binarioToDecimalString(dirBroadcast1) + "." + Utilidades.binarioToDecimalString(dirBroadcast2) + "."
-                    + Utilidades.binarioToDecimalString(dirBroadcast3) + "." + Utilidades.binarioToDecimalString(dirBroadcast4);
-        } else {
-            return "";
+                return Utilidades.binarioToDecimalString(dirBroadcast1) + "." + Utilidades.binarioToDecimalString(dirBroadcast2) + "."
+                        + Utilidades.binarioToDecimalString(dirBroadcast3) + "." + Utilidades.binarioToDecimalString(dirBroadcast4);
+            }
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
         }
+        return "";
+
+    }
+
+    /**
+     *
+     * @param dirreccion
+     * @return
+     */
+    public static String getCalculaBroadcast(String direccion) {
+        String[] valores = direccion.split("/");
+        return getCalculaBroadcast(valores[0], valores[1]);
     }
 
     /**
@@ -180,6 +211,16 @@ public class VlanCtrl {
 
         return ips[0] + "." + ips[1] + "." + ips[2] + "." + ips[3];
 
+    }
+
+    /**
+     *
+     * @param direccion
+     * @return
+     */
+    public static String getCalculaUltimaIp(String direccion) {
+        String[] valores = direccion.split("/");
+        return getCalculaUltimaIp(valores[0], valores[1]);
     }
 
     /**

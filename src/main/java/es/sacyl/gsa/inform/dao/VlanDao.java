@@ -46,6 +46,12 @@ public class VlanDao extends ConexionDao implements Serializable, ConexionInterf
             vlanBean.setFechacambio(Utilidades.getFechaLocalDate(rs.getLong("vlanfechacmabio")));
             vlanBean.setComentario(rs.getString("vlancomentario"));
             vlanBean.setMascara(VlanCtrl.getCalculaMascara(vlanBean.getDireccion()));
+            String[] valores = vlanBean.getDireccion().split("/");
+            vlanBean.setPuertaenlace(VlanCtrl.getCalculaPuertaEnlace(valores[0], vlanBean.getMascara()));
+            vlanBean.setBroadcast(VlanCtrl.getCalculaBroadcast(vlanBean.getDireccion()));
+            vlanBean.setUltimaIp(VlanCtrl.getCalculaUltimaIp(vlanBean.getDireccion()));
+
+            vlanBean.setNumeroDirecciones(VlanCtrl.getCalculaNumeroDirecciones(valores[1]));
 
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));

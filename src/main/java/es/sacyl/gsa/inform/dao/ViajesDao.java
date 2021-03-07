@@ -4,7 +4,6 @@ import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.bean.ViajeBean;
 import es.sacyl.gsa.inform.bean.ViajeCentroBean;
-import es.sacyl.gsa.inform.bean.ViajeTecnicoBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -285,8 +284,8 @@ public class ViajesDao extends ConexionDao implements Serializable {
      * @param id El id del viaje cuyos técnicos se quieren recuperar
      * @return Un ArrayList de Usuarios asociados al viaje
      */
-    public ArrayList<ViajeTecnicoBean> getViajeTecnicos(ViajeBean viajeBean) {
-        ArrayList<ViajeTecnicoBean> listaTecnicos = new ArrayList<>();
+    public ArrayList<UsuarioBean> getViajeTecnicos(ViajeBean viajeBean) {
+        ArrayList<UsuarioBean> listaTecnicos = new ArrayList<>();
         Connection connection = null;
         try {
             connection = super.getConexionBBDD();
@@ -294,13 +293,8 @@ public class ViajesDao extends ConexionDao implements Serializable {
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {
-                ViajeTecnicoBean viajeTecnico = new ViajeTecnicoBean();
-                viajeTecnico.setId(resulSet.getLong("id"));
-                viajeTecnico.setViaje(viajeBean);
                 UsuarioBean tecnico = new UsuarioDao().getPorId(resulSet.getLong("idtecnico"));
-                viajeTecnico.setTecnico(tecnico);
-
-                listaTecnicos.add(viajeTecnico);
+                listaTecnicos.add(tecnico);
             }
             statement.close();
             LOGGER.debug(sql);
@@ -392,12 +386,13 @@ public class ViajesDao extends ConexionDao implements Serializable {
      * @param id
      * @return Boora un tecnicos asociados al viaje id
      */
-    public Boolean doBorraUnTecnico(ViajeTecnicoBean viajeTecnicoBean) {
+    public Boolean doBorraUnTecnico(ViajeBean viajeBean, UsuarioBean usuarioBean) {
         Connection connection = null;
         Boolean booradoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " DELETE FROM  viajestecnicos WHERE idviaje='" + viajeTecnicoBean.getViaje().getId() + "' AND idtecnico='" + viajeTecnicoBean.getTecnico().getId() + "'";
+            sql = " DELETE FROM  viajestecnicos WHERE idviaje='" + viajeBean.getId()
+                    + "' AND idtecnico='" + usuarioBean.getId() + "'";
             Statement statement = connection.createStatement();
             booradoBoolean = statement.execute(sql);
             booradoBoolean = true;

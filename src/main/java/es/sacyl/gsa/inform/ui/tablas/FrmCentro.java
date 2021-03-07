@@ -94,12 +94,10 @@ public final class FrmCentro extends FrmMasterPantalla {
     private final ComboBox<NivelesAtentionTipoBean> nivelAtencionTipoCombo = new CombosUi().getNivelestTipoCombo(null);
     private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
     private final TextField mapgoogle = new ObjetosComunes().getTextField("Google Map");
-    // private  Iframe  mapgoogleIframe = new Iframe();
     private Image googleMapsImage = new Image("icons/googlemap.jpg", "Mapa");
     private CentroBean centroBean = null;
     private final Binder<CentroBean> centroBinder = new Binder<>();
     private final PaginatedGrid<CentroBean> centroGrid = new PaginatedGrid<>();
-    //  private final PaginatedGrid<CentroFicheroBean> centroFicheroGrid = new PaginatedGrid<>();
     private final PaginatedGrid<CentroFicheroBean> centroFicheroGrid = new PaginatedGrid<>();
     private final PaginatedGrid<CentroUsuarioBean> centroUsuarioGrid = new GridUi().getCentroUsuarioPaginateGrid();
 
@@ -208,6 +206,11 @@ public final class FrmCentro extends FrmMasterPantalla {
         autonomiaCombo.setValue(AutonomiaBean.AUTONOMIADEFECTO);
         provinciaCombo.setValue(ProvinciaBean.PROVINCIA_DEFECTO);
         gerenciaCombo.setValue(GerenciaBean.GERENCIADEFECTO);
+
+        // borra el contenido de los tabs
+        centroUsuarioGrid.setItems(new ArrayList<>());
+        centroFicheroGrid.setItems(new ArrayList<>());
+        miniaturasHorizontalLayout.removeAll();
         doControlBotones(null);
     }
 
@@ -281,6 +284,13 @@ public final class FrmCentro extends FrmMasterPantalla {
                 .setHeader("Borra");
     }
 
+    /**
+     *
+     * @param grid
+     * @param item
+     * @return crea el boton de borrado en el grid de centrofichero con el
+     * evento asociado
+     */
     private Button createRemoveButton(Grid<CentroFicheroBean> grid, CentroFicheroBean item) {
         @SuppressWarnings("unchecked")
         Button button = new Button(VaadinIcon.MINUS_CIRCLE.create(), clickEvent -> {
@@ -297,6 +307,9 @@ public final class FrmCentro extends FrmMasterPantalla {
         return button;
     }
 
+    /**
+     * Actualiza grid de la lista de ficheros que se muestra en el tabs
+     */
     public void doActualizaGridCentroFichero() {
         ArrayList<CentroFicheroBean> centroFicheroBeans = new CentroFicheroDao().getLista(centroBean);
         centroBean.setCentroFicheroArrayList(centroFicheroBeans);
@@ -305,6 +318,9 @@ public final class FrmCentro extends FrmMasterPantalla {
         ficherosTab.setLabel("Ficheros (" + Integer.toString(centroFicheroBeans.size()) + ")");
     }
 
+    /**
+     * Actualiza el grid de usuario que se muestra en el tab
+     */
     public void doActualizaGridCentroUsuario() {
         ArrayList<CentroUsuarioBean> centroUsuarioBeans = new CentroUsuarioDao().getLista(centroBean);
         centroBean.setCentroUsuarioArrayList(centroUsuarioBeans);
@@ -313,6 +329,9 @@ public final class FrmCentro extends FrmMasterPantalla {
         usuariosTab.setLabel("Usuario (" + Integer.toString(centroUsuarioBeans.size()) + ")");
     }
 
+    /**
+     * Actualiza grid de centros de la derecha
+     */
     @Override
     public void doActualizaGrid() {
         centroTArrayList = new CentroDao().getLista(buscador.getValue(), autonomiaComboBuscador.getValue(), provinciaComboBuscador.getValue(), null, nivelAtencionComboBuscador.getValue(), centroTipoComboBuscador.getValue(), nivelAtencionTipoComboBuscador.getValue(), null);
@@ -414,6 +433,11 @@ public final class FrmCentro extends FrmMasterPantalla {
     public void doComponenesAtributos() {
         this.titulo.setText("Centros");
         buscador.setLabel(" Valores a buscar");
+        // como se hace borrado lógico con modificar el registro el centro y poner activo=N es lo mismo
+        botonBorrar.setVisible(false);
+        miniaturasTab.setLabel("Miniatruas");
+        ficherosTab.setLabel("Ficheros");
+        usuariosTab.setLabel("Usuarios");
 
         googleMapsImage.setVisible(false);
         page1.setWidthFull();

@@ -11,6 +11,9 @@ public class VlanBean extends MasterBean {
     private String mascara;
     private String puertaenlace;
     private String comentario;
+    private String broadcast;
+    private String ultimaIp;
+    private Integer numeroDirecciones;
 
     public VlanBean() {
         super();
@@ -54,6 +57,30 @@ public class VlanBean extends MasterBean {
 
     public void setComentario(String comentario) {
         this.comentario = comentario;
+    }
+
+    public String getBroadcast() {
+        return broadcast;
+    }
+
+    public void setBroadcast(String broadcast) {
+        this.broadcast = broadcast;
+    }
+
+    public String getUltimaIp() {
+        return ultimaIp;
+    }
+
+    public void setUltimaIp(String ultimaIp) {
+        this.ultimaIp = ultimaIp;
+    }
+
+    public Integer getNumeroDirecciones() {
+        return numeroDirecciones;
+    }
+
+    public void setNumeroDirecciones(Integer numeroDirecciones) {
+        this.numeroDirecciones = numeroDirecciones;
     }
 
 }

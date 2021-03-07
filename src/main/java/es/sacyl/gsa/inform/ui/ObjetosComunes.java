@@ -16,7 +16,6 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
-import es.sacyl.gsa.inform.bean.LopdSujetoBean;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.GfhDao;
 import es.sacyl.gsa.inform.dao.JimenaDao;
@@ -75,6 +74,10 @@ public class ObjetosComunes {
 
     }
 
+    /**
+     *
+     * @return
+     */
     public RadioButtonGroup<String> getEstadoRadio() {
         RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
         radioGroup.setLabel("Activo");
@@ -82,6 +85,11 @@ public class ObjetosComunes {
         return radioGroup;
     }
 
+    /**
+     *
+     * @param label
+     * @return
+     */
     public RadioButtonGroup<String> getSNRadio(String label) {
         RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
         if (label != null) {
@@ -91,6 +99,10 @@ public class ObjetosComunes {
         return radioGroup;
     }
 
+    /**
+     *
+     * @return
+     */
     public Details getDetails() {
         Details details = new Details();
         details.setEnabled(true);
@@ -108,11 +120,6 @@ public class ObjetosComunes {
         checkboxGroup = new CheckboxGroup<CentroBean>();
         checkboxGroup.setItems(new JimenaDao().getListaCentrosPrimaria());
         checkboxGroup.setItemLabelGenerator(CentroBean::getNomcen);
-
-//      if (valor != null) {
-//    	  checkboxGroup.setValue(valor);
-//      }
-        //checkboxGroup.setWidth("150px");
         return checkboxGroup;
     }
 
@@ -141,28 +148,6 @@ public class ObjetosComunes {
         if (valor != null) {
             combo.setValue(valor);
         }
-        return combo;
-    }
-
-    /**
-     *
-     * @param valor
-     * @return
-     */
-    public ComboBox<LopdSujetoBean> getLopdSujetoCombo(LopdSujetoBean valor) {
-        ComboBox<LopdSujetoBean> combo;
-        combo = new ComboBox<>("Sujeto");
-        combo.setItems(LopdSujetoBean.LISTASUJETOS_COMPLETA);
-        combo.setItemLabelGenerator(lopdSujeto -> {
-            return lopdSujeto.getDescripcion();
-        });
-        if (valor != null) {
-            combo.setValue(valor);
-        } else {
-            combo.setValue(LopdSujetoBean.SUJETO_PACIENTE);
-        }
-        combo.setWidth("200px");
-        combo.setClearButtonVisible(true);
         return combo;
     }
 
@@ -244,7 +229,6 @@ public class ObjetosComunes {
         if (text != null) {
             textField.setLabel(text);
         }
-
         textField.setClearButtonVisible(true);
         return textField;
     }
@@ -287,6 +271,11 @@ public class ObjetosComunes {
         return textArea;
     }
 
+    /**
+     *
+     * @param text
+     * @return
+     */
     public TextArea getTextArea(String text) {
         TextArea textArea = new TextArea();
         if (text != null) {
@@ -386,6 +375,10 @@ public class ObjetosComunes {
         return campo;
     }
 
+    /**
+     *
+     * @return
+     */
     public TextField getNumeroHc() {
         TextField campo = getTextField("Nº Historia", null, 6, "105px", "95px");
 

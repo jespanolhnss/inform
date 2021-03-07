@@ -10,6 +10,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import es.sacyl.gsa.inform.bean.VlanBean;
@@ -180,6 +181,28 @@ public final class FrmVlan extends FrmMasterPantalla {
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 20))
                 .bind(VlanBean::getPuertaenlace, VlanBean::setPuertaenlace);
 
+        vlanBinder.forField(broadcast)
+                .withNullRepresentation("")
+                .asRequired()
+                .withValidator(
+                        ip -> IpCtrl.siValid(ip),
+                        "Dirección no válida")
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 20))
+                .bind(VlanBean::getBroadcast, VlanBean::setBroadcast);
+        vlanBinder.forField(ultimaip)
+                .withNullRepresentation("")
+                .asRequired()
+                .withValidator(
+                        ip -> IpCtrl.siValid(ip),
+                        "Dirección no válida")
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 20))
+                .bind(VlanBean::getUltimaIp, VlanBean::setUltimaIp);
+        vlanBinder.forField(numeroDirecciones)
+                .withNullRepresentation("")
+                .withConverter(new StringToIntegerConverter(FrmMensajes.AVISONUMERO))
+                .bind(VlanBean::getNumeroDirecciones, VlanBean::setNumeroDirecciones);
     }
 
     @Override

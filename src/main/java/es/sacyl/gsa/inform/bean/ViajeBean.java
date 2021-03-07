@@ -13,8 +13,10 @@ public class ViajeBean implements Serializable {
     private LocalDateTime llegada;
 
     private String matricula;
+
     private ArrayList<ViajeCentroBean> listaCentros = new ArrayList<>();
-    private ArrayList<ViajeTecnicoBean> listaTecnicos = new ArrayList<>();
+
+    private ArrayList<UsuarioBean> listaTecnicos = new ArrayList<>();
 
     public ViajeBean() {
         id = new Long(0);
@@ -60,11 +62,11 @@ public class ViajeBean implements Serializable {
         this.listaCentros = listaCentros;
     }
 
-    public ArrayList<ViajeTecnicoBean> getListaTecnicos() {
+    public ArrayList<UsuarioBean> getListaTecnicos() {
         return listaTecnicos;
     }
 
-    public void setListaTecnicos(ArrayList<ViajeTecnicoBean> listaTecnicos) {
+    public void setListaTecnicos(ArrayList<UsuarioBean> listaTecnicos) {
         this.listaTecnicos = listaTecnicos;
     }
 

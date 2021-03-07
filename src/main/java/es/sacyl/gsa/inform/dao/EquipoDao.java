@@ -441,7 +441,10 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         return lista;
     }
 
-    public ArrayList<DatoGenericoBean> listaDatosGenericos(EquipoBean equipoBean) {
+    /*
+    Métodos de datos genéricos
+     */
+    public ArrayList<DatoGenericoBean> getListaDatosGenericos(EquipoBean equipoBean) {
         ArrayList<DatoGenericoBean> lista = new ArrayList<>();
         ArrayList<String> listaTipoDatos = new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPODATOS, equipoBean.getTipo(), 50);
         for (String tipo : listaTipoDatos) {
@@ -455,6 +458,8 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
     }
 
     public String getValorDatoGenerico(DatoGenericoBean dato) {
+        return dato.getTipoDato() + "....";
+        /*
         String valor = "";
         Connection connection = null;
         try {
@@ -476,6 +481,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             this.doCierraConexion(connection);
         }
         return valor;
+         */
     }
 
     public Boolean grabatValorDatoGenerico(DatoGenericoBean dato) {

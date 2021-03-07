@@ -3,6 +3,7 @@ package es.sacyl.gsa.inform.ui.viajes;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -198,8 +199,12 @@ public final class FrmViajesCentrosRegistrar extends FrmMasterVentana {
 
     @Override
     public void doComponentesOrganizacion() {
+
         botonCancelar.setText("Salir");
         contenedorBotones.add(modificarButton);
+        contenedorFormulario.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("150px", 1),
+                new FormLayout.ResponsiveStep("150px", 2));
         contenedorFormulario.add(provinciasCombo, tipoCentroCombo, centroCombo, preparacionTextArea, actuacionTextArea);
     }
 

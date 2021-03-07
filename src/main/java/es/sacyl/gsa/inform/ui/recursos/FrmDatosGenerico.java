@@ -33,7 +33,9 @@ public final class FrmDatosGenerico extends FrmMasterVentana {
         this.equipoBean = equipoBean;
         setDetalleEquipo(equipoBean);
         equipoBean.getDatosGenericoBeans().forEach(dato -> {
-            listaCamposTextFields.add(new ObjetosComunes().getTextField(dato.getTipoDato()));
+            TextField textField = new ObjetosComunes().getTextField(dato.getTipoDato());
+            textField.setValue(dato.getValor());
+            listaCamposTextFields.add(textField);
         });
         doComponentesOrganizacion();
         doGrid();
@@ -47,7 +49,7 @@ public final class FrmDatosGenerico extends FrmMasterVentana {
      */
     @Override
     public void doGrabar() {
-        equipoBean.getDatosGenericoBeans().removeAll(equipoBean.getDatosGenericoBeans());
+        // Borra los datos genéricos actuales de bean y luego añade los nuevos
         for (TextField textField : listaCamposTextFields) {
             DatoGenericoBean dato = new DatoGenericoBean();
             dato.setTipoDato(textField.getLabel());
@@ -59,8 +61,23 @@ public final class FrmDatosGenerico extends FrmMasterVentana {
                 dato.setValor("");
                 new EquipoDao().grabatValorDatoGenerico(dato);
             }
-            equipoBean.getDatosGenericoBeans().add(dato);
         }
+    }
+
+    public ArrayList<DatoGenericoBean> getDatosGenericoBeans() {
+        ArrayList<DatoGenericoBean> lista = new ArrayList<>();
+        for (TextField textField : listaCamposTextFields) {
+            DatoGenericoBean dato = new DatoGenericoBean();
+            dato.setTipoDato(textField.getLabel());
+            dato.setIdDatoEqipo(equipoBean.getId());
+            if (!textField.getValue().isEmpty()) {
+                dato.setValor(textField.getValue());
+
+            } else {
+                dato.setValor("");
+            }
+        }
+        return lista;
     }
 
     /**
@@ -129,11 +146,9 @@ public final class FrmDatosGenerico extends FrmMasterVentana {
     }
 
     public void setDetalleEquipo(EquipoBean equipoBean) {
-
         equipoDetalle.setContent(new Html(equipoBean.toHtml()));
         equipoDetalle.setSummaryText(equipoBean.getTipo());
         equipoDetalle.setEnabled(true);
         equipoDetalle.setOpened(true);
-
     }
 }
