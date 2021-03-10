@@ -42,7 +42,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 + ",usu.estado as usuarioestado,usu.usucambio as usuariousucambio"
                 + ",usu.fechacambio as usuariofechacambio,usu.mail as usuariomail"
                 + ",usu.telefono as usuariotelefon,usu.idgfh as usuarioidgfh"
-                + ",usu.idcategoria as usuarioidcategoria , usu.estado as usuarioestado"
+                + ",usu.idcategoria as usuarioidcategoria"
                 + " FROM usuarios usu "
                 + " WHERE 1=1";
 
@@ -344,6 +344,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         try {
             connection = super.getConexionBBDD();
 
+
             sql = sql.concat(" AND estado=" + ConexionDao.BBDD_ACTIVOSI);
             sql = sql.concat(" ORDER BY apellido1,apellido2,nombre	");
 
@@ -353,7 +354,6 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 UsuarioBean usuario = getRegistroResulset(resulSet);
                 lista.add(usuario);
             }
-            statement.close();
             statement.close();
             logger.debug(sql);
         } catch (SQLException e) {
