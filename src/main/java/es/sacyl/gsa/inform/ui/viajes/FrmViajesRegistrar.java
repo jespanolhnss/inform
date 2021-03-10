@@ -180,6 +180,11 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
     public void doLimpiar() {
         viajesBinder.readBean(null);
 
+        viajeCentroGrid.setItems(new ArrayList<ViajeCentroBean>());
+        doActualizaGridCentros(viajeBean);
+
+        viajeTecnicoGrid.setItems(new ArrayList<UsuarioBean>());
+        doActualizaGridTecnicos(viajeBean);
     }
 
     @Override
@@ -235,6 +240,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
     public void doActualizaGrid() {
         arrayListViajes = new ViajesDao().getListaViajes(desde.getValue(), hasta.getValue(), centroComboBuscador.getValue(), null, 1);
         viajesGrid.setItems(arrayListViajes);
+
     }
 
     @Override
@@ -418,11 +424,13 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
     private void doActualizaGridCentros(ViajeBean viajeBean) {
         viajeCentrosArrayList = new ViajesDao().getViajeCentros(viajeBean);
         viajeCentroGrid.setItems(viajeCentrosArrayList);
+        centrosTab.setLabel("Centros (" + viajeCentrosArrayList + ")");
     }
 
     private void doActualizaGridTecnicos(ViajeBean viajeBean) {
-        viajeTecnicoGrid.setItems(new ViajesDao().getViajeTecnicos(viajeBean));
-
+        ArrayList<UsuarioBean> usuarioBeans = new ViajesDao().getViajeTecnicos(viajeBean);
+        viajeTecnicoGrid.setItems(usuarioBeans);
+        centrosTab.setLabel("Técnicos (" + usuarioBeans.size() + ")");
     }
 
 }

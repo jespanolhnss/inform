@@ -89,6 +89,7 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
                     if (resulSet.next()) {
                         ipBean = getRegistroResulset(resulSet);
                     }
+                    statement.close();
                 }
                 LOGGER.debug(sql);
             } catch (SQLException e) {
@@ -104,7 +105,31 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
 
     @Override
     public IpBean getPorCodigo(String codigo) {
-        return null;
+        Connection connection = null;
+        IpBean ipBean = null;
+
+        try {
+            connection = super.getConexionBBDD();
+
+            sql = sql.concat(" AND ip.ip='" + codigo + "'");
+
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sql);
+                if (resulSet.next()) {
+                    ipBean = getRegistroResulset(resulSet);
+                }
+                statement.close();
+            }
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+
+        return ipBean;
     }
 
     @Override

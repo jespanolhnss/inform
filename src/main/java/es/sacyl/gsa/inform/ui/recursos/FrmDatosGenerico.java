@@ -50,34 +50,25 @@ public final class FrmDatosGenerico extends FrmMasterVentana {
     @Override
     public void doGrabar() {
         // Borra los datos genéricos actuales de bean y luego añade los nuevos
-        for (TextField textField : listaCamposTextFields) {
-            DatoGenericoBean dato = new DatoGenericoBean();
-            dato.setTipoDato(textField.getLabel());
-            dato.setIdDatoEqipo(equipoBean.getId());
-            if (!textField.getValue().isEmpty()) {
-                dato.setValor(textField.getValue());
-                new EquipoDao().grabatValorDatoGenerico(dato);
-            } else {
-                dato.setValor("");
-                new EquipoDao().grabatValorDatoGenerico(dato);
-            }
-        }
-    }
-
-    public ArrayList<DatoGenericoBean> getDatosGenericoBeans() {
         ArrayList<DatoGenericoBean> lista = new ArrayList<>();
         for (TextField textField : listaCamposTextFields) {
             DatoGenericoBean dato = new DatoGenericoBean();
             dato.setTipoDato(textField.getLabel());
             dato.setIdDatoEqipo(equipoBean.getId());
+            lista.add(dato);
             if (!textField.getValue().isEmpty()) {
                 dato.setValor(textField.getValue());
-
             } else {
                 dato.setValor("");
             }
+            new EquipoDao().grabatValorDatoGenerico(dato);
         }
-        return lista;
+        equipoBean.setDatosGenericoBeans(lista);
+        this.close();
+    }
+
+    public ArrayList<DatoGenericoBean> getDatosGenericoBeans() {
+        return equipoBean.getDatosGenericoBeans();
     }
 
     /**

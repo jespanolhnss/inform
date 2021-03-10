@@ -457,17 +457,21 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         return lista;
     }
 
+    /**
+     *
+     * @param dato
+     * @return
+     */
     public String getValorDatoGenerico(DatoGenericoBean dato) {
-        return dato.getTipoDato() + "....";
-        /*
         String valor = "";
         Connection connection = null;
+        String sqlValor = "";
         try {
             connection = super.getConexionBBDD();
-            String sqlValor = " SELECT * FORM equiposdatos WHERE idequipo=" + dato.getIdDatoEqipo() + " AND "
-                    + " tipo='" + dato.getTipoDato() + "'";
+            sqlValor = " SELECT * FROM equiposdatos WHERE idequipo=" + dato.getIdDatoEqipo() + " AND "
+                    + " tipodato='" + dato.getTipoDato() + "'";
             Statement statement = connection.createStatement();
-            ResultSet resulSet = statement.executeQuery(sql);
+            ResultSet resulSet = statement.executeQuery(sqlValor);
             if (resulSet.next()) {
                 valor = resulSet.getString("valor");
             }
@@ -481,21 +485,21 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             this.doCierraConexion(connection);
         }
         return valor;
-         */
     }
 
     public Boolean grabatValorDatoGenerico(DatoGenericoBean dato) {
         String valor = "";
+        String sqlValor = "";
         Connection connection = null;
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            String sqlValor = " SELECT * FORM equiposdatos WHERE idequipo=" + dato.getIdDatoEqipo() + " AND "
-                    + " tipo='" + dato.getTipoDato() + "'";
+            sqlValor = " SELECT * FROM equiposdatos WHERE idequipo=" + dato.getIdDatoEqipo() + " AND "
+                    + " tipodato='" + dato.getTipoDato() + "'";
             Statement statement = connection.createStatement();
-            ResultSet resulSet = statement.executeQuery(sql);
+            ResultSet resulSet = statement.executeQuery(sqlValor);
             if (resulSet.next()) {
-                sqlValor = " UPDATE equiposdatos SET valor=? WHERE idequipo=? AND tipo=? ";
+                sqlValor = " UPDATE equiposdatos SET valor=? WHERE idequipo=? AND tipodato=? ";
                 PreparedStatement statementInsert = connection.prepareStatement(sqlValor);
                 statementInsert.setString(1, dato.getValor());
                 statementInsert.setLong(2, dato.getIdDatoEqipo());
@@ -504,19 +508,21 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 statementInsert.close();
                 LOGGER.debug(sqlValor);
             } else {
-                sqlValor = " INSERT INTO  equiposdatos (id, valor, idequipo, tipo) VALUES (?,?,,?,,?,?) ";
+                dato.setId(getSiguienteId("equiposdatos"));
+                sqlValor = " INSERT INTO  equiposdatos (id, valor, idequipo, tipodato) VALUES (?,?,?,?) ";
                 PreparedStatement statementUpdate = connection.prepareStatement(sqlValor);
-                statementUpdate.setString(1, dato.getValor());
-                statementUpdate.setLong(2, dato.getIdDatoEqipo());
-                statementUpdate.setString(3, dato.getTipoDato());
+                statementUpdate.setLong(1, dato.getId());
+                statementUpdate.setString(2, dato.getValor());
+                statementUpdate.setLong(3, dato.getIdDatoEqipo());
+                statementUpdate.setString(4, dato.getTipoDato());
                 insertadoBoolean = statementUpdate.executeUpdate() > 0;
                 statementUpdate.close();
                 LOGGER.debug(sqlValor);
             }
             statement.close();
-            LOGGER.debug(sql);
+            LOGGER.debug(sqlValor);
         } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
+            LOGGER.error(sqlValor + Utilidades.getStackTrace(e));
         } catch (Exception e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         } finally {
@@ -528,17 +534,18 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
     public Boolean borraValorDatoGenerico(DatoGenericoBean dato) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
+        String sqlValor = "";
         try {
             connection = super.getConexionBBDD();
-            String sqlValor = " DELETE FROM  equiposdatos WHERE idequipo=? AND  tipo=? ";
+            sqlValor = " DELETE FROM  equiposdatos WHERE idequipo=? AND  tipo=? ";
             PreparedStatement statement = connection.prepareStatement(sqlValor);
             statement.setLong(1, dato.getEstado());
             statement.setString(2, dato.getValor());
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
-            LOGGER.debug(sql);
+            LOGGER.debug(sqlValor);
         } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
+            LOGGER.error(sqlValor + Utilidades.getStackTrace(e));
         } catch (Exception e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         } finally {

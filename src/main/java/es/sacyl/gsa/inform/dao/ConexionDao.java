@@ -157,14 +157,18 @@ public class ConexionDao implements Serializable {
         return null;
     }
 
+    /**
+     *
+     * @param tabla
+     * @return
+     */
     public Long getSiguienteId(String tabla) {
         Connection connection = null;
         Long id = new Long(1);
         try {
             connection = this.getConexionBBDD();
-            sql = " SELECT max(id) +1  as id FROM  " + tabla;
-            //   sql = " select SEC_ID_" + tabla + ".nextval from dual ";
-
+            //  sql = " SELECT max(id) +1  as id FROM  " + tabla;
+            sql = " select SEC_ID_" + tabla + ".nextval as id from dual ";
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
@@ -185,6 +189,10 @@ public class ConexionDao implements Serializable {
         return id;
     }
 
+    /**
+     *
+     * @param connection
+     */
     public void doCierraConexion(Connection connection) {
         try {
             if (connection != null) {

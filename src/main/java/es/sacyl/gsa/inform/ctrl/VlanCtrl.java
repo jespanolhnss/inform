@@ -5,6 +5,10 @@
  */
 package es.sacyl.gsa.inform.ctrl;
 
+import es.sacyl.gsa.inform.bean.IpBean;
+import es.sacyl.gsa.inform.bean.VlanBean;
+import es.sacyl.gsa.inform.dao.ConexionDao;
+import es.sacyl.gsa.inform.dao.IpDao;
 import es.sacyl.gsa.inform.util.NumeroBinario;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
@@ -274,5 +278,44 @@ public class VlanCtrl implements Serializable {
             return -4;
         }
         return 1;
+    }
+
+    public void doGeneraIpsDelRango(VlanBean vlanBean) {
+        String dir1, dir2, dir3, dir4;
+        String[] ips = vlanBean.getPuertaenlace().split("\\.");
+        //    NumeroBinario unoBinario = new NumeroBinario(
+        //           new NumeroBinario(31, NumeroBinario.ZERO_CHAR).getNumero() + NumeroBinario.ONE_CHAR);
+
+        NumeroBinario unoBinario = new NumeroBinario("1");
+
+        // pasa cada direccion a binario y rellena con ceros por la izqueirda para montar la direccion con los 32 caracteres
+        NumeroBinario ipBinario = new NumeroBinario(
+                new NumeroBinario(Integer.parseInt(ips[0])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR)
+                        .concat(new NumeroBinario(Integer.parseInt(ips[1])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+                        .concat(new NumeroBinario(Integer.parseInt(ips[2])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR))
+                        .concat(new NumeroBinario(Integer.parseInt(ips[3])).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR)));
+        int contador = 0;
+        do {
+            dir1 = ipBinario.getNumero().substring(0, 8);
+            dir2 = ipBinario.getNumero().substring(8, 16);
+            dir3 = ipBinario.getNumero().substring(16, 24);
+            dir4 = ipBinario.getNumero().substring(24, 32);
+            IpBean ip = new IpBean();
+            ip.setIp(Utilidades.binarioToDecimalString(dir1) + "." + Utilidades.binarioToDecimalString(dir2) + "."
+                    + Utilidades.binarioToDecimalString(dir3) + "." + Utilidades.binarioToDecimalString(dir4));
+
+            ip.setVlan(vlanBean);
+            ip.setValoresAut();
+            IpDao ipDao = new IpDao();
+            // si la ip no existe la inserta si no no hace nada
+            if (ipDao.getPorCodigo(ip.getIp()) == null) {
+                ip.setId(new ConexionDao().getSiguienteId("ips"));
+                ipDao.doInsertaDatos(ip);
+            }
+            contador++;
+            // suma uno para calcular la siguiente direccion y lo guarda en el mismo objeto
+            ipBinario = ipBinario.sumar(unoBinario);
+        } while (contador < vlanBean.getNumeroDirecciones());
+
     }
 }

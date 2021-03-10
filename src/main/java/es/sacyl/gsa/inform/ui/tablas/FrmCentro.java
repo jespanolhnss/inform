@@ -209,7 +209,9 @@ public final class FrmCentro extends FrmMasterPantalla {
 
         // borra el contenido de los tabs
         centroUsuarioGrid.setItems(new ArrayList<>());
+        doActualizaGridCentroUsuario();
         centroFicheroGrid.setItems(new ArrayList<>());
+        doActualizaGridCentroFichero();
         miniaturasHorizontalLayout.removeAll();
         doControlBotones(null);
     }
@@ -325,7 +327,6 @@ public final class FrmCentro extends FrmMasterPantalla {
         ArrayList<CentroUsuarioBean> centroUsuarioBeans = new CentroUsuarioDao().getLista(centroBean);
         centroBean.setCentroUsuarioArrayList(centroUsuarioBeans);
         centroUsuarioGrid.setItems(centroUsuarioBeans);
-        doMuestraMiniaturas();
         usuariosTab.setLabel("Usuario (" + Integer.toString(centroUsuarioBeans.size()) + ")");
     }
 

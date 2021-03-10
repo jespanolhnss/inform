@@ -22,12 +22,12 @@ import org.apache.logging.log4j.Logger;
  *
  * @author 06551256M
  */
-public class UsuarioCategoriaDao extends ConexionDao implements Serializable {
+public class CategoriaDao extends ConexionDao implements Serializable {
 
-    private static final Logger LOGGER = LogManager.getLogger(UsuarioCategoriaDao.class);
+    private static final Logger LOGGER = LogManager.getLogger(CategoriaDao.class);
     private static final long serialVersionUID = 1L;
 
-    public UsuarioCategoriaDao() {
+    public CategoriaDao() {
         super();
         sql = " SELECT uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ", uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "

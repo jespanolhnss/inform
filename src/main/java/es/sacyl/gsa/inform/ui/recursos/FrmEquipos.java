@@ -238,15 +238,20 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     public void doActualizaGridAplicacion() {
         ArrayList<EquipoAplicacionBean> equipoAplicacionArrayList = new EquipoAplicacionDao().getLista(null, equipoBean, null);
+        equipoBean.setAplicacinesArrayList(equipoAplicacionArrayList);
         equipoAplicacionGrid.setItems(equipoAplicacionArrayList);
         equipoAplicacionGrid.setHeightByRows(true);
-        equipoAplicacionGrid.setPageSize(equipoAplicacionArrayList.size());
+        if (equipoAplicacionArrayList.size() > 0) {
+            equipoAplicacionGrid.setPageSize(equipoAplicacionArrayList.size());
+        }
     }
 
     public void doActualizaGridDatosGenericos() {
         datosGenericosGrid.setItems(equipoBean.getDatosGenericoBeans());
-        equipoAplicacionGrid.setHeightByRows(true);
-        equipoAplicacionGrid.setPageSize(equipoBean.getDatosGenericoBeans().size());
+        datosGenericosGrid.setHeightByRows(true);
+        if (equipoBean.getDatosGenericoBeans().size() > 0) {
+            datosGenericosGrid.setPageSize(equipoBean.getDatosGenericoBeans().size());
+        }
     }
 
     @Override
@@ -290,7 +295,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         equipoBinder.forField(macAdress)
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 17))
+                        FrmMensajes.AVISODATOABLIGATORIO, 0, 17))
                 .bind(EquipoBean::getMacadress, EquipoBean::setMacadress);
 
         equipoBinder.forField(ip)
@@ -401,6 +406,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         });
 
         equipoGrid.addItemClickListener(event -> {
+            equipoBean = new EquipoBean();
             equipoBean = event.getItem();
             equipoBinder.readBean(event.getItem());
             // Estos datos sólo los carga cuando hace clic en el grid
@@ -495,9 +501,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     public void doActualizaComboCentro() {
         ArrayList<CentroBean> centroArrayList = new CentroDao().getLista(null, autonomiaComboBuscador.getValue(),
                 provinciaComboBuscador.getValue(), null, null, centroTipoComboBuscador.getValue(), null, ConexionDao.BBDD_ACTIVOSI);
-
         centroCombo.setItems(centroArrayList);
-
         centroComboBuscador.setItems(centroArrayList);
         if (centroArrayList.size() > 0) {
             centroCombo.setValue(centroArrayList.get(0));

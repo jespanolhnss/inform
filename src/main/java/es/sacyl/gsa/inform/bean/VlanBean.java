@@ -1,5 +1,7 @@
 package es.sacyl.gsa.inform.bean;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author 06551256M
@@ -14,6 +16,8 @@ public class VlanBean extends MasterBean {
     private String broadcast;
     private String ultimaIp;
     private Integer numeroDirecciones;
+
+    private ArrayList<IpBean> ipsDelRango = new ArrayList<>();
 
     public VlanBean() {
         super();
@@ -81,6 +85,14 @@ public class VlanBean extends MasterBean {
 
     public void setNumeroDirecciones(Integer numeroDirecciones) {
         this.numeroDirecciones = numeroDirecciones;
+    }
+
+    public ArrayList<IpBean> getIpsDelRango() {
+        return ipsDelRango;
+    }
+
+    public void setIpsDelRango(ArrayList<IpBean> ipsDelRango) {
+        this.ipsDelRango = ipsDelRango;
     }
 
 }

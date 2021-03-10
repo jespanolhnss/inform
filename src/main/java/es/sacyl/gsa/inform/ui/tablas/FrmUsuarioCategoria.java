@@ -11,7 +11,7 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import es.sacyl.gsa.inform.bean.UsuarioCategoriaBean;
-import es.sacyl.gsa.inform.dao.UsuarioCategoriaDao;
+import es.sacyl.gsa.inform.dao.CategoriaDao;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
@@ -63,7 +63,7 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
     @Override
     public void doGrabar() {
         if (usuarioCategoriaBinder.writeBeanIfValid(usuarioCategoriaBean)) {
-            if (new UsuarioCategoriaDao().doGrabaDatos(usuarioCategoriaBean) == true) {
+            if (new CategoriaDao().doGrabaDatos(usuarioCategoriaBean) == true) {
                 (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                 doActualizaGrid();
                 doLimpiar();
@@ -94,7 +94,7 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
                 FrmMensajes.AVISOCONFIRMACIONACCION,
                 FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
                 FrmMensajes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
-                    new UsuarioCategoriaDao().doBorraDatos(usuarioCategoriaBean);
+                    new CategoriaDao().doBorraDatos(usuarioCategoriaBean);
                     Notification.show(FrmMensajes.AVISODATOBORRADO);
                     doActualizaGrid();
                     doLimpiar();
@@ -132,7 +132,7 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
 
     @Override
     public void doActualizaGrid() {
-        usuarioCategoriaArrayList = new UsuarioCategoriaDao().getLista(buscador.getValue());
+        usuarioCategoriaArrayList = new CategoriaDao().getLista(buscador.getValue());
         usuarioCategoriaGrid.setItems(usuarioCategoriaArrayList);
     }
 

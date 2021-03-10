@@ -5,7 +5,7 @@ package es.sacyl.gsa.inform.bean;
  *
  * @author 06551256M
  */
-public class UsuarioCategoria {
+public class CategoriaBean {
     private Long id;
     private String codigo;
     private String descripcion;

@@ -170,6 +170,7 @@ public final class FrmIp extends FrmMasterPantalla {
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("150px", 1),
                 new FormLayout.ResponsiveStep("150px", 2));
+
         contenedorFormulario.add(id, vlanCombo, ip, equipo, ayudaEquipo, equipoDetalle);
         contenedorBuscadores.add(buscador, vlanComoboBuscador, ipLibre);
         contenedorDerecha.add(contenedorBuscadores, ipGrid);
