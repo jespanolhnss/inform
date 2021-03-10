@@ -5,13 +5,8 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.BinderValidationStatus;
-import com.vaadin.flow.data.binder.BindingValidationStatus;
-import com.vaadin.flow.data.converter.StringToLongConverter;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.bean.ViajeBean;
-import es.sacyl.gsa.inform.bean.ViajeTecnicoBean;
 import es.sacyl.gsa.inform.dao.ViajesDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
@@ -19,9 +14,6 @@ import es.sacyl.gsa.inform.ui.FrmMasterConstantes;
 import es.sacyl.gsa.inform.ui.FrmMasterVentana;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -30,7 +22,6 @@ import java.util.stream.Collectors;
 public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
 
     /* Campos del formulario */
-    TextField id = new ObjetosComunes().getTextField("id");
     TextField idViaje = new ObjetosComunes().getTextField("idViaje");
     ComboBox<UsuarioBean> tecnicosComboBox = new CombosUi().getInformaticosCombo(null);
 
@@ -38,10 +29,6 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
 
     /* Componentes */
     ViajeBean viajeBean = new ViajeBean();
-    ViajeTecnicoBean viajeTecnicoBean = new ViajeTecnicoBean();
-    Binder<ViajeTecnicoBean> viajeTecnicoBinder = new Binder<>();
-    ArrayList<ViajeTecnicoBean> arrayListTecnicoViaje = new ArrayList<>();
-    UsuarioBean informaticos = new UsuarioBean();
 
     public FrmViajesTecnicosRegistrar(String ancho, ViajeBean viajeBean) {
         super(ancho);
@@ -55,10 +42,8 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
 
     @Override
     public void doGrabar() {
-        if (viajeTecnicoBinder.writeBeanIfValid(viajeTecnicoBean)) {
-            viajeTecnicoBean.setViaje(viajeBean);
-            informaticos.setId(viajeTecnicoBean.getTecnico().getId());
-            if (new ViajesDao().doInsertaUnTecnico(viajeBean, informaticos) == true) {
+        if (tecnicosComboBox.getValue() != null) {
+            if (new ViajesDao().doInsertaUnTecnico(viajeBean, tecnicosComboBox.getValue()) == true) {
                 (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                 doLimpiar();
                 this.close();
@@ -67,13 +52,8 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
             }
             // this.close();
         } else {
-            BinderValidationStatus<ViajeTecnicoBean> validate = viajeTecnicoBinder.validate();
-            String errorText = validate.getFieldValidationStatuses()
-                    .stream().filter(BindingValidationStatus::isError)
-                    .map(BindingValidationStatus::getMessage)
-                    .map(Optional::get).distinct()
-                    .collect(Collectors.joining(", "));
-            Notification.show(FrmMensajes.AVISODATOERRORVALIDANDO + errorText);
+
+            Notification.show(FrmMensajes.AVISODATOERRORVALIDANDO);
         }
     }
 
@@ -83,7 +63,7 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
                 FrmMasterConstantes.AVISOCONFIRMACIONACCION,
                 FrmMasterConstantes.AVISOCONFIRMACIONACCIONSEGURO,
                 FrmMasterConstantes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
-                    new ViajesDao().doBorraUnTecnico(viajeTecnicoBean);
+                    new ViajesDao().doBorraUnTecnico(viajeBean, tecnicosComboBox.getValue());
                     Notification.show(FrmMasterConstantes.AVISODATOBORRADO);
                     doActualizaGrid();
                     doLimpiar();
@@ -110,7 +90,7 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
 
     @Override
     public void doLimpiar() {
-        viajeTecnicoBinder.readBean(null);
+
     }
 
     @Override
@@ -125,23 +105,26 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
 
     @Override
     public void doBinderPropiedades() {
+        /*
         viajeTecnicoBinder.forField(id)
                 .withNullRepresentation("")
                 .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(ViajeTecnicoBean::getId, null);
 
-        /*
+
         viajeTecnicoBinder.forField(idViaje)
                 .withNullRepresentation("")
                 .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(ViajeTecnicoBean::getIdViaje, null);
-         */
+
         viajeTecnicoBinder.forField(tecnicosComboBox).bind(ViajeTecnicoBean::getTecnico, ViajeTecnicoBean::setTecnico);
+         */
     }
 
     @Override
     public void doComponenesAtributos() {
         idViaje.setValue(viajeBean.getId().toString());
+        idViaje.setEnabled(false);
         botonCancelar.setText("Salir");
         botonAyuda.setVisible(false);
         botonLimpiar.setVisible(false);
@@ -150,7 +133,7 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
 
     @Override
     public void doComponentesOrganizacion() {
-        contenedorFormulario.add(id, idViaje, tecnicosComboBox);
+        contenedorFormulario.add(idViaje, tecnicosComboBox);
     }
 
     @Override

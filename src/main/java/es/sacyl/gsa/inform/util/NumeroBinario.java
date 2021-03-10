@@ -216,10 +216,15 @@ public class NumeroBinario {
             }
 
         }
-
+        String resultado;
         result[0] = carry;
+        resultado = new String(result).trim();
+        // si erl carry es cero no hace falta añadir un cero a la izquierda
+        if (carry == ZERO_CHAR) {
+            resultado = resultado.substring(1, resultado.length());
+        }
 
-        return new NumeroBinario(new String(result).trim());
+        return new NumeroBinario(resultado);
     }
 
     /**

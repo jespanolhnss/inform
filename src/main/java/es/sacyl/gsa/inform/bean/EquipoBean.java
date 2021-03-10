@@ -1,6 +1,5 @@
 package es.sacyl.gsa.inform.bean;
 
-import es.sacyl.gsa.inform.util.Constantes;
 import java.util.ArrayList;
 
 /**
@@ -14,11 +13,17 @@ public class EquipoBean extends MasterBean {
     private String marca;
     private String modelo;
     private String numeroSerie;
+    private String macadress;
     private CentroBean centro;
     private UbicacionBean ubicacion;
     private GfhBean servicio;
     private String comentario;
     private ArrayList<IpBean> listaIps = new ArrayList<>();
+    private ArrayList<EquipoAplicacionBean> aplicacinesArrayList = new ArrayList<>();
+
+    private ArrayList<DatoGenericoBean> datosGenericoBeans = new ArrayList<>();
+
+    public static String TIPOCPU = "Cpu";
 
     public EquipoBean() {
         super();
@@ -64,6 +69,14 @@ public class EquipoBean extends MasterBean {
         this.numeroSerie = numeroSerie;
     }
 
+    public String getMacadress() {
+        return macadress;
+    }
+
+    public void setMacadress(String macadress) {
+        this.macadress = macadress;
+    }
+
     public CentroBean getCentro() {
         return centro;
     }
@@ -104,6 +117,22 @@ public class EquipoBean extends MasterBean {
         this.listaIps = listaIps;
     }
 
+    public ArrayList<EquipoAplicacionBean> getAplicacinesArrayList() {
+        return aplicacinesArrayList;
+    }
+
+    public void setAplicacinesArrayList(ArrayList<EquipoAplicacionBean> aplicacinesArrayList) {
+        this.aplicacinesArrayList = aplicacinesArrayList;
+    }
+
+    public ArrayList<DatoGenericoBean> getDatosGenericoBeans() {
+        return datosGenericoBeans;
+    }
+
+    public void setDatosGenericoBeans(ArrayList<DatoGenericoBean> datosGenericoBeans) {
+        this.datosGenericoBeans = datosGenericoBeans;
+    }
+
     public String getIpsCadena() {
         String cadena = "";
         for (IpBean ipBean : getListaIps()) {
@@ -129,27 +158,28 @@ public class EquipoBean extends MasterBean {
         } else {
             cadena = cadena.concat(" ");
         }
-
-        cadena = cadena.concat(Constantes.HTMLESPACIO1 + "Inventario:   ");
+        cadena = cadena.concat("<hr> ");
+        cadena = cadena.concat("Inventario:   ");
         if (inventario != null) {
             cadena = cadena.concat(inventario);
         } else {
             cadena = cadena.concat(" ");
         }
         cadena = cadena.concat("<hr> ");
-        cadena = cadena.concat(Constantes.HTMLESPACIO1 + "Marca: ");
+        cadena = cadena.concat("Marca: ");
         if (marca != null) {
             cadena = cadena.concat(marca);
         } else {
             cadena = cadena.concat(" ");
         }
-
+        cadena = cadena.concat("<hr> ");
         cadena = cadena.concat("Modelo: ");
         if (modelo != null) {
             cadena = cadena.concat(modelo);
         } else {
             cadena = cadena.concat(" ");
         }
+        cadena = cadena.concat("<hr> ");
         cadena = cadena.concat("NumeroSerie: ");
         if (numeroSerie != null) {
             cadena = cadena.concat(numeroSerie);

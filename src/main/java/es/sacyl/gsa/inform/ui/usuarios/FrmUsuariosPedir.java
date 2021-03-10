@@ -160,19 +160,22 @@ public class FrmUsuariosPedir extends FrmMasterPantalla {
             usuarioBinder.readBean(usuarioBean);
         });
 
-//        buscador.addBlurListener(event -> {
-//            if (buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
-//                arrayListUsuarios = new UsuarioDao().getLista(null);
-//            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
-//                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), camposFiltro.getValue());
-//            } else if (buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
-//                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(null, camposFiltro.getValue());
-//            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
-//                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), null);
-//            }
-//            usuariosGrid.setItems(arrayListUsuarios);
-//        });
-    }
+ 
+        buscador.addBlurListener(event -> {
+            /*
+            if (buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
+                arrayListUsuarios = new UsuarioDao().getLista(null);
+            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
+                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), camposFiltro.getValue());
+            } else if (buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
+                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(null, camposFiltro.getValue());
+            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
+                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), null);
+            }
+             */
+            usuariosGrid.setItems(arrayListUsuarios);
+        });
+ 
 
     @Override
     public void doImprimir() {

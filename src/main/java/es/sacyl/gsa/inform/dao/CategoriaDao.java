@@ -22,12 +22,12 @@ import org.apache.logging.log4j.Logger;
  *
  * @author 06551256M
  */
-public class UsuarioCategoriaDao extends ConexionDao implements Serializable {
+public class CategoriaDao extends ConexionDao implements Serializable {
 
-    private static final Logger LOGGER = LogManager.getLogger(UsuarioCategoriaDao.class);
+    private static final Logger LOGGER = LogManager.getLogger(CategoriaDao.class);
     private static final long serialVersionUID = 1L;
 
-    public UsuarioCategoriaDao() {
+    public CategoriaDao() {
         super();
         sql = " SELECT uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ", uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
@@ -52,7 +52,7 @@ public class UsuarioCategoriaDao extends ConexionDao implements Serializable {
         UsuarioCategoriaBean usuarioCategoriaBean = null;
         try {
             connection = super.getConexionBBDD();
-            sql = sql.concat(" AND uc.codigo='" + codigo + "'");
+            sql = sql.concat(" AND uc.CODIGOPERSIGO='" + codigo + "'");
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
@@ -110,7 +110,7 @@ public class UsuarioCategoriaDao extends ConexionDao implements Serializable {
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " INSERT INTO  usuarioscategorias  (id,codigo,nombre, estado) "
+            sql = " INSERT INTO  usuarioscategorias  (id,CODIGOPERSIGO,nombre, estado) "
                     + " VALUES "
                     + "(?,?,?,?)";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -130,6 +130,8 @@ public class UsuarioCategoriaDao extends ConexionDao implements Serializable {
             } else {
                 statement.setNull(4, Types.CHAR);
             }
+            insertadoBoolean = statement.executeUpdate() > 0;
+            statement.close();
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
@@ -146,24 +148,28 @@ public class UsuarioCategoriaDao extends ConexionDao implements Serializable {
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE   usuarioscategorias  SET codigo=?,nombre=?, estado=?  WHERE id =?  ";
+            sql = " UPDATE   usuarioscategorias  SET CODIGOPERSIGO=?,nombre=?, estado=?  WHERE id =?  ";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setLong(1, usuarioCategoriaBean.getId());
+
             if (usuarioCategoriaBean.getCodigo() != null) {
-                statement.setString(2, usuarioCategoriaBean.getCodigo());
+                statement.setString(1, usuarioCategoriaBean.getCodigo());
+            } else {
+                statement.setNull(1, Types.CHAR);
+            }
+            if (usuarioCategoriaBean.getNombre() != null) {
+                statement.setString(2, usuarioCategoriaBean.getNombre());
             } else {
                 statement.setNull(2, Types.CHAR);
             }
-            if (usuarioCategoriaBean.getNombre() != null) {
-                statement.setString(3, usuarioCategoriaBean.getNombre());
-            } else {
-                statement.setNull(3, Types.CHAR);
-            }
             if (usuarioCategoriaBean.getEstado() != null) {
-                statement.setInt(4, usuarioCategoriaBean.getEstado());
+                statement.setInt(3, usuarioCategoriaBean.getEstado());
             } else {
-                statement.setNull(4, Types.CHAR);
+                statement.setNull(3, Types.INTEGER);
             }
+            statement.setLong(4, usuarioCategoriaBean.getId()
+            );
+            insertadoBoolean = statement.executeUpdate() > 0;
+            statement.close();
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));

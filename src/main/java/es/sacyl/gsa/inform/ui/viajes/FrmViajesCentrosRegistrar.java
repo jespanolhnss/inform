@@ -3,6 +3,7 @@ package es.sacyl.gsa.inform.ui.viajes;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -41,6 +42,7 @@ public final class FrmViajesCentrosRegistrar extends FrmMasterVentana {
     ComboBox<CentroTipoBean> tipoCentroCombo = new CombosUi().getCentroTipoCombo(null);
     ComboBox<CentroBean> centroCombo = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO,
             ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPOCENTROSALUD, null, null);
+
     //TextArea preparacion = new ObjetosComunes().getTextArea("Preparación", "datos de la preparación del viaje", 100, "50px", "150px", "50px", "20px");
     TextArea preparacionTextArea = new TextArea("Preparación");
     //TextArea actuacion = new ObjetosComunes().getTextArea("Actuación", "registra el trabajo realizado", 100, "50px", "175px", "50px", "20px");
@@ -160,7 +162,6 @@ public final class FrmViajesCentrosRegistrar extends FrmMasterVentana {
 
     @Override
     public void doActualizaGrid() {
-        // TODO Auto-generated method stub
 
     }
 
@@ -186,11 +187,11 @@ public final class FrmViajesCentrosRegistrar extends FrmMasterVentana {
 
     @Override
     public void doComponenesAtributos() {
-        //this.setCloseOnEsc(true);
-        //this.setCloseOnOutsideClick(true);
-        //this.setModal(true);
+        this.setModal(true);
+        contenedorDerecha.setVisible(false);
         preparacionTextArea.setHeight("150px");
         preparacionTextArea.setPlaceholder("Datos de la preparación del viaje");
+
         actuacionTextArea.setHeight("150px");
         actuacionTextArea.setPlaceholder("registra el trabajo realizado");
 
@@ -198,9 +199,21 @@ public final class FrmViajesCentrosRegistrar extends FrmMasterVentana {
 
     @Override
     public void doComponentesOrganizacion() {
+
         botonCancelar.setText("Salir");
         contenedorBotones.add(modificarButton);
-        contenedorFormulario.add(provinciasCombo, tipoCentroCombo, centroCombo, preparacionTextArea, actuacionTextArea);
+        contenedorFormulario.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("50px", 1),
+                new FormLayout.ResponsiveStep("50px", 2),
+                new FormLayout.ResponsiveStep("50px", 3),
+                new FormLayout.ResponsiveStep("50px", 4));
+        // fila1
+        contenedorFormulario.add(provinciasCombo, tipoCentroCombo);
+        contenedorFormulario.add(centroCombo, 2);
+// fila 2
+        contenedorFormulario.add(preparacionTextArea, 2);
+// fila 3
+        contenedorFormulario.add(actuacionTextArea, 2);
     }
 
     @Override

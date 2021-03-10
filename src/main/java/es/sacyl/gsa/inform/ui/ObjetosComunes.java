@@ -6,7 +6,9 @@ import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -14,7 +16,6 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
-import es.sacyl.gsa.inform.bean.LopdSujetoBean;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.GfhDao;
 import es.sacyl.gsa.inform.dao.JimenaDao;
@@ -73,6 +74,10 @@ public class ObjetosComunes {
 
     }
 
+    /**
+     *
+     * @return
+     */
     public RadioButtonGroup<String> getEstadoRadio() {
         RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
         radioGroup.setLabel("Activo");
@@ -80,6 +85,11 @@ public class ObjetosComunes {
         return radioGroup;
     }
 
+    /**
+     *
+     * @param label
+     * @return
+     */
     public RadioButtonGroup<String> getSNRadio(String label) {
         RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
         if (label != null) {
@@ -87,6 +97,17 @@ public class ObjetosComunes {
         }
         radioGroup.setItems("S", "N");
         return radioGroup;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Details getDetails() {
+        Details details = new Details();
+        details.setEnabled(true);
+        details.setOpened(true);
+        return details;
     }
 
     /**
@@ -99,11 +120,6 @@ public class ObjetosComunes {
         checkboxGroup = new CheckboxGroup<CentroBean>();
         checkboxGroup.setItems(new JimenaDao().getListaCentrosPrimaria());
         checkboxGroup.setItemLabelGenerator(CentroBean::getNomcen);
-
-//      if (valor != null) {
-//    	  checkboxGroup.setValue(valor);
-//      }
-        //checkboxGroup.setWidth("150px");
         return checkboxGroup;
     }
 
@@ -137,28 +153,6 @@ public class ObjetosComunes {
 
     /**
      *
-     * @param valor
-     * @return
-     */
-    public ComboBox<LopdSujetoBean> getLopdSujetoCombo(LopdSujetoBean valor) {
-        ComboBox<LopdSujetoBean> combo;
-        combo = new ComboBox<>("Sujeto");
-        combo.setItems(LopdSujetoBean.LISTASUJETOS_COMPLETA);
-        combo.setItemLabelGenerator(lopdSujeto -> {
-            return lopdSujeto.getDescripcion();
-        });
-        if (valor != null) {
-            combo.setValue(valor);
-        } else {
-            combo.setValue(LopdSujetoBean.SUJETO_PACIENTE);
-        }
-        combo.setWidth("200px");
-        combo.setClearButtonVisible(true);
-        return combo;
-    }
-
-    /**
-     *
      * @param text
      * @param buttonVariant
      * @param icon
@@ -178,6 +172,18 @@ public class ObjetosComunes {
             boton.setIcon(icon);
         }
         boton.setHeight("35px");
+        return boton;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Button getBotonMini() {
+        Button boton = getBoton(null, null, VaadinIcon.QUESTION_CIRCLE.create());
+        boton.setWidth("30px");
+        boton.setMaxWidth("30px");
+        boton.setMinWidth("30px");
         return boton;
     }
 
@@ -223,7 +229,6 @@ public class ObjetosComunes {
         if (text != null) {
             textField.setLabel(text);
         }
-
         textField.setClearButtonVisible(true);
         return textField;
     }
@@ -266,6 +271,11 @@ public class ObjetosComunes {
         return textArea;
     }
 
+    /**
+     *
+     * @param text
+     * @return
+     */
     public TextArea getTextArea(String text) {
         TextArea textArea = new TextArea();
         if (text != null) {
@@ -359,10 +369,16 @@ public class ObjetosComunes {
      */
     public TextField getDni() {
         TextField campo = getTextField("DNI", "dni", 9, "95px", "95px");
-
+        campo.setMaxWidth("100px");
+        campo.setMinWidth("100px");
+        campo.setWidth("100px");
         return campo;
     }
 
+    /**
+     *
+     * @return
+     */
     public TextField getNumeroHc() {
         TextField campo = getTextField("Nº Historia", null, 6, "105px", "95px");
 

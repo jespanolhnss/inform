@@ -20,6 +20,8 @@ public class AplicacionBean extends MasterBean {
 
     private ArrayList<AplicacionPerfilBean> listaPerfiles = new ArrayList<>();
 
+    private ArrayList<EquipoAplicacionBean> listaEquipoBeans = new ArrayList<>();
+
     public AplicacionBean() {
         super();
     }
@@ -86,6 +88,14 @@ public class AplicacionBean extends MasterBean {
 
     public void setListaPerfiles(ArrayList<AplicacionPerfilBean> listaPerfiles) {
         this.listaPerfiles = listaPerfiles;
+    }
+
+    public ArrayList<EquipoAplicacionBean> getListaEquipoBeans() {
+        return listaEquipoBeans;
+    }
+
+    public void setListaEquipoBeans(ArrayList<EquipoAplicacionBean> listaEquipoBeans) {
+        this.listaEquipoBeans = listaEquipoBeans;
     }
 
 }

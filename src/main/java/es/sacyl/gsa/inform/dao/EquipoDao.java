@@ -1,6 +1,8 @@
 package es.sacyl.gsa.inform.dao;
 
 import es.sacyl.gsa.inform.bean.CentroBean;
+import es.sacyl.gsa.inform.bean.ComboBean;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.util.Utilidades;
@@ -129,8 +131,10 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             equipoBean.setEstado(rs.getInt("equipoestado"));
             equipoBean.setFechacambio(Utilidades.getFechaLocalDate(rs.getLong("equipofechacambio")));
             equipoBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("equipousucambio")));
-
+// actualiza ip
             equipoBean.setListaIps(new IpDao().getLista(null, null, equipoBean, null, null));
+            // actualiza app instaladas
+            equipoBean.setAplicacinesArrayList(new EquipoAplicacionDao().getLista(null, equipoBean, null));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         }
@@ -435,6 +439,119 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             this.doCierraConexion(connection);
         }
         return lista;
+    }
+
+    /*
+    Métodos de datos genéricos
+     */
+    public ArrayList<DatoGenericoBean> getListaDatosGenericos(EquipoBean equipoBean) {
+        ArrayList<DatoGenericoBean> lista = new ArrayList<>();
+        ArrayList<String> listaTipoDatos = new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPODATOS, equipoBean.getTipo(), 50);
+        for (String tipo : listaTipoDatos) {
+            DatoGenericoBean dato = new DatoGenericoBean();
+            dato.setIdDatoEqipo(equipoBean.getId());
+            dato.setTipoDato(tipo);
+            dato.setValor(this.getValorDatoGenerico(dato));
+            lista.add(dato);
+        }
+        return lista;
+    }
+
+    /**
+     *
+     * @param dato
+     * @return
+     */
+    public String getValorDatoGenerico(DatoGenericoBean dato) {
+        String valor = "";
+        Connection connection = null;
+        String sqlValor = "";
+        try {
+            connection = super.getConexionBBDD();
+            sqlValor = " SELECT * FROM equiposdatos WHERE idequipo=" + dato.getIdDatoEqipo() + " AND "
+                    + " tipodato='" + dato.getTipoDato() + "'";
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(sqlValor);
+            if (resulSet.next()) {
+                valor = resulSet.getString("valor");
+            }
+            statement.close();
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return valor;
+    }
+
+    public Boolean grabatValorDatoGenerico(DatoGenericoBean dato) {
+        String valor = "";
+        String sqlValor = "";
+        Connection connection = null;
+        Boolean insertadoBoolean = false;
+        try {
+            connection = super.getConexionBBDD();
+            sqlValor = " SELECT * FROM equiposdatos WHERE idequipo=" + dato.getIdDatoEqipo() + " AND "
+                    + " tipodato='" + dato.getTipoDato() + "'";
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(sqlValor);
+            if (resulSet.next()) {
+                sqlValor = " UPDATE equiposdatos SET valor=? WHERE idequipo=? AND tipodato=? ";
+                PreparedStatement statementInsert = connection.prepareStatement(sqlValor);
+                statementInsert.setString(1, dato.getValor());
+                statementInsert.setLong(2, dato.getIdDatoEqipo());
+                statementInsert.setString(3, dato.getTipoDato());
+                insertadoBoolean = statementInsert.executeUpdate() > 0;
+                statementInsert.close();
+                LOGGER.debug(sqlValor);
+            } else {
+                dato.setId(getSiguienteId("equiposdatos"));
+                sqlValor = " INSERT INTO  equiposdatos (id, valor, idequipo, tipodato) VALUES (?,?,?,?) ";
+                PreparedStatement statementUpdate = connection.prepareStatement(sqlValor);
+                statementUpdate.setLong(1, dato.getId());
+                statementUpdate.setString(2, dato.getValor());
+                statementUpdate.setLong(3, dato.getIdDatoEqipo());
+                statementUpdate.setString(4, dato.getTipoDato());
+                insertadoBoolean = statementUpdate.executeUpdate() > 0;
+                statementUpdate.close();
+                LOGGER.debug(sqlValor);
+            }
+            statement.close();
+            LOGGER.debug(sqlValor);
+        } catch (SQLException e) {
+            LOGGER.error(sqlValor + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return insertadoBoolean;
+    }
+
+    public Boolean borraValorDatoGenerico(DatoGenericoBean dato) {
+        Connection connection = null;
+        Boolean insertadoBoolean = false;
+        String sqlValor = "";
+        try {
+            connection = super.getConexionBBDD();
+            sqlValor = " DELETE FROM  equiposdatos WHERE idequipo=? AND  tipo=? ";
+            PreparedStatement statement = connection.prepareStatement(sqlValor);
+            statement.setLong(1, dato.getEstado());
+            statement.setString(2, dato.getValor());
+            insertadoBoolean = statement.executeUpdate() > 0;
+            statement.close();
+            LOGGER.debug(sqlValor);
+        } catch (SQLException e) {
+            LOGGER.error(sqlValor + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return insertadoBoolean;
     }
 
 }

@@ -35,7 +35,7 @@ import es.sacyl.gsa.inform.dao.NivelesAtencionDao;
 import es.sacyl.gsa.inform.dao.NivelesAtencionTipoDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
 import es.sacyl.gsa.inform.dao.UbicacionDao;
-import es.sacyl.gsa.inform.dao.UsuarioCategoriaDao;
+import es.sacyl.gsa.inform.dao.CategoriaDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.dao.VlanDao;
 import es.sacyl.gsa.inform.dao.ZonaDao;
@@ -87,6 +87,14 @@ public class CombosUi {
         return combo;
     }
 
+    /**
+     *
+     * @param label
+     * @param valor
+     * @param grupo
+     * @param anchoCadema
+     * @return
+     */
     public ComboBox<String> getCombodeTabla(String label, String valor, String grupo, Integer anchoCadema) {
         ComboBox<String> combo;
         combo = new ComboBox<>(label);
@@ -517,7 +525,7 @@ public class CombosUi {
     public ComboBox<UsuarioCategoriaBean> getUsuarioCategoriaCombo(String texto, UsuarioCategoriaBean valor
     ) {
         ComboBox<UsuarioCategoriaBean> combo = new ComboBox<>("Ubicación Padre  ");
-        combo.setItems(new UsuarioCategoriaDao().getLista(texto));
+        combo.setItems(new CategoriaDao().getLista(texto));
         combo.setItemLabelGenerator(UsuarioCategoriaBean::getNombre);
         if (valor != null) {
             combo.setValue(valor);
@@ -529,7 +537,7 @@ public class CombosUi {
 
     public ComboBox<VlanBean> getVlanCombo(String texto, VlanBean valor
     ) {
-        ComboBox<VlanBean> combo = new ComboBox<>("Valn  ");
+        ComboBox<VlanBean> combo = new ComboBox<>("Vlan  ");
         combo.setItems(new VlanDao().getLista(texto));
         combo.setItemLabelGenerator(VlanBean::getNombre);
         if (valor != null) {

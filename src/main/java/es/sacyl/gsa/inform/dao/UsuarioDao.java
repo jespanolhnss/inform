@@ -344,7 +344,8 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         try {
             connection = super.getConexionBBDD();
 
-            sql = sql.concat("AND estado = " + ConexionDao.BBDD_ACTIVOSI);
+
+            sql = sql.concat(" AND estado=" + ConexionDao.BBDD_ACTIVOSI);
             sql = sql.concat(" ORDER BY apellido1,apellido2,nombre	");
 
             Statement statement = connection.createStatement();
@@ -382,32 +383,6 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             }
         }
         return usuario;
-    }
-
-    public ArrayList<UsuarioBean> getUsuariosFiltro(String texto, String campo) {
-        Connection connection = null;
-        ArrayList<UsuarioBean> listaUsuarios = new ArrayList<>();
-        try {
-            connection = super.getConexionBBDD();
-            sql = " SELECT * FROM usuarios WHERE  1=1 and nombre = 'JUAN' ";
-//            if (texto != null && !texto.isEmpty() && campo != null && !campo.isEmpty()) {
-//                sql = sql.concat(" AND  " + campo + " = " + texto.toUpperCase() + "");
-//            }
-            Statement statement = connection.createStatement();
-            ResultSet resulSet = statement.executeQuery(sql);
-            while (resulSet.next()) {
-                listaUsuarios.add(getRegistroResulset(resulSet));
-            }
-            statement.close();
-            logger.debug(sql);
-        } catch (SQLException e) {
-            logger.error(sql + Utilidades.getStackTrace(e));
-        } catch (Exception e) {
-            logger.error(Utilidades.getStackTrace(e));
-        } finally {
-            this.doCierraConexion(connection);
-        }
-        return listaUsuarios;
     }
 
     @Override

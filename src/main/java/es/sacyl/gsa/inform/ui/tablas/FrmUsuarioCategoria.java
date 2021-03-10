@@ -1,20 +1,17 @@
- 
 package es.sacyl.gsa.inform.ui.tablas;
 
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
-import es.sacyl.gsa.inform.bean.AutonomiaBean;
-import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.UsuarioCategoriaBean;
-import es.sacyl.gsa.inform.dao.AutonomiaDao;
-import es.sacyl.gsa.inform.dao.UsuarioCategoriaDao;
+import es.sacyl.gsa.inform.dao.CategoriaDao;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
@@ -30,12 +27,12 @@ import org.vaadin.klaudeta.PaginatedGrid;
  */
 public class FrmUsuarioCategoria extends FrmMasterPantalla {
 
-   private final TextField id = new ObjetosComunes().getTextField("Id");
+    private final TextField id = new ObjetosComunes().getTextField("Id");
     private final TextField codigo = new ObjetosComunes().getTextField("Código");
     private final TextField nombre = new ObjetosComunes().getTextField("Nombre");
-private final TextField estado = new ObjetosComunes().getTextField("Estado");
+    private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
 
-    private  UsuarioCategoriaBean usuarioCategoriaBean;
+    private UsuarioCategoriaBean usuarioCategoriaBean;
     private final Binder<UsuarioCategoriaBean> usuarioCategoriaBinder = new Binder<>();
     private final PaginatedGrid<UsuarioCategoriaBean> usuarioCategoriaGrid = new PaginatedGrid<>();
     private ArrayList<UsuarioCategoriaBean> usuarioCategoriaArrayList = new ArrayList<>();
@@ -49,7 +46,8 @@ private final TextField estado = new ObjetosComunes().getTextField("Estado");
         doBinderPropiedades();
         doCompentesEventos();
     }
- @Override
+
+    @Override
     public void doControlBotones(Object obj) {
         super.doControlBotones(obj);
         if (obj == null) {
@@ -61,10 +59,11 @@ private final TextField estado = new ObjetosComunes().getTextField("Estado");
             nombre.focus();
         }
     }
+
     @Override
     public void doGrabar() {
         if (usuarioCategoriaBinder.writeBeanIfValid(usuarioCategoriaBean)) {
-            if (new UsuarioCategoriaDao().doGrabaDatos(usuarioCategoriaBean) == true) {
+            if (new CategoriaDao().doGrabaDatos(usuarioCategoriaBean) == true) {
                 (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                 doActualizaGrid();
                 doLimpiar();
@@ -82,7 +81,8 @@ private final TextField estado = new ObjetosComunes().getTextField("Estado");
             Notification.show(FrmMensajes.AVISODATOERRORVALIDANDO + errorText);
         }
     }
-      @Override
+
+    @Override
     public void doCancelar() {
         this.removeAll();
         this.setVisible(false);
@@ -94,7 +94,7 @@ private final TextField estado = new ObjetosComunes().getTextField("Estado");
                 FrmMensajes.AVISOCONFIRMACIONACCION,
                 FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
                 FrmMensajes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
-                    new UsuarioCategoriaDao().doBorraDatos(usuarioCategoriaBean);
+                    new CategoriaDao().doBorraDatos(usuarioCategoriaBean);
                     Notification.show(FrmMensajes.AVISODATOBORRADO);
                     doActualizaGrid();
                     doLimpiar();
@@ -106,7 +106,6 @@ private final TextField estado = new ObjetosComunes().getTextField("Estado");
     public void doAyuda() {
     }
 
-    
     @Override
     public void doLimpiar() {
         usuarioCategoriaBean = new UsuarioCategoriaBean();
@@ -119,12 +118,13 @@ private final TextField estado = new ObjetosComunes().getTextField("Estado");
     public void doImprimir() {
     }
 
-     @Override
+    @Override
     public void doGrid() {
         usuarioCategoriaGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         usuarioCategoriaGrid.setHeightByRows(true);
         usuarioCategoriaGrid.setPageSize(14);
         usuarioCategoriaGrid.addColumn(UsuarioCategoriaBean::getId).setAutoWidth(true).setHeader(new Html("<b>Id</b>"));
+        usuarioCategoriaGrid.addColumn(UsuarioCategoriaBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Estado</b>"));
         usuarioCategoriaGrid.addColumn(UsuarioCategoriaBean::getCodigo).setAutoWidth(true).setHeader(new Html("<b>Código</b>"));
         usuarioCategoriaGrid.addColumn(UsuarioCategoriaBean::getNombre).setAutoWidth(true).setHeader(new Html("<b>Nombre</b>"));
         doActualizaGrid();
@@ -132,39 +132,47 @@ private final TextField estado = new ObjetosComunes().getTextField("Estado");
 
     @Override
     public void doActualizaGrid() {
-        usuarioCategoriaArrayList = new UsuarioCategoriaDao().getLista(buscador.getValue());
+        usuarioCategoriaArrayList = new CategoriaDao().getLista(buscador.getValue());
         usuarioCategoriaGrid.setItems(usuarioCategoriaArrayList);
     }
 
     @Override
     public void doBinderPropiedades() {
-     usuarioCategoriaBinder.forField(id)
+        usuarioCategoriaBinder.forField(id)
                 .withNullRepresentation("")
                 .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(UsuarioCategoriaBean::getId, null);
-  usuarioCategoriaBinder.forField(codigo)
+        usuarioCategoriaBinder.forField(codigo)
                 .withNullRepresentation("")
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 25))
                 .bind(UsuarioCategoriaBean::getCodigo, UsuarioCategoriaBean::setCodigo);
 
-   usuarioCategoriaBinder.forField(nombre)
+        usuarioCategoriaBinder.forField(nombre)
+                .withNullRepresentation("")
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 25))
+                .bind(UsuarioCategoriaBean::getNombre, UsuarioCategoriaBean::setNombre);
+
+        usuarioCategoriaBinder.forField(estadoRadio)
                 .withNullRepresentation("")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
-                .bind(UsuarioCategoriaBean::getNombre, UsuarioCategoriaBean::setNombre);
+                .bind(UsuarioCategoriaBean::getEstadoString, UsuarioCategoriaBean::setEstado);
 
     }
 
     @Override
     public void doComponenesAtributos() {
+        codigo.setMaxLength(25);
+        nombre.setMaxLength(25);
     }
 
     @Override
     public void doComponentesOrganizacion() {
-          this.titulo.setText("Categorías de los usuarios");
+        this.titulo.setText("Categorías de los usuarios");
 
-        this.contenedorFormulario.add(id,codigo, nombre,estado);
+        this.contenedorFormulario.add(id, codigo, nombre, estadoRadio);
 
         this.contenedorBuscadores.add(buscador);
         this.contenedorDerecha.removeAll();
@@ -173,15 +181,21 @@ private final TextField estado = new ObjetosComunes().getTextField("Estado");
 
     @Override
     public void doCompentesEventos() {
-         buscador.addValueChangeListener(event -> {
+        buscador.addValueChangeListener(event -> {
             doActualizaGrid();
         });
-  usuarioCategoriaGrid.addItemClickListener(event -> {
+        usuarioCategoriaGrid.addItemClickListener(event -> {
             usuarioCategoriaBean = event.getItem();
             usuarioCategoriaBinder.readBean(event.getItem());
             doControlBotones(usuarioCategoriaBean);
         }
         );
     }
-    
+
+    /*
+
+    WebApplicationContext appCtx = ((WebApplicationContext) this.getContext());
+    ServletContext servletCtx = appCtx.getHttpSession().getServletContext();
+
+     */
 }

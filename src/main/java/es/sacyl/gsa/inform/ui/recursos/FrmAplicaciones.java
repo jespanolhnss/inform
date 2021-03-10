@@ -1,15 +1,20 @@
 package es.sacyl.gsa.inform.ui.recursos;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -21,20 +26,26 @@ import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.bean.AplicacionBean;
 import es.sacyl.gsa.inform.bean.AplicacionPerfilBean;
 import es.sacyl.gsa.inform.bean.ComboBean;
+import es.sacyl.gsa.inform.bean.EquipoAplicacionBean;
+import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.ProveedorBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.dao.AplicacionDao;
 import es.sacyl.gsa.inform.dao.AplicacionPerfilDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
+import es.sacyl.gsa.inform.dao.EquipoAplicacionDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
+import es.sacyl.gsa.inform.ui.GridUi;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
 import es.sacyl.gsa.inform.util.Constantes;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.vaadin.klaudeta.PaginatedGrid;
@@ -64,17 +75,29 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
 
     private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
 
-    private AplicacionBean aplicacionesBean = null;
+    private AplicacionBean aplicacionBean = null;
     private final Binder<AplicacionBean> aplicacionesBinder = new Binder<>();
     private final PaginatedGrid<AplicacionBean> aplicacionesGrid = new PaginatedGrid<>();
     private final PaginatedGrid<AplicacionPerfilBean> aplicacionesPerfiGrid = new PaginatedGrid<>();
     private ArrayList<AplicacionBean> aplicacionesLista = new ArrayList<>();
 
+    private final PaginatedGrid<EquipoBean> equipoGrid = new GridUi().getEquipoGridPaginado();
+
+    // componentes para gestionar los tabs de la parte inferior
+    private final Tab perfilesTab = new Tab("Perfiles");
+    private final Tab equipoTab = new Tab("Equipos");
+    private final Tabs tabs = new Tabs(equipoTab, perfilesTab);
+    private final Map<Tab, Component> tabsToPages = new HashMap<>();
+    private final Div page1 = new Div();
+    private final Div page2 = new Div();
+
     public FrmAplicaciones() {
         super();
-        this.aplicacionesBean = new AplicacionBean();
+        this.aplicacionBean = new AplicacionBean();
         doComponentesOrganizacion();
         doGrid();
+        doGridPerfiles();
+        doGridEquipo();
         doComponenesAtributos();
         doBinderPropiedades();
         doCompentesEventos();
@@ -92,9 +115,9 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
 
     @Override
     public void doGrabar() {
-        if (aplicacionesBinder.writeBeanIfValid(aplicacionesBean)) {
-            aplicacionesBean.setValoresAut();
-            if (new AplicacionDao().doGrabaDatos(aplicacionesBean) == true) {
+        if (aplicacionesBinder.writeBeanIfValid(aplicacionBean)) {
+            aplicacionBean.setValoresAut();
+            if (new AplicacionDao().doGrabaDatos(aplicacionBean) == true) {
                 (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                 doLimpiar();
             } else {
@@ -117,9 +140,9 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
                 FrmMensajes.AVISOCONFIRMACIONACCION,
                 FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
                 FrmMensajes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
-                    aplicacionesBean.setEstado(ConexionDao.BBDD_ACTIVONO);
-                    aplicacionesBean.setValoresAut();
-                    new AplicacionDao().doBorraDatos(aplicacionesBean);
+                    aplicacionBean.setEstado(ConexionDao.BBDD_ACTIVONO);
+                    aplicacionBean.setValoresAut();
+                    new AplicacionDao().doBorraDatos(aplicacionBean);
                     Notification.show(FrmMensajes.AVISODATOBORRADO);
                     doLimpiar();
                 });
@@ -132,8 +155,8 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
 
     @Override
     public void doLimpiar() {
-        aplicacionesBean = new AplicacionBean();
-        aplicacionesBinder.readBean(aplicacionesBean);
+        aplicacionBean = new AplicacionBean();
+        aplicacionesBinder.readBean(aplicacionBean);
         doActualizaGrid();
         doActualizaGridPerfiles();
         doControlBotones(null);
@@ -162,6 +185,9 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
         });
         doActualizaGrid();
 
+    }
+
+    public void doGridPerfiles() {
         aplicacionesPerfiGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         aplicacionesPerfiGrid.setHeightByRows(true);
         aplicacionesPerfiGrid.setPageSize(14);
@@ -179,12 +205,32 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
                 return "my-style-2";
             }
         });
+    }
 
+    public void doGridEquipo() {
+        equipoGrid.addComponentColumn(item -> createRemoveButtonU(equipoGrid, item))
+                .setHeader("Borra");
+    }
+
+    private Button createRemoveButtonU(Grid<EquipoBean> grid, EquipoBean item) {
+        @SuppressWarnings("unchecked")
+        Button button = new Button(VaadinIcon.MINUS_CIRCLE.create(), clickEvent -> {
+            final ConfirmDialog dialog = new ConfirmDialog(
+                    FrmMensajes.AVISOCONFIRMACIONACCION,
+                    FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
+                    FrmMensajes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
+                        new EquipoAplicacionDao().doBorraDatos(item, aplicacionBean);
+                        aplicacionBean.setListaEquipoBeans(new EquipoAplicacionDao().getLista(null, null, aplicacionBean));
+                        doActualizaGridEquipos();
+                    });
+            dialog.open();
+        });
+        return button;
     }
 
     private Button createRemoveButton(PaginatedGrid<AplicacionPerfilBean> grid, AplicacionPerfilBean item) {
         @SuppressWarnings("unchecked")
-        Button button = new Button("Borra", clickEvent -> {
+        Button button = new Button(VaadinIcon.MINUS_CIRCLE.create(), clickEvent -> {
             final ConfirmDialog dialog = new ConfirmDialog(
                     FrmMensajes.AVISOCONFIRMACIONACCION,
                     FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
@@ -207,7 +253,19 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
     }
 
     public void doActualizaGridPerfiles() {
-        aplicacionesPerfiGrid.setItems(aplicacionesBean.getListaPerfiles());
+        aplicacionesPerfiGrid.setItems(aplicacionBean.getListaPerfiles());
+        perfilesTab.setLabel("Perfiles (" + Integer.toString(aplicacionBean.getListaPerfiles().size()) + ")");
+    }
+
+    public void doActualizaGridEquipos() {
+        ArrayList<EquipoAplicacionBean> listaAplicacionBeans = aplicacionBean.getListaEquipoBeans();
+
+        ArrayList<EquipoBean> listaEquipoBeans = new ArrayList<>();
+        for (EquipoAplicacionBean eqap : listaAplicacionBeans) {
+            listaEquipoBeans.add(eqap.getEquipo());
+        }
+        equipoGrid.setItems(listaEquipoBeans);
+        equipoTab.setLabel("Equipos (" + Integer.toString(listaEquipoBeans.size()) + ")");
     }
 
     @Override
@@ -262,6 +320,14 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
     @Override
     public void doComponenesAtributos() {
         buscador.setLabel("Dato a buscar");
+        page1.setWidthFull();
+        page2.setWidthFull();
+
+        equipoTab.setVisible(true);
+        perfilesTab.setVisible(true);
+
+        page1.setVisible(false);
+        page2.setVisible(false);
     }
 
     @Override
@@ -276,6 +342,13 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
                 new FormLayout.ResponsiveStep("50px", 5),
                 new FormLayout.ResponsiveStep("50px", 6));
 
+        tabsToPages.put(equipoTab, page1);
+        tabsToPages.put(perfilesTab, page2);
+
+        //   Div pages = new Div(page1, page2, page3);
+        page1.add(equipoGrid);
+        page2.add(aplicacionesPerfiGrid);
+
         this.contenedorFormulario.add(id);
         this.contenedorFormulario.add(nombre, 5);
 
@@ -288,7 +361,10 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
         this.contenedorFormulario.add(estadoRadio, 2);
         this.contenedorFormulario.add(descripcion, 4);
 
-        contenedorIzquierda.add(aplicacionesPerfiGrid);
+        // contenedorIzquierda.add(aplicacionesPerfiGrid);
+        this.contenedorIzquierda.removeAll();
+        this.contenedorIzquierda.add(contenedorBotones, contenedorFormulario, tabs, page1, page2);
+
         this.contenedorBuscadores.add(buscador, gfhcomboBuscador, proveedorComboBuscador);
         this.contenedorDerecha.removeAll();
         this.contenedorDerecha.add(contenedorBuscadores, aplicacionesGrid);
@@ -312,10 +388,13 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
             doActualizaGrid();
         });
         aplicacionesGrid.addItemClickListener(event -> {
-            aplicacionesBean = event.getItem();
+            aplicacionBean = event.getItem();
+            aplicacionBean.setListaEquipoBeans(new EquipoAplicacionDao().getLista(null, null, aplicacionBean));
             aplicacionesBinder.readBean(event.getItem());
-            doControlBotones(aplicacionesBean);
+            doControlBotones(aplicacionBean);
             doActualizaGridPerfiles();
+            doActualizaGridEquipos();
+            page1.setVisible(true);
         }
         );
 
@@ -326,8 +405,29 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
         );
         botonPerfiles.addClickListener(event -> {
             AplicacionPerfilBean aplicacionPerfilBean = new AplicacionPerfilBean();
-            aplicacionPerfilBean.setAplicacion(aplicacionesBean);
+            aplicacionPerfilBean.setAplicacion(aplicacionBean);
             doVentanaPerfil(aplicacionPerfilBean);
+        });
+
+        tabs.addSelectedChangeListener(event -> {
+            tabsToPages.values().forEach(page -> page.setVisible(false));
+            Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+            selectedPage.setVisible(true);
+        });
+
+        equipoGrid.addItemClickListener(event -> {
+            EquipoBean equipoBean = event.getItem();
+            EquipoAplicacionBean equipoAplicacionBean = new EquipoAplicacionDao().getPorEquipoAppId(equipoBean, aplicacionBean);
+            if (equipoAplicacionBean != null) {
+                FrmEquipoAplicacion frmEquipoAplicacion = new FrmEquipoAplicacion("600px", equipoAplicacionBean);
+                frmEquipoAplicacion.addDialogCloseActionListener(event1 -> {
+                    doActualizaGridEquipos();
+                });
+                frmEquipoAplicacion.addDetachListener(event2 -> {
+                    doActualizaGridEquipos();
+                });
+                frmEquipoAplicacion.open();
+            }
         });
     }
 

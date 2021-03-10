@@ -9,20 +9,10 @@ package es.sacyl.gsa.inform.bean;
  *
  * @author 06551256M
  */
-public class UsuarioCategoriaBean {
-    
-    private Long id;
+public class UsuarioCategoriaBean extends MasterBean {
+
     private String codigo;
     private String nombre;
-    private Integer estado;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getCodigo() {
         return codigo;
@@ -40,13 +30,4 @@ public class UsuarioCategoriaBean {
         this.nombre = nombre;
     }
 
-    public Integer getEstado() {
-        return estado;
-    }
-
-    public void setEstado(Integer estado) {
-        this.estado = estado;
-    }
-    
-    
 }
