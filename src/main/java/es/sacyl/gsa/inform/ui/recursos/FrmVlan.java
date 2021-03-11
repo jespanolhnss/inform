@@ -308,6 +308,7 @@ public final class FrmVlan extends FrmMasterPantalla {
             vlanBean.setIpsDelRango(new IpDao().getLista(null, vlanBean, null, null, null));
             doActualizaGridIps();
             page1.setVisible(true);
+            ipsTab.setSelected(true);
 
         });
         /**

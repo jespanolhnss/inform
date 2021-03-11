@@ -17,6 +17,10 @@ import es.sacyl.gsa.inform.ui.ObjetosComunes;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+/**
+ *
+ * @author 06551256M
+ */
 public class FrmUsuariosPedir extends FrmMasterPantalla {
 
     private static final long serialVersionUID = 1L;
@@ -160,7 +164,6 @@ public class FrmUsuariosPedir extends FrmMasterPantalla {
             usuarioBinder.readBean(usuarioBean);
         });
 
- 
         buscador.addBlurListener(event -> {
             /*
             if (buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
@@ -175,11 +178,12 @@ public class FrmUsuariosPedir extends FrmMasterPantalla {
              */
             usuariosGrid.setItems(arrayListUsuarios);
         });
- 
+
+    }
 
     @Override
     public void doImprimir() {
-        
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

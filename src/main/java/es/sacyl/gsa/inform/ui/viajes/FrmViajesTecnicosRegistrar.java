@@ -37,7 +37,7 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
         doGrid();
         doComponenesAtributos();
         doCompentesEventos();
-        doBinderPropiedades();
+        //   doBinderPropiedades();
     }
 
     @Override
@@ -125,6 +125,7 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
     public void doComponenesAtributos() {
         idViaje.setValue(viajeBean.getId().toString());
         idViaje.setEnabled(false);
+
         botonCancelar.setText("Salir");
         botonAyuda.setVisible(false);
         botonLimpiar.setVisible(false);

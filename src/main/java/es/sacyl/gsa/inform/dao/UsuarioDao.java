@@ -2,6 +2,7 @@ package es.sacyl.gsa.inform.dao;
 
 import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.bean.FuncionalidadBean;
+import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Utilidades;
@@ -344,7 +345,6 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         try {
             connection = super.getConexionBBDD();
 
-
             sql = sql.concat(" AND estado=" + ConexionDao.BBDD_ACTIVOSI);
             sql = sql.concat(" ORDER BY apellido1,apellido2,nombre	");
 
@@ -391,8 +391,9 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
     }
 
     public ArrayList<UsuarioBean> getInformaticos() {
-        Connection connection = null;
+
         ArrayList<UsuarioBean> listaUsuarios = new ArrayList<>();
+        /*
         UsuarioBean juan = new UsuarioBean();
         juan.setId(new Long(1));
         juan.setApellido1("Nieto");
@@ -405,6 +406,16 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         antonio.setApellido2("Losáñez");
         antonio.setNombre("Antonio");
         listaUsuarios.add(antonio);
+         */
+        String dnis = new ParametroDao().getPorCodigo(ParametroBean.USR_INFORMATICOS).getValor();
+        String[] dni = dnis.split(",");
+        for (String undni : dni) {
+            UsuarioBean usu = getUsuarioDni(undni, Boolean.FALSE);
+            if (usu != null) {
+                listaUsuarios.add(usu);
+            }
+        }
+
         return listaUsuarios;
     }
 
