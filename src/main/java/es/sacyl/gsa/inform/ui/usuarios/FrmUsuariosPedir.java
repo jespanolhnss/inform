@@ -1,13 +1,24 @@
 package es.sacyl.gsa.inform.ui.usuarios;
 
+import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
+import es.sacyl.gsa.inform.bean.AplicacionBean;
+import es.sacyl.gsa.inform.bean.AplicacionPerfilBean;
+import es.sacyl.gsa.inform.bean.AutonomiaBean;
+import es.sacyl.gsa.inform.bean.CentroBean;
+import es.sacyl.gsa.inform.bean.CentroTipoBean;
+import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
+import es.sacyl.gsa.inform.bean.UsuarioCategoriaBean;
+import es.sacyl.gsa.inform.dao.CentroDao;
+import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
@@ -15,12 +26,9 @@ import es.sacyl.gsa.inform.ui.FrmMasterConstantes;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.regex.Pattern;
 
-/**
- *
- * @author 06551256M
- */
 public class FrmUsuariosPedir extends FrmMasterPantalla {
 
     private static final long serialVersionUID = 1L;
@@ -31,8 +39,12 @@ public class FrmUsuariosPedir extends FrmMasterPantalla {
     TextField apellido2Usuario = new ObjetosComunes().getTextField("Apellido 2", "teclea segundo apellido", 25, "100px", "30px");
     TextField nifUsuario = new ObjetosComunes().getTextField("NIF", "teclea el NIF", 25, "50px", "30px");
     TextField correoUsuario = new ObjetosComunes().getTextField("Correo Electrónico", "teclea el correo electrónico", 25, "100px", "30px");
-    ComboBox<String> categoriaUsuario = new CombosUi().getStringCombo("Categoria", null, ObjetosComunes.Categorias, "50px");
-    CheckboxGroup<String> aplicacionesUsuario = new CheckboxGroup<>();
+    ComboBox<UsuarioCategoriaBean> categoriaUsuario = new CombosUi().getCategoriasUsuarios(null);
+    ComboBox<ProvinciaBean> provinciasCombo = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null,
+            AutonomiaBean.AUTONOMIADEFECTO);
+    CheckboxGroup<CentroTipoBean> tiposCentro = new ObjetosComunes().getTipoCentroCecheckboxGroup();
+    CheckboxGroup<CentroBean> centro = new ObjetosComunes().getCentrosCheckboxGroup();
+    Accordion aplicacionesAccordion = new Accordion();    
 
     /* Campos para el Grid */
     ComboBox<String> camposFiltro = new CombosUi().getStringCombo("Buscar por campo: ", null, ObjetosComunes.FiltroBusquedaUsuarios, "150px");
@@ -42,6 +54,7 @@ public class FrmUsuariosPedir extends FrmMasterPantalla {
     UsuarioBean usuarioBean = new UsuarioBean();
     Binder<UsuarioBean> usuarioBinder = new Binder<>();
     ArrayList<UsuarioBean> arrayListUsuarios = new ArrayList<>();
+    ArrayList<AplicacionBean> arrayListAplicaciones = new ArrayList<>();
 
     public FrmUsuariosPedir() {
         super();
@@ -127,6 +140,7 @@ public class FrmUsuariosPedir extends FrmMasterPantalla {
         usuarioBinder.forField(apellido1Usuario).bind(UsuarioBean::getApellido1, UsuarioBean::setApellido1);
         usuarioBinder.forField(apellido2Usuario).bind(UsuarioBean::getApellido2, UsuarioBean::setApellido2);
         usuarioBinder.forField(nifUsuario)
+                .asRequired("El NIF es obligatorio")
                 .withValidator(
                         name -> Pattern.matches("(\\d{1,8})([TRWAGMYFPDXBNJZSQVHLCKEtrwagmyfpdxbnjzsqvhlcke])", name),
                         "Name must contain at least three characters")
@@ -136,23 +150,21 @@ public class FrmUsuariosPedir extends FrmMasterPantalla {
 
     @Override
     public void doComponenesAtributos() {
-        aplicacionesUsuario.setLabel("Aplicaciones");
-        aplicacionesUsuario.setItems("Galeno", "Jimena", "Gacela", "HP-HIS");
-
         buscador.focus();
         buscador.setLabel("Texto de la búsqueda:");
+        aplicacionesAccordion.close();  
     }
 
     @Override
     public void doComponentesOrganizacion() {
+        construirAccordion();
+        contenedorFormulario.add(nifUsuario); 
         contenedorFormulario.add(nombreUsuario);
         contenedorFormulario.add(apellido1Usuario);
         contenedorFormulario.add(apellido2Usuario);
-        contenedorFormulario.add(nifUsuario);
         contenedorFormulario.add(correoUsuario);
         contenedorFormulario.add(categoriaUsuario);
-        contenedorFormulario.add(aplicacionesUsuario);
-
+        contenedorFormulario.add(aplicacionesAccordion);
         contenedorBuscadores.add(camposFiltro, buscador);
         contenedorDerecha.add(usuariosGrid);
     }
@@ -163,27 +175,69 @@ public class FrmUsuariosPedir extends FrmMasterPantalla {
             usuarioBean = event.getItem();
             usuarioBinder.readBean(usuarioBean);
         });
-
-        buscador.addBlurListener(event -> {
-            /*
-            if (buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
-                arrayListUsuarios = new UsuarioDao().getLista(null);
-            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
-                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), camposFiltro.getValue());
-            } else if (buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
-                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(null, camposFiltro.getValue());
-            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
-                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), null);
-            }
-             */
-            usuariosGrid.setItems(arrayListUsuarios);
+        
+        nifUsuario.addBlurListener(event -> {
+           if (!nifUsuario.getValue().isEmpty() && nifUsuario.getValue() != null) {
+               usuarioBean = new UsuarioDao().getUsuarioPersigo(nifUsuario.getValue());
+               usuarioBinder.readBean(usuarioBean);             
+           }
         });
 
+        tiposCentro.addValueChangeListener( event -> {                        
+            doCargaCentros(tiposCentro.getSelectedItems());
+        });
+
+//        buscador.addBlurListener(event -> {
+//            if (buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
+//                arrayListUsuarios = new UsuarioDao().getLista(null);
+//            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
+//                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), camposFiltro.getValue());
+//            } else if (buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
+//                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(null, camposFiltro.getValue());
+//            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
+//                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), null);
+//            }
+//            usuariosGrid.setItems(arrayListUsuarios);
+//        });
     }
 
     @Override
     public void doImprimir() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+    }
+    
+    public void construirAccordion() {
+        VerticalLayout tipoCentroLayout = new VerticalLayout();
+        tipoCentroLayout.add(tiposCentro);
+        aplicacionesAccordion.add("Tipo Centro", tipoCentroLayout);
+        
+        VerticalLayout centrosLayout = new VerticalLayout();
+        centrosLayout.add(centro);
+        aplicacionesAccordion.add("Centros", centrosLayout);
+        
+        VerticalLayout galenoLayout = new VerticalLayout();
+        Long idGaleno = new Long(9);
+        CheckboxGroup<AplicacionPerfilBean> perfilesGaleno = 
+               new ObjetosComunes().getAplicacionesPerfilesPorIdCheckboxGroup(idGaleno);
+        galenoLayout.add(perfilesGaleno);
+        aplicacionesAccordion.add("Galeno",galenoLayout); 
+        
+        VerticalLayout jimenaLayout = new VerticalLayout();
+        Long idJimena = new Long(8);
+        CheckboxGroup<AplicacionPerfilBean> perfilesJimena = 
+               new ObjetosComunes().getAplicacionesPerfilesPorIdCheckboxGroup(idJimena);
+        jimenaLayout.add(perfilesJimena);
+        aplicacionesAccordion.add("Jimena",jimenaLayout);      
     }
 
+    private void doCargaCentros(Set<CentroTipoBean> c) {
+        ArrayList<CentroBean> alc = new ArrayList();
+        for (CentroTipoBean ct:c) {
+            alc.addAll(
+            new CentroDao().getLista(null, AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, 
+                    null, null, ct, null, ConexionDao.BBDD_ACTIVOSI));       
+        }
+                
+        centro.setItems(alc);
+    }
 }

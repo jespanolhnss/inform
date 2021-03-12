@@ -36,6 +36,7 @@ import es.sacyl.gsa.inform.dao.NivelesAtencionTipoDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
 import es.sacyl.gsa.inform.dao.UbicacionDao;
 import es.sacyl.gsa.inform.dao.CategoriaDao;
+import es.sacyl.gsa.inform.dao.UsuarioCategoriaDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.dao.VlanDao;
 import es.sacyl.gsa.inform.dao.ZonaDao;
@@ -589,6 +590,24 @@ public class CombosUi {
         }
         combo.setMinWidth("150px");
         combo.setMaxWidth("250px");
+        combo.setClearButtonVisible(true);
+        return combo;
+    }
+    
+    /**
+     * Devuelve un listado con las categorias de Pérsigo
+     * @param valor
+     * @return 
+     */
+    public ComboBox<UsuarioCategoriaBean> getCategoriasUsuarios(UsuarioCategoriaBean valor) {
+        ComboBox<UsuarioCategoriaBean> combo;
+        combo = new ComboBox<>("Categorias");
+        combo.setItems(new UsuarioCategoriaDao().getLista(null));
+        combo.setItemLabelGenerator(UsuarioCategoriaBean::getNombre);
+        if (valor != null) {
+            combo.setValue(valor);
+        }
+        combo.setMinWidth("150px");
         combo.setClearButtonVisible(true);
         return combo;
     }

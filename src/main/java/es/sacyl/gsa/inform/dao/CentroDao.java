@@ -39,7 +39,7 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
                 + " ,c.CODLOCAL as centrocodlocal "
                 + " ,c.CPCENTRO as centrocpcentro,c.TELEPREV as centroteleprev,c.TIPOCENTRO as centrotipocentro"
                 + " ,c.NIVATENCION as centronivatencion "
-                + " ,c.estado as centroestado, c.mapgoogle as centromapggole  "
+                + " ,c.estado as centroestado, c.mapgoogle as centromapggole, c.nomcorto as centronomcorto  "
                 + " ,n.id as nivelid,n.codigo as nivelcodigo,n.descripcion as niveldescripcion,n.tipo as niveltipo"
                 + " ,n.estado as nivelestado  "
                 + " ,l.codigo as localidadcodigo,l.nombre localidadnombre,l.nombre localidadprovincia "
@@ -109,6 +109,7 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
 
             centroBean.setEstado(rs.getInt("centroestado"));
             centroBean.setMapgoogle(rs.getString("centromapggole"));
+            centroBean.setNomcorto(rs.getString("centronomcorto"));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         }
@@ -205,9 +206,9 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " INSERT INTO  CENTROS  (ID,CODAUTO,CODGEREN, CODZONA   ,   CODIGO   ,NOMCEN    ,TIPOVIA   "
-                    + " ,CALLECEN  ,   NUMCALCEN  ,OTRDIRCEN  ,   CODLOCAL "
-                    + " ,   CPCENTRO   ,   TELEPREV   ,    TIPOCENTRO , NIVATENCION ,estao,mapgoogle ) "
+            sql = " INSERT INTO  CENTROS (ID,CODAUTO,CODGEREN,CODZONA,CODIGO,NOMCEN,TIPOVIA   "
+                    + ",CALLECEN,NUMCALCEN,OTRDIRCEN,CODLOCAL "
+                    + " ,CPCENTRO,TELEPREV,TIPOCENTRO,NIVATENCION,ESTADO,MAPGOOGLE,NOMCORTO ) "
                     + " VALUES "
                     + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -294,6 +295,11 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
             } else {
                 statement.setNull(17, Types.CHAR);
             }
+            if (centroBean.getNomcorto()!= null) {
+                statement.setString(18, centroBean.getNomcorto());
+            } else {
+                statement.setNull(18, Types.CHAR);
+            }
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
             LOGGER.debug(sql);
@@ -318,7 +324,7 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
                     + " ,TIPOVIA=?   "
                     + " ,CALLECEN=?  ,   NUMCALCEN=?  ,OTRDIRCEN=?  ,   CODLOCAL=? "
                     + " ,   CPCENTRO =?  ,   TELEPREV=?   ,    TIPOCENTRO=? , NIVATENCION =? "
-                    + ",estado=?,mapgoogle=?"
+                    + ",,ESTADO=?,MAPGOOGLE=?,NOMCORTO=?"
                     + " WHERE id=?";
             PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -405,8 +411,13 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
             } else {
                 statement.setNull(16, Types.CHAR);
             }
+            if (centroBean.getNomcorto() != null) {
+                statement.setString(17, centroBean.getNomcorto());
+            } else {
+                statement.setNull(17, Types.CHAR);
+            }
 
-            statement.setLong(17, centroBean.getId());
+            statement.setLong(18, centroBean.getId());
 
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();

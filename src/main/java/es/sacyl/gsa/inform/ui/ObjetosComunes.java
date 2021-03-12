@@ -14,8 +14,17 @@ import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import es.sacyl.gsa.inform.bean.AplicacionBean;
+import es.sacyl.gsa.inform.bean.AplicacionPerfilBean;
+import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
+import es.sacyl.gsa.inform.bean.CentroTipoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
+import es.sacyl.gsa.inform.bean.ProvinciaBean;
+import es.sacyl.gsa.inform.dao.AplicacionDao;
+import es.sacyl.gsa.inform.dao.AplicacionPerfilDao;
+import es.sacyl.gsa.inform.dao.CentroDao;
+import es.sacyl.gsa.inform.dao.CentroTipoDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.GfhDao;
 import es.sacyl.gsa.inform.dao.JimenaDao;
@@ -122,7 +131,61 @@ public class ObjetosComunes {
         checkboxGroup.setItemLabelGenerator(CentroBean::getNomcen);
         return checkboxGroup;
     }
-
+    
+     /**
+     * 
+     * @return 
+     */    
+    public CheckboxGroup<AplicacionBean> getAplicacionesCheckboxGroup() {
+        CheckboxGroup<AplicacionBean> checkboxGroup;
+        checkboxGroup = new CheckboxGroup<AplicacionBean>();
+        checkboxGroup.setLabel("Aplicaciones");
+        checkboxGroup.setItems(new AplicacionDao().getLista(null));
+        checkboxGroup.setItemLabelGenerator(AplicacionBean::getNombre);
+        
+        return checkboxGroup;
+    }
+    
+    /**
+     * 
+     * @param id
+     * @return 
+     */
+    public CheckboxGroup<AplicacionPerfilBean> getAplicacionesPerfilesPorIdCheckboxGroup(Long id) {
+        AplicacionBean aplicacion = new AplicacionBean();
+        aplicacion.setId(id);
+        CheckboxGroup<AplicacionPerfilBean> checkboxGroup;
+        checkboxGroup = new CheckboxGroup<>();
+        checkboxGroup.setItems(new AplicacionPerfilDao().getLista(null,aplicacion));
+        checkboxGroup.setItemLabelGenerator(AplicacionPerfilBean::getNombre);
+   
+        return checkboxGroup;
+    }
+    
+     /**
+     * Devuelve un checkboxGroup con los tipos de centro
+     * @return 
+     */
+    public CheckboxGroup<CentroTipoBean> getTipoCentroCecheckboxGroup() {
+        CheckboxGroup<CentroTipoBean> tipoCentro = new CheckboxGroup<>();
+        ArrayList<CentroTipoBean> tiposArrayList = new CentroTipoDao().getLista(null, ConexionDao.BBDD_ACTIVOSI);
+        tipoCentro.setItems(tiposArrayList);
+        tipoCentro.setItemLabelGenerator(CentroTipoBean::getDescripcion);
+        return tipoCentro;        
+    }
+    
+    /**
+     * Devuelve un checkboxGroup con los centros de Ávila
+     * @return 
+     */
+    public CheckboxGroup<CentroBean> getCentrosCheckboxGroup() {
+        CheckboxGroup<CentroBean> centros = new CheckboxGroup<>();
+        ArrayList<CentroBean> centrosArrayList = new CentroDao().getLista(null, AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, null, null, ConexionDao.BBDD_ACTIVOSI);
+        centros.setItems(centrosArrayList);
+        centros.setItemLabelGenerator(CentroBean::getNomcorto);
+        return centros;        
+    }
+    
     /**
      *
      * @param valor el valor que esté seleccionado del combo

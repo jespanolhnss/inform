@@ -30,6 +30,7 @@ public class CentroBean {
     private NivelesAtencionBean nivatencion;
     private Integer estado;
     private String mapgoogle;
+    private String nomcorto;
 
     private ArrayList<CentroFicheroBean> centroFicheroArrayList = new ArrayList<>();
 
@@ -245,6 +246,14 @@ public class CentroBean {
 
     public void setMapgoogle(String mapgoogle) {
         this.mapgoogle = mapgoogle;
+    }
+    
+    public String getNomcorto() {
+        return nomcorto;
+    }
+
+    public void setNomcorto(String nomcorto) {
+        this.nomcorto = nomcorto;
     }
 
     public ArrayList<CentroFicheroBean> getCentroFicheroArrayList() {
