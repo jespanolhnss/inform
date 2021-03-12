@@ -310,10 +310,10 @@ public class ProveedorDao extends ConexionDao implements Serializable, ConexionI
      */
     @Override
     public ArrayList<ProveedorBean> getLista(String texto) {
-        return getLista(texto, null);
+        return getLista(texto, null, ConexionDao.BBDD_ACTIVOSI);
     }
 
-    public ArrayList<ProveedorBean> getLista(String texto, ProvinciaBean provinciaBean) {
+    public ArrayList<ProveedorBean> getLista(String texto, ProvinciaBean provinciaBean, Integer estado) {
         Connection connection = null;
         ArrayList<ProveedorBean> lista = new ArrayList<>();
         try {
@@ -325,7 +325,9 @@ public class ProveedorDao extends ConexionDao implements Serializable, ConexionI
             if (texto != null && !texto.isEmpty()) {
                 sql = sql.concat(" AND  ( UPPER(prvee.nombre) like'%" + texto.toUpperCase() + "%'  ");
             }
-
+            if (estado != null) {
+                sql = sql.concat(" AND prvee.estado = " + estado);
+            }
             sql = sql.concat(" ORDER BY prvee.nombre  ");
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sql);

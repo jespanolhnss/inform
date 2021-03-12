@@ -35,6 +35,7 @@ public class ParametroBean implements Serializable {
     public static String URL_CONEXION_TURNOS = "url.conexion.turnos";
     public static String URL_CONEXION_GACELA = "url.conexion.gacela";
     public static String URL_CONEXION_JIMENA = "url.conexion.jimena";
+    public static String URL_CONEXION_GALENO = "url.conexion.galeno";
 
     public static String USR_INFORMATICOS = "usr.informaticos";
 

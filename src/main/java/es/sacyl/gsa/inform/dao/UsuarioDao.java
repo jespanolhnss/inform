@@ -418,5 +418,33 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
 
         return listaUsuarios;
     }
-
+    
+    public UsuarioBean getUsuarioPersigo(String value) {
+        
+        Connection connection = null;
+        UsuarioBean usuario = new UsuarioBean();
+        
+        try {
+            connection = super.getConexionBBDD();
+            String select = " select nif,ape1,ape2,nombre,mail FROM S15_PERS@PFSACY01 where nif = '" + value + "'";
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(select);
+                while (resulSet.next()) {
+                    usuario.setDni(resulSet.getString("nif"));
+                    usuario.setApellido1(resulSet.getString("ape1"));
+                    usuario.setApellido2(resulSet.getString("ape2"));
+                    usuario.setNombre(resulSet.getString("nombre"));
+                    usuario.setMail(resulSet.getString("mail"));
+                }
+            }
+            logger.debug(select);
+        } catch (SQLException e) {
+            logger.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return usuario;
+    }
 }

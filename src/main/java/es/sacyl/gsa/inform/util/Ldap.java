@@ -50,7 +50,7 @@ public class Ldap {
 
             String keystore = null;
 
-            if (javaHome.indexOf("jre") == -1) {
+            if (javaHome.indexOf("jre") != -1) {
 
                 keystore = javaHome + fileSeparator + "jre" + fileSeparator + "lib" + fileSeparator + "security"
                         + fileSeparator + "ldap";
