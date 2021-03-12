@@ -36,7 +36,6 @@ import es.sacyl.gsa.inform.dao.NivelesAtencionTipoDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
 import es.sacyl.gsa.inform.dao.UbicacionDao;
 import es.sacyl.gsa.inform.dao.CategoriaDao;
-import es.sacyl.gsa.inform.dao.UsuarioCategoriaDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.dao.VlanDao;
 import es.sacyl.gsa.inform.dao.ZonaDao;
@@ -602,7 +601,7 @@ public class CombosUi {
     public ComboBox<UsuarioCategoriaBean> getCategoriasUsuarios(UsuarioCategoriaBean valor) {
         ComboBox<UsuarioCategoriaBean> combo;
         combo = new ComboBox<>("Categorias");
-        combo.setItems(new UsuarioCategoriaDao().getLista(null));
+        combo.setItems(new CategoriaDao().getLista(null));
         combo.setItemLabelGenerator(UsuarioCategoriaBean::getNombre);
         if (valor != null) {
             combo.setValue(valor);
