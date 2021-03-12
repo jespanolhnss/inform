@@ -23,12 +23,12 @@ import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.server.VaadinSession;
+import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.LopdDocumentoBean;
 import es.sacyl.gsa.inform.bean.LopdIncidenciaBean;
 import es.sacyl.gsa.inform.bean.LopdNotaBean;
 import es.sacyl.gsa.inform.bean.LopdTipoBean;
 import es.sacyl.gsa.inform.bean.PacienteBean;
-import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.dao.LopdDocumentoDao;
 import es.sacyl.gsa.inform.dao.LopdIncidenciaDao;
@@ -435,17 +435,17 @@ public final class FrmLopdIncidenciaGestionar extends FrmMasterPantalla implemen
             botonInforme.setEnabled(true);
             botonNota.setEnabled(true);
             lopdNotaGrid.setVisible(Boolean.TRUE);
+            botonJimenaIntereconsulta.setEnabled(true);
             lopdDocumentoGrid.setVisible(Boolean.TRUE);
             if (lopdIncidenciaBean.getPaciente() != null && !lopdIncidenciaBean.getPaciente().getNumerohc().isEmpty()) {
                 botonJimenaInforme.setEnabled(true);
                 botonJimenaRegistro.setEnabled(true);
-                botonJimenaIntereconsulta.setEnabled(true);
+
                 botonHis.setEnabled(true);
 
             } else {
                 botonJimenaInforme.setEnabled(false);
                 botonJimenaRegistro.setEnabled(false);
-                botonJimenaIntereconsulta.setEnabled(false);
                 botonHis.setEnabled(false);
 
             }

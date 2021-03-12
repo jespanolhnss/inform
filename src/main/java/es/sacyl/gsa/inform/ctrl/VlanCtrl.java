@@ -127,8 +127,13 @@ public class VlanCtrl implements Serializable {
             dirMascara2 = direccionBase.substring(8, 16);
             dirMascara3 = direccionBase.substring(16, 24);
             dirMascara4 = direccionBase.substring(24, 32);
+
+            int dir4 = Utilidades.binarioToDecimal(dirMascara4);
+            dir4++;
+
+            dirMascara4 = Utilidades.binarioToDecimalString(dir4);
             return Utilidades.binarioToDecimalString(dirMascara1) + "." + Utilidades.binarioToDecimalString(dirMascara2) + "."
-                    + Utilidades.binarioToDecimalString(dirMascara3) + "." + Utilidades.binarioToDecimalString(dirMascara4) + 1;
+                    + Utilidades.binarioToDecimalString(dirMascara3) + "." + Utilidades.binarioToDecimalString(dirMascara4);
         } catch (Exception ex) {
             LOGGER.error(Utilidades.getStackTrace(ex));
         }

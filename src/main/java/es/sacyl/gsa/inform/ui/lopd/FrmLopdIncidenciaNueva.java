@@ -26,6 +26,7 @@ import es.sacyl.gsa.inform.bean.LopdSujetoBean;
 import es.sacyl.gsa.inform.bean.LopdTipoBean;
 import es.sacyl.gsa.inform.bean.PacienteBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
+import es.sacyl.gsa.inform.ctrl.MensajesCtrl;
 import es.sacyl.gsa.inform.ctrl.SesionCtrl;
 import es.sacyl.gsa.inform.dao.LopdIncidenciaDao;
 import es.sacyl.gsa.inform.dao.LopdTipoDao;
@@ -38,7 +39,6 @@ import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Utilidades;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -102,6 +102,7 @@ public final class FrmLopdIncidenciaNueva extends FrmMasterPantalla {
     public void doGrabar() {
         try {
             if (lopdIncidenciaBinder.writeBeanIfValid(lopdIncidenciaBean)) {
+                lopdIncidenciaBean.setValoresAut();
                 lopdIncidenciaBean.setUsuCambio((UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME));
                 pacienteBinder.readBean(paciente);
                 usuRegistraBinder.writeBean(usuRegistraBean);
@@ -109,6 +110,7 @@ public final class FrmLopdIncidenciaNueva extends FrmMasterPantalla {
                 lopdIncidenciaBean.setPaciente(paciente);
                 if (new LopdIncidenciaDao().grabaDatos(lopdIncidenciaBean) == true) {
                     (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
+                    new MensajesCtrl().doNuevoMensajeIncidencia(lopdIncidenciaBean);
                     doActualizaGrid();
                     doLimpiar();
                     doCancelar();
@@ -140,9 +142,10 @@ public final class FrmLopdIncidenciaNueva extends FrmMasterPantalla {
                 FrmMensajes.AVISOCONFIRMACIONACCION,
                 FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
                 FrmMensajes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
-                    lopdIncidenciaBean.setUsuCambio(usuarioCambio);
-                    lopdIncidenciaBean.setFechaCambio(LocalDate.now());
-                    lopdIncidenciaBean.setEstado(Boolean.FALSE);
+                    lopdIncidenciaBean.setValoresAut();
+                    // lopdIncidenciaBean.setUsuCambio(usuarioCambio);
+                    //lopdIncidenciaBean.setFechaCambio(LocalDate.now());
+                    //lopdIncidenciaBean.setEstado(Boolean.FALSE);
                     new LopdIncidenciaDao().grabaDatos(lopdIncidenciaBean);
                     Notification.show(FrmMensajes.AVISODATOBORRADO);
                 });

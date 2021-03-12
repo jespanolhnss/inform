@@ -28,7 +28,7 @@ public class ParametroBean implements Serializable {
     public static String MAIL_HOST = "mail.smtp.host"; //	Host del correo
     public static String MAIL_AUTH = "mail.smtp.auth"; //	Auth
 
-    public static String MAIL_LDAP_DESTINOLOPD = "mail.ldap.destinolopd"; //	Destinatarios correo lopd
+    public static String MAIL_LDAP_DESTINOLOPD = "mail.ldap.destinolopd"; //	Destinatarios correo lopd para gestion de incidencias
 
     public static String URL_CONEXION_HIS = "url.conexion.his";
     public static String URL_CONEXION_FARMCIA = "url.conexion.farmacia";

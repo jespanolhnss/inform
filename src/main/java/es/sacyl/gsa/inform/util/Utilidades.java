@@ -273,6 +273,10 @@ public class Utilidades {
         }
     }
 
+    public static int binarioToDecimal(int binario) {
+        return binarioToDecimal(new Long(binario));
+    }
+
     public static int binarioToDecimal(long binario) {
         int decimal = 0;
         int digito;

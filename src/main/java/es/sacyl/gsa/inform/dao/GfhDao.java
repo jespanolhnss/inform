@@ -242,7 +242,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
         GfhBean gfh = null;
         try {
             connection = super.getConexionBBDD();
-            sql = "SELECT  *  FROM gfh WHERE estado=" + ConexionDao.BBDD_ACTIVOSI + " AND id=" + id;
+            sql = sql.concat(" AND id=" + id);
             logger.debug(sql);
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
@@ -267,7 +267,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
         GfhBean gfh = null;
         try {
             connection = super.getConexionBBDD();
-            sql = "SELECT  *  FROM gfh WHERE estado=" + ConexionDao.BBDD_ACTIVOSI + " AND idjimena=" + id;
+            sql = sql.concat(" AND idjimena=" + id);
             logger.debug(sql);
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);

@@ -30,6 +30,7 @@ public class LopdIncidenciaDao extends ConexionDao {
         boolean actualizado = false;
 
         if (incidencia.getId().equals(new Long(0))) {
+            incidencia.setId(getSiguienteId("lopd_incidencias"));
             actualizado = this.insertaDatos(incidencia);
         } else {
             actualizado = this.actualizaDatos(incidencia);

@@ -7,11 +7,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class LopdIncidenciaBean implements Serializable {
+public class LopdIncidenciaBean extends MasterBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long id;
     private UsuarioBean usuarioRegistra;
     private LopdSujetoBean sujeto;
     private LopdTipoBean tipo;
@@ -25,8 +24,6 @@ public class LopdIncidenciaBean implements Serializable {
     private String descripcionError;
     private String descripcionSolucion;
 
-    private boolean estado;
-    private LocalDate fechaCambio;
     private UsuarioBean usuCambio;
     private UsuarioBean usuarioAfectado;
     private Boolean resuelta;
@@ -234,14 +231,6 @@ public class LopdIncidenciaBean implements Serializable {
         this.descripcionSolucion = descripcionSolucion;
     }
 
-    public LocalDate getFechaCambio() {
-        return fechaCambio;
-    }
-
-    public void setFechaCambio(LocalDate fechaCambio) {
-        this.fechaCambio = fechaCambio;
-    }
-
     public UsuarioBean getUsuCambio() {
         return usuCambio;
     }
@@ -284,14 +273,6 @@ public class LopdIncidenciaBean implements Serializable {
 
     public LocalDate getFechaSolucion() {
         return fechaSolucion;
-    }
-
-    public boolean isEstado() {
-        return estado;
-    }
-
-    public void setEstado(boolean estado) {
-        this.estado = estado;
     }
 
     public String getFechaSolucionString() {
