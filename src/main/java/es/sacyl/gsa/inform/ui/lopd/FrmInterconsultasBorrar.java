@@ -10,15 +10,15 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.JimenaInformeBean;
 import es.sacyl.gsa.inform.bean.LopdIncidenciaBean;
 import es.sacyl.gsa.inform.bean.LopdNotaBean;
-import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.dao.ConexionDao;
+import es.sacyl.gsa.inform.dao.GfhDao;
 import es.sacyl.gsa.inform.dao.JimenaDao;
 import es.sacyl.gsa.inform.dao.LopdNotaDao;
-import es.sacyl.gsa.inform.dao.GfhDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.EmbeddedPdfDocument;
@@ -110,7 +110,7 @@ public final class FrmInterconsultasBorrar extends Dialog {
         jimenaInformeGrid.setWidth("600px");
         jimenaInformeGrid.addColumn(JimenaInformeBean::getFechaHoraInforme).setHeader("Fecha Hora Informe");
         jimenaInformeGrid.addColumn(JimenaInformeBean::getInterconsultaServicioDestinoString).setHeader("Serv").setWidth("60px");
-        jimenaInformeGrid.addColumn(JimenaInformeBean::getEpisodio).setHeader("Esta").setWidth("60px");
+        jimenaInformeGrid.addColumn(JimenaInformeBean::getEstado).setHeader("Esta").setWidth("60px");
         jimenaInformeGrid.addColumn(JimenaInformeBean::getDescripcion20).setHeader("Informe");
         jimenaInformeGrid.addColumn(JimenaInformeBean::getUsuarioBeanApellidosNombre).setHeader("Médico");
         jimenaInformeGrid.setPaginatorSize(15);
@@ -208,8 +208,8 @@ public final class FrmInterconsultasBorrar extends Dialog {
             } else {
                 informe.setListaCampos(new JimenaDao().getListaCamposInforme(informe.getId(), JimenaInformeBean.INFORME_ESTADO_EDICION));
                 if (informe.getListaCampos().size() > 0) {
-                    String txtCabecera = informe.getTxtCabecera();
-                    String txtDedatelle = informe.gettxtCampos_i();
+                    String txtCabecera = informe.getHtmlCabecera();
+                    String txtDedatelle = informe.getHtmlCampos_i();
                     Details component = new Details(new Span(txtCabecera),
                             new Span(txtDedatelle));
                     component.setEnabled(false);
@@ -222,7 +222,7 @@ public final class FrmInterconsultasBorrar extends Dialog {
             }
 
         } else {
-            Notification.show("Sin seleccionar informe");
+            // Notification.show("Sin seleccionar informe");
             borrarInfomeBoton.setEnabled(Boolean.FALSE);
         }
         jimenaInformeGrid.setEnabled(true);

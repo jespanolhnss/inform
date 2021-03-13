@@ -72,6 +72,7 @@ public class LopdNotaDao extends ConexionDao {
         boolean actualizado = false;
 
         if (nota.getId().equals(new Long(0))) {
+            nota.setId(getSiguienteId("lopd_notas"));
             return this.doInserta(incidencia, nota);
         } else {
             return this.doActualiza(incidencia, nota);

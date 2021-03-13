@@ -7,11 +7,11 @@ package es.sacyl.gsa.inform.ctrl;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.QueryParameters;
+import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.LopdIncidenciaBean;
 import es.sacyl.gsa.inform.bean.LopdSujetoBean;
 import es.sacyl.gsa.inform.bean.LopdTipoBean;
 import es.sacyl.gsa.inform.bean.PacienteBean;
-import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.dao.JimenaDao;
 import es.sacyl.gsa.inform.dao.PacienteDao;
@@ -26,18 +26,19 @@ import java.util.Map;
  * @author 06551256M
  */
 public final class LlamdasExternas {
-    
+
     private UsuarioBean usuarioBean = null;
     private PacienteBean pacienteBean = null;
-    private GfhBean ServicioBean=null;
+    private GfhBean ServicioBean = null;
     private VerticalLayout contenedorFormularios = new VerticalLayout();
-    private final String apl, nhc, usr, tipo,serv,icu;
+    private final String apl, nhc, usr, tipo, serv, icu;
     public static String LOPDNUEVA = "LOPDNUEVA";
     public QueryParameters queryParameters;
+
     /**
-     * 
+     *
      * @param qm
-     * @param cf 
+     * @param cf
      */
     public LlamdasExternas(QueryParameters qm, VerticalLayout cf) {
         queryParameters = qm;
@@ -50,13 +51,16 @@ public final class LlamdasExternas {
         icu = getParametroLlamada("ICU");
         if (usr != null) {
             usuarioBean = new UsuarioDao().getUsuarioDni(usr, Boolean.FALSE);
-            if (usuarioBean==null){
-                usuarioBean= new JimenaDao().getUsuarioBean(usr);
+            if (usuarioBean == null) {
+                usuarioBean = new JimenaDao().getUsuarioBean(usr);
             }
             SesionCtrl.doCreaSesionUsuario(usuarioBean);
         }
         if (nhc != null) {
             pacienteBean = new JimenaDao().getPaciente(nhc);
+            if (new PacienteDao().getPacienteNhc(pacienteBean.getNumerohc()) == null) {
+                new PacienteDao().insertaPaciente(pacienteBean);
+            }
         }
         switch (tipo) {
             case "LOPDNUEVA":
@@ -64,10 +68,11 @@ public final class LlamdasExternas {
                 break;
         }
     }
+
     /**
-     * 
+     *
      * @param parametro
-     * @return 
+     * @return
      */
     public String getParametroLlamada(String parametro) {
         String valor = null;
@@ -78,8 +83,9 @@ public final class LlamdasExternas {
         }
         return valor;
     }
+
     /**
-     * 
+     *
      */
     public void doPantallaLopd() {
         contenedorFormularios.removeAll();
@@ -96,14 +102,14 @@ public final class LlamdasExternas {
         frmLopdIncidenciaNueva.getBotonLimpiar().setVisible(Boolean.FALSE);
         frmLopdIncidenciaNueva.getBotonImprimir().setVisible(Boolean.FALSE);
         frmLopdIncidenciaNueva.getBuscador().setVisible(Boolean.FALSE);
-        
-          frmLopdIncidenciaNueva.getDni().setReadOnly(true);
+
+        frmLopdIncidenciaNueva.getDni().setReadOnly(true);
         frmLopdIncidenciaNueva.getApellidosNombre().setReadOnly(true);
-     //     frmLopdIncidenciaNueva.getMail().setReadOnly(true);
-       //     frmLopdIncidenciaNueva.getTelefono().setReadOnly(true);
+        //     frmLopdIncidenciaNueva.getMail().setReadOnly(true);
+        //     frmLopdIncidenciaNueva.getTelefono().setReadOnly(true);
         frmLopdIncidenciaNueva.getComboSujeto().setReadOnly(Boolean.TRUE);
-        
-         contenedorFormularios.add(frmLopdIncidenciaNueva);
-         
+
+        contenedorFormularios.add(frmLopdIncidenciaNueva);
+
     }
 }
