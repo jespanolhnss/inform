@@ -117,9 +117,11 @@ public final class FrmUbicacion extends FrmMasterPantalla {
     @Override
     public void doLimpiar() {
         CentroBean centroActual = centroCombo.getValue();
+        UbicacionBean ubicacionPadre = ubicacionCombo.getValue();
         ubicacionBean = new UbicacionBean();
         ubicacionBinder.readBean(ubicacionBean);
         centroCombo.setValue(centroActual);
+        ubicacionCombo.setValue(ubicacionPadre);
         descripcion.clear();
         nivel.setValue("0");
         descripcionfull.clear();

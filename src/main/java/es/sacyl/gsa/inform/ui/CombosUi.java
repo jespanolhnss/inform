@@ -189,7 +189,7 @@ public class CombosUi {
         if (valor != null) {
             combo.setValue(valor);
         }
-        combo.setWidth("150px");
+        combo.setWidth("450px");
         return combo;
     }
 

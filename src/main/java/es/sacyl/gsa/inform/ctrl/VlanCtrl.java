@@ -98,13 +98,18 @@ public class VlanCtrl implements Serializable {
      *
      * -----------------------------------------------
      *
-     * Subred (and)11011100.01100100.01100100.00000000
+     * Subred (and)11011100.01100100.01100100.00000000 mas 1 En decimal
+     * 220.100.100.0
      *
-     * En decimal 220.100.100.0
+     * La puerta de enlace es la direccin base + 1
      */
     public static String getCalculaPuertaEnlace(String direccion, String mascara) {
         String[] ips = direccion.split("\\.");
         String[] mask = mascara.split("\\.");
+        /*
+        ips[3] = Integer.toString(Integer.parseInt(ips[3]) + 1);
+        return ips[0] + "." + ips[1] + "." + ips[2] + "." + ips[3];
+         */
         String dirMascara1, dirMascara2, dirMascara3, dirMascara4;
         try {
             NumeroBinario ipBinario = new NumeroBinario(
@@ -131,13 +136,16 @@ public class VlanCtrl implements Serializable {
             int dir4 = Utilidades.binarioToDecimal(dirMascara4);
             dir4++;
 
-            dirMascara4 = Utilidades.binarioToDecimalString(dir4);
+            dirMascara4 = new NumeroBinario(dir4).rellenaIzquierda(8, NumeroBinario.ZERO_CHAR);
             return Utilidades.binarioToDecimalString(dirMascara1) + "." + Utilidades.binarioToDecimalString(dirMascara2) + "."
                     + Utilidades.binarioToDecimalString(dirMascara3) + "." + Utilidades.binarioToDecimalString(dirMascara4);
+
         } catch (Exception ex) {
             LOGGER.error(Utilidades.getStackTrace(ex));
         }
+
         return "";
+
     }
 
     /**

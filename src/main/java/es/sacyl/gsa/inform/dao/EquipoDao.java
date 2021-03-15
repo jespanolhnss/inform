@@ -31,7 +31,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         sql = " SELECT  e.id as equipoid,e.tipo as equipotipo, e.inventario as  equipoinventario,e.marca as   equipomarca"
                 + " ,e.modelo as  equipomodelo"
                 + " ,e.numeroserie as   equiponumeroserie, e.centro   equipocentro,  e.ubicacion  equipoubicacion  "
-                + " ,e.servicio as  equiposervicio, e.ip as  equipoip, e.comentario as  equipocomentario "
+                + " ,e.servicio as  equiposervicio, e.ip as  equipoip, e.comentario as  equipocomentario,e.mac as equipomac "
                 + " ,gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
                 + ",gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
                 + " ,u.id as ubicacionesid , u.centro as ubicacionescentro, u.descripcion as ubicacionesdescripcion,"
@@ -72,7 +72,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         sql = " SELECT  e.id as equipoid,e.tipo as equipotipo, e.inventario as  equipoinventario,e.marca as   equipomarca"
                 + " ,e.modelo as  equipomodelo"
                 + " ,e.numeroserie as   equiponumeroserie, e.centro   equipocentro,  e.ubicacion  equipoubicacion  "
-                + " ,e.servicio as  equiposervicio, e.ip as  equipoip, e.comentario as  equipocomentario "
+                + " ,e.servicio as  equiposervicio, e.ip as  equipoip, e.comentario as  equipocomentario,e.mac as equipomac "
                 + " ,e.estado as equipoestado,e.fechacambio as equipofechacambio, e.usucambio as equipousucambio "
                 + " ,gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
                 + ",gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
@@ -127,6 +127,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
 
             //   equipoBean.setIp(rs.getString("equipoip"));
             equipoBean.setComentario(rs.getString("equipocomentario"));
+            equipoBean.setMacadress(rs.getString("equipomac"));
 
             equipoBean.setEstado(rs.getInt("equipoestado"));
             equipoBean.setFechacambio(Utilidades.getFechaLocalDate(rs.getLong("equipofechacambio")));
@@ -209,8 +210,8 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         try {
             connection = super.getConexionBBDD();
             sql = sql = "INSERT INTO     equipos  "
-                    + "( id,tipo,  inventario,  marca,  modelo,  numeroserie,  centro,  ubicacion, servicio,    comentario, estado,fechacambio,usucambio )"
-                    + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    + "( id,tipo,  inventario,  marca,  modelo,  numeroserie,  centro,  ubicacion, servicio,    comentario, estado,fechacambio,usucambio,mac )"
+                    + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setLong(1, equipoBean.getId());
             if (equipoBean.getTipo() == null) {
@@ -263,7 +264,11 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             statement.setInt(11, ConexionDao.BBDD_ACTIVOSI);
             statement.setLong(12, Utilidades.getFechaLong(equipoBean.getFechacambio()));
             statement.setLong(13, equipoBean.getUsucambio().getId());
-
+            if (equipoBean.getMacadress() == null) {
+                statement.setNull(14, Types.VARCHAR);
+            } else {
+                statement.setString(14, equipoBean.getMacadress());
+            }
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
         } catch (SQLException e) {
@@ -286,7 +291,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
 
             sql = sql = "UPDATE     equipos  SET "
                     + "tipo=?, inventario=?,  marca=?,  modelo=?,  numeroserie=?,  centro=?,  ubicacion=?, servicio=?,   comentario=? "
-                    + " , fechacambio=?, usucambio=?  WHERE id=?";
+                    + " , fechacambio=?, usucambio=? ,mac=? WHERE id=?";
             PreparedStatement statement = connection.prepareStatement(sql);
             if (equipoBean.getTipo() == null) {
                 statement.setNull(1, Types.VARCHAR);
@@ -337,7 +342,12 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             }
             statement.setLong(10, Utilidades.getFechaLong(equipoBean.getFechacambio()));
             statement.setLong(11, equipoBean.getUsucambio().getId());
-            statement.setLong(12, equipoBean.getId());
+            if (equipoBean.getMacadress() == null) {
+                statement.setNull(12, Types.VARCHAR);
+            } else {
+                statement.setString(12, equipoBean.getMacadress());
+            }
+            statement.setLong(13, equipoBean.getId());
 
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
@@ -487,6 +497,35 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         return valor;
     }
 
+    public String getValorDatoGenericoDemModelo(String tipodato, EquipoBean equipoBean) {
+        String valor = "";
+        Connection connection = null;
+        String sqlValor = "";
+        try {
+            connection = super.getConexionBBDD();
+            sqlValor = " SELECT  e.marca,e.modelo,d.* FROM equipos e "
+                    + " JOIN equiposdatos d ON e.marca='" + equipoBean.getMarca() + "' AND  e.modelo='" + equipoBean.getModelo() + "' "
+                    + " WHERE d.tipodato='" + tipodato + "' ORDER BY d.id desc";
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(sqlValor);
+            while (resulSet.next()) {
+                valor = resulSet.getString("valor");
+                if (valor != null && !valor.isEmpty()) {
+                    break;
+                }
+            }
+            statement.close();
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return valor;
+    }
+
     public Boolean grabatValorDatoGenerico(DatoGenericoBean dato) {
         String valor = "";
         String sqlValor = "";
@@ -499,22 +538,38 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sqlValor);
             if (resulSet.next()) {
-                sqlValor = " UPDATE equiposdatos SET valor=? WHERE idequipo=? AND tipodato=? ";
+                sqlValor = " UPDATE equiposdatos SET valor=?,estado=?,fechacambio=?,usucambio=? WHERE idequipo=? AND tipodato=? ";
                 PreparedStatement statementInsert = connection.prepareStatement(sqlValor);
                 statementInsert.setString(1, dato.getValor());
-                statementInsert.setLong(2, dato.getIdDatoEqipo());
-                statementInsert.setString(3, dato.getTipoDato());
+
+                statementInsert.setInt(2, dato.getEstado());
+                statementInsert.setLong(3, Utilidades.getFechaLong(dato.getFechacambio()));
+                if (dato.getUsucambio() != null && dato.getUsucambio().getId() != null) {
+                    statementInsert.setLong(4, dato.getUsucambio().getId());
+                } else {
+                    statementInsert.setNull(4, Types.INTEGER);
+                }
+                statementInsert.setLong(5, dato.getIdDatoEqipo());
+                statementInsert.setString(6, dato.getTipoDato());
                 insertadoBoolean = statementInsert.executeUpdate() > 0;
                 statementInsert.close();
                 LOGGER.debug(sqlValor);
             } else {
                 dato.setId(getSiguienteId("equiposdatos"));
-                sqlValor = " INSERT INTO  equiposdatos (id, valor, idequipo, tipodato) VALUES (?,?,?,?) ";
+                sqlValor = " INSERT INTO  equiposdatos (id, valor, idequipo, tipodato,estado,fechacambio,usucambio) "
+                        + "VALUES (?,?,?,?,?,?,?) ";
                 PreparedStatement statementUpdate = connection.prepareStatement(sqlValor);
                 statementUpdate.setLong(1, dato.getId());
                 statementUpdate.setString(2, dato.getValor());
                 statementUpdate.setLong(3, dato.getIdDatoEqipo());
                 statementUpdate.setString(4, dato.getTipoDato());
+                statementUpdate.setInt(5, dato.getEstado());
+                statementUpdate.setLong(6, Utilidades.getFechaLong(dato.getFechacambio()));
+                if (dato.getUsucambio() != null && dato.getUsucambio().getId() != null) {
+                    statementUpdate.setLong(7, dato.getUsucambio().getId());
+                } else {
+                    statementUpdate.setNull(7, Types.INTEGER);
+                }
                 insertadoBoolean = statementUpdate.executeUpdate() > 0;
                 statementUpdate.close();
                 LOGGER.debug(sqlValor);

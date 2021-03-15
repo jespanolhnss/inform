@@ -179,7 +179,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
             connection = super.getConexionBBDD();
             sql = " UPDATE viajes SET  " + ",estado='" + ConexionDao.BBDD_ACTIVOSI + "'"
                     + ",usucambio='" + usuarioBean.getId() + "'"
-                    + ",fechacambio=" + Utilidades.getFechaActualLong() + "'"
+                    + ",fechacambio=" + Utilidades.getFechaActualLong()
                     + " WHERE id='" + viajeBean.getId() + "'";
             Statement statement = connection.createStatement();
             insertadoBoolean = statement.execute(sql);
@@ -334,12 +334,17 @@ public class ViajesDao extends ConexionDao implements Serializable {
         return booradoBoolean;
     }
 
-    public Boolean doBorraUnCentro(Long id, ViajeCentroBean viajeCentroBean) {
+    /**
+     *
+     * @param viajeCentroBean
+     * @return
+     */
+    public Boolean doBorraUnCentro(ViajeCentroBean viajeCentroBean) {
         Connection connection = null;
         Boolean booradoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " DELETE FROM  viajesCentros WHERE idviaje='" + id + "'  AND idcenro='" + viajeCentroBean.getId() + "'";
+            sql = " DELETE FROM  viajesCentros WHERE id='" + viajeCentroBean.getId() + "'";
             Statement statement = connection.createStatement();
             booradoBoolean = statement.execute(sql);
             booradoBoolean = true;

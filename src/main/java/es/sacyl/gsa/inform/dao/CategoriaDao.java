@@ -31,7 +31,7 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         super();
         sql = " SELECT uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ", uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
-                + " FROM usuarioscategorias uc WHERE  1=1 ";
+                + " FROM categorias uc WHERE  1=1 ";
     }
 
     public static UsuarioCategoriaBean getRegistroResulset(ResultSet rs) {
@@ -97,7 +97,7 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         boolean actualizado = false;
 
         if (this.getPorCodigo(usuarioCategoriaBean.getCodigo()) == null) {
-            usuarioCategoriaBean.setId(getSiguienteId("usuarioscategorias"));
+            usuarioCategoriaBean.setId(getSiguienteId("categorias"));
             actualizado = this.doInsertaDatos(usuarioCategoriaBean);
         } else {
             actualizado = this.doActualizaDatos(usuarioCategoriaBean);
@@ -110,7 +110,7 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " INSERT INTO  usuarioscategorias  (id,CODIGOPERSIGO,nombre, estado) "
+            sql = " INSERT INTO  categorias  (id,CODIGOPERSIGO,nombre, estado) "
                     + " VALUES "
                     + "(?,?,?,?)";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -148,7 +148,7 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE   usuarioscategorias  SET CODIGOPERSIGO=?,nombre=?, estado=?  WHERE id =?  ";
+            sql = " UPDATE   categorias  SET CODIGOPERSIGO=?,nombre=?, estado=?  WHERE id =?  ";
             PreparedStatement statement = connection.prepareStatement(sql);
 
             if (usuarioCategoriaBean.getCodigo() != null) {
@@ -186,7 +186,7 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE   usuarioscategorias  SET estado='" + ConexionDao.BBDD_ACTIVONO + "' WHERE id=" + usuarioCategoriaBean.getId();
+            sql = " UPDATE   categorias  SET estado='" + ConexionDao.BBDD_ACTIVONO + "' WHERE id=" + usuarioCategoriaBean.getId();
             Statement statement = connection.createStatement();
             insertadoBoolean = statement.execute(sql);
             insertadoBoolean = true;

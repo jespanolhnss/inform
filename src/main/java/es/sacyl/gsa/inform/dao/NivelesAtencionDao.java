@@ -1,6 +1,5 @@
 package es.sacyl.gsa.inform.dao;
 
-import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.NivelesAtencionBean;
 import es.sacyl.gsa.inform.bean.NivelesAtentionTipoBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
@@ -20,34 +19,34 @@ import org.apache.logging.log4j.Logger;
  *
  * @author JuanNieto
  */
-public class NivelesAtencionDao extends ConexionDao implements Serializable,ConexionInterface<NivelesAtencionBean> {
+public class NivelesAtencionDao extends ConexionDao implements Serializable, ConexionInterface<NivelesAtencionBean> {
 
     private static final Logger LOGGER = LogManager.getLogger(NivelesAtencionDao.class);
     private static final long serialVersionUID = 1L;
 
     /**
-     * 
+     *
      */
     public NivelesAtencionDao() {
         super();
         sql = " SELECT   n.id as nivelid,n.codigo as nivelcodigo,n.descripcion as niveldescripcion,n.tipo as niveltipo,n.estado as nivelestado "
                 + " , na.id as niveltipotipoid, na.descripcion as niveltipodescripcion,na.estado  as niveltipoestado  "
-              +"   , p. codigo as provinciacodigo, p.nombre as provincianombre,p.codauto as provinciacodauto "
+                + "   , p. codigo as provinciacodigo, p.nombre as provincianombre,p.codauto as provinciacodauto "
                 + " ,a.codigo as autonomiacodigo, a.nombre as autonomianombre,a.estado as autonomiaestado "
                 + " FROM nivelesatencion n "
                 + "  JOIN  NIVELESATENCIONTIPO na  ON na.id =n.tipo"
                 + " JOIN provincia p ON p.codigo=n.codprov  "
-                +"  JOIN  cautonom  a ON  p.codauto=a.codigo "
+                + "  JOIN  cautonom  a ON  p.codauto=a.codigo "
                 + " WHERE  1=1 ";
     }
 
     /**
-     * 
+     *
      * @param rs
-     * @return 
+     * @return
      */
     @Override
-    public  NivelesAtencionBean getRegistroResulset(ResultSet rs) {
+    public NivelesAtencionBean getRegistroResulset(ResultSet rs) {
         NivelesAtencionBean nivel = new NivelesAtencionBean();
         try {
             nivel.setId(rs.getLong("nivelid"));
@@ -55,7 +54,7 @@ public class NivelesAtencionDao extends ConexionDao implements Serializable,Cone
             nivel.setDescripcion(rs.getString("niveldescripcion").trim());
             nivel.setTipo(new NivelesAtencionTipoDao().getRegistroResulset(rs));
             nivel.setEstado(rs.getInt("nivelestado"));
-            nivel.setProvincia(ProvinciaDao.getRegistroResulset(rs,null));
+            nivel.setProvincia(ProvinciaDao.getRegistroResulset(rs, null));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         }
@@ -63,17 +62,17 @@ public class NivelesAtencionDao extends ConexionDao implements Serializable,Cone
     }
 
     /**
-     * 
+     *
      * @param id
-     * @return 
+     * @return
      */
     @Override
-      public NivelesAtencionBean getPorId(Long id) {
+    public NivelesAtencionBean getPorId(Long id) {
         Connection connection = null;
         NivelesAtencionBean nivelesAtencionBean = null;
         try {
             connection = super.getConexionBBDD();
-                sql = sql.concat(" AND n.id='" + id + "'");
+            sql = sql.concat(" AND n.id='" + id + "'");
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
@@ -91,19 +90,19 @@ public class NivelesAtencionDao extends ConexionDao implements Serializable,Cone
         }
         return nivelesAtencionBean;
     }
-      
-      /**
-       * 
-       * @param codigo
-       * @return 
-       */
+
+    /**
+     *
+     * @param codigo
+     * @return
+     */
     @Override
     public NivelesAtencionBean getPorCodigo(String codigo) {
         Connection connection = null;
         NivelesAtencionBean nivelesAtencionBean = null;
         try {
             connection = super.getConexionBBDD();
-                sql = sql.concat(" AND codigo='" + codigo + "'");
+            sql = sql.concat(" AND codigo='" + codigo + "'");
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
@@ -122,18 +121,17 @@ public class NivelesAtencionDao extends ConexionDao implements Serializable,Cone
         return nivelesAtencionBean;
     }
 
-   
-/**
- * 
- * @param nivelesAtencionBean
- * @return 
- */
+    /**
+     *
+     * @param nivelesAtencionBean
+     * @return
+     */
     @Override
     public boolean doGrabaDatos(NivelesAtencionBean nivelesAtencionBean) {
         boolean actualizado = false;
 
         if (this.getPorId(nivelesAtencionBean.getId()) == null) {
-               nivelesAtencionBean.setId(this.getSiguienteId("nivelesatencion"));
+            nivelesAtencionBean.setId(this.getSiguienteId("nivelesatencion"));
             actualizado = this.doInsertaDatos(nivelesAtencionBean);
         } else {
             actualizado = this.doActualizaDatos(nivelesAtencionBean);
@@ -142,9 +140,9 @@ public class NivelesAtencionDao extends ConexionDao implements Serializable,Cone
     }
 
     /**
-     * 
+     *
      * @param nivelatencion
-     * @return 
+     * @return
      */
     @Override
     public boolean doInsertaDatos(NivelesAtencionBean nivelesAtencionBean) {
@@ -152,7 +150,7 @@ public class NivelesAtencionDao extends ConexionDao implements Serializable,Cone
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-               sql = " INSERT INTO    nivelesatencion  (id,codigo,descripcion,tipo, estado,codprov)  "
+            sql = " INSERT INTO    nivelesatencion  (id,codigo,descripcion,tipo, estado,codprov)  "
                     + " VALUES "
                     + "(?,?,?,?,?,?)";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -162,27 +160,27 @@ public class NivelesAtencionDao extends ConexionDao implements Serializable,Cone
             } else {
                 statement.setNull(2, Types.CHAR);
             }
-            if (nivelesAtencionBean.getDescripcion()!= null) {
+            if (nivelesAtencionBean.getDescripcion() != null) {
                 statement.setString(3, nivelesAtencionBean.getDescripcion());
             } else {
                 statement.setNull(3, Types.CHAR);
-            }  
-             if (nivelesAtencionBean.getTipo()!= null && nivelesAtencionBean.getTipo().getId()!=null) {
+            }
+            if (nivelesAtencionBean.getTipo() != null && nivelesAtencionBean.getTipo().getId() != null) {
                 statement.setLong(4, nivelesAtencionBean.getTipo().getId());
             } else {
                 statement.setNull(4, Types.INTEGER);
-            } 
-              if (nivelesAtencionBean.getEstado()!= null) {
+            }
+            if (nivelesAtencionBean.getEstado() != null) {
                 statement.setInt(5, nivelesAtencionBean.getEstado());
             } else {
                 statement.setNull(5, Types.INTEGER);
-            }  
-                if (nivelesAtencionBean.getProvincia()!= null && nivelesAtencionBean.getProvincia().getCodigo()!=null) {
+            }
+            if (nivelesAtencionBean.getProvincia() != null && nivelesAtencionBean.getProvincia().getCodigo() != null) {
                 statement.setString(6, nivelesAtencionBean.getProvincia().getCodigo());
             } else {
                 statement.setNull(6, Types.INTEGER);
-            }  
-                           insertadoBoolean = statement.executeUpdate() > 0;
+            }
+            insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
             LOGGER.debug(sql);
         } catch (SQLException e) {
@@ -196,46 +194,45 @@ public class NivelesAtencionDao extends ConexionDao implements Serializable,Cone
     }
 
     /**
-     * 
+     *
      * @param nivelatencion
-     * @return 
+     * @return
      */
     @Override
-  public boolean doActualizaDatos(NivelesAtencionBean nivelesAtencionBean) {
+    public boolean doActualizaDatos(NivelesAtencionBean nivelesAtencionBean) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-               sql = " UPDATE    nivelesatencion  SET "
-                       + "codigo=?,descripcion=?,tipo=?, estado=?,codprov=? "
-                    + " WHERE id=?  "
-                    ;
+            sql = " UPDATE    nivelesatencion  SET "
+                    + "codigo=?,descripcion=?,tipo=?, estado=?,codprov=? "
+                    + " WHERE id=?  ";
             PreparedStatement statement = connection.prepareStatement(sql);
             if (nivelesAtencionBean.getCodigo() != null) {
                 statement.setString(1, nivelesAtencionBean.getCodigo());
             } else {
                 statement.setNull(1, Types.CHAR);
             }
-            if (nivelesAtencionBean.getDescripcion()!= null) {
+            if (nivelesAtencionBean.getDescripcion() != null) {
                 statement.setString(2, nivelesAtencionBean.getDescripcion());
             } else {
                 statement.setNull(2, Types.CHAR);
-            }  
-             if (nivelesAtencionBean.getTipo()!= null && nivelesAtencionBean.getTipo().getId()!=null) {
+            }
+            if (nivelesAtencionBean.getTipo() != null && nivelesAtencionBean.getTipo().getId() != null) {
                 statement.setLong(3, nivelesAtencionBean.getTipo().getId());
             } else {
                 statement.setNull(3, Types.INTEGER);
-            } 
-              if (nivelesAtencionBean.getEstado()!= null) {
+            }
+            if (nivelesAtencionBean.getEstado() != null) {
                 statement.setInt(4, nivelesAtencionBean.getEstado());
             } else {
                 statement.setNull(4, Types.INTEGER);
-            }  
-                if (nivelesAtencionBean.getProvincia()!= null && nivelesAtencionBean.getProvincia().getCodigo()!=null) {
+            }
+            if (nivelesAtencionBean.getProvincia() != null && nivelesAtencionBean.getProvincia().getCodigo() != null) {
                 statement.setString(5, nivelesAtencionBean.getProvincia().getCodigo());
             } else {
                 statement.setNull(5, Types.INTEGER);
-            }  
+            }
             statement.setLong(6, nivelesAtencionBean.getId());
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
@@ -251,9 +248,9 @@ public class NivelesAtencionDao extends ConexionDao implements Serializable,Cone
     }
 
     /**
-     * 
+     *
      * @param nivelatencion
-     * @return 
+     * @return
      */
     @Override
     public boolean doBorraDatos(NivelesAtencionBean nivelatencion) {
@@ -261,7 +258,7 @@ public class NivelesAtencionDao extends ConexionDao implements Serializable,Cone
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE   nivelesatencion  SET estado="+ConexionDao.BBDD_ACTIVONO+" WHERE id='" + nivelatencion.getId() + "'";
+            sql = " UPDATE   nivelesatencion  SET estado=" + ConexionDao.BBDD_ACTIVONO + " WHERE id='" + nivelatencion.getId() + "'";
             Statement statement = connection.createStatement();
             insertadoBoolean = statement.execute(sql);
             insertadoBoolean = true;
@@ -276,32 +273,32 @@ public class NivelesAtencionDao extends ConexionDao implements Serializable,Cone
         }
         return insertadoBoolean;
     }
-    
-    
-/**
- * 
- * @param texto
- * @return 
- */
-    @Override
-     public ArrayList<NivelesAtencionBean> getLista(String texto){
-         return getLista(texto, null, null,null);
-     }
+
     /**
-     * 
+     *
+     * @param texto
+     * @return
+     */
+    @Override
+    public ArrayList<NivelesAtencionBean> getLista(String texto) {
+        return getLista(texto, null, null, null);
+    }
+
+    /**
+     *
      * @param texto
      * @param nivelTipo
      * @param provinciaBean
-     * @return 
-     */ 
+     * @return
+     */
     public ArrayList<NivelesAtencionBean> getLista(String texto, NivelesAtentionTipoBean nivelTipo, ProvinciaBean provinciaBean, Integer estado) {
         Connection connection = null;
         ArrayList<NivelesAtencionBean> listaniveles = new ArrayList<>();
         try {
             connection = super.getConexionBBDD();
-if (estado!=null) {
-    sql = sql.concat(" AND estado=" + estado);
-}
+            if (estado != null) {
+                sql = sql.concat(" AND n.estado=" + estado);
+            }
             if (texto != null && !texto.isEmpty()) {
                 sql = sql.concat(" AND  ( UPPER(descripcion) like'%" + texto.toUpperCase() + "%'  OR   UPPER(codigo) like'%" + texto.toUpperCase() + "%' )");
             }

@@ -98,7 +98,7 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
             } else {
                 centroBean.setLocalidad(localidad);
             }
-
+            centroBean.setCpcentro(rs.getString("centrocpcentro"));
             centroBean.setTeleprev(rs.getString("centroteleprev"));
 
             CentroTipoBean centroTiBean = new CentroTipoDao().getRegistroResulset(rs);
@@ -106,7 +106,6 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
 
             NivelesAtencionBean nivelesAtencionBean = new NivelesAtencionDao().getRegistroResulset(rs);
             centroBean.setNivatencion(nivelesAtencionBean);
-
             centroBean.setEstado(rs.getInt("centroestado"));
             centroBean.setMapgoogle(rs.getString("centromapggole"));
             centroBean.setNomcorto(rs.getString("centronomcorto"));
@@ -295,7 +294,7 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
             } else {
                 statement.setNull(17, Types.CHAR);
             }
-            if (centroBean.getNomcorto()!= null) {
+            if (centroBean.getNomcorto() != null) {
                 statement.setString(18, centroBean.getNomcorto());
             } else {
                 statement.setNull(18, Types.CHAR);
@@ -324,7 +323,7 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
                     + " ,TIPOVIA=?   "
                     + " ,CALLECEN=?  ,   NUMCALCEN=?  ,OTRDIRCEN=?  ,   CODLOCAL=? "
                     + " ,   CPCENTRO =?  ,   TELEPREV=?   ,    TIPOCENTRO=? , NIVATENCION =? "
-                    + ",,ESTADO=?,MAPGOOGLE=?,NOMCORTO=?"
+                    + ",ESTADO=?,MAPGOOGLE=?,NOMCORTO=?"
                     + " WHERE id=?";
             PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -498,7 +497,7 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
                 sql = sql.concat(" AND  n.tipo=" + nivelesAtentionTipoBean.getId());
             }
             if (estado != null) {
-                sql = sql.concat(" AND estado=" + estado);
+                sql = sql.concat(" AND c.estado=" + estado);
             }
             sql = sql.concat(" ORDER BY c.nomcen  ");
             Statement statement = connection.createStatement();

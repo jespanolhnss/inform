@@ -94,9 +94,9 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
 
     // componentes para gestionar los tabs de la parte inferior
     private final Tab centrosTab = new Tab("Centros");
-    private final Tab tecnicoxTab = new Tab("Tecnicos");
+    private final Tab tecnicosTab = new Tab("Tecnicos");
 
-    private final Tabs tabs = new Tabs(centrosTab, tecnicoxTab);
+    private final Tabs tabs = new Tabs(centrosTab, tecnicosTab);
     private final Map<Tab, Component> tabsToPages = new HashMap<>();
     private final Div page1 = new Div();
     private final Div page2 = new Div();
@@ -206,6 +206,9 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         viajeCentroGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         viajeCentroGrid.addColumn(ViajeCentroBean::getIdViaje).setHeader("IdViaje").setAutoWidth(true);
         viajeCentroGrid.addColumn(ViajeCentroBean::getNombreCentro).setHeader("Centro").setAutoWidth(true);
+        viajeCentroGrid.addComponentColumn(item -> createRemoveButtonCen(viajeCentroGrid, item))
+                .setHeader("Borra");
+
         viajeCentroGrid.addColumn(ViajeCentroBean::getPreparacion).setHeader("Preparación").setAutoWidth(true);
         viajeCentroGrid.addColumn(ViajeCentroBean::getActuacion).setHeader("Actuación").setAutoWidth(true);
 
@@ -221,6 +224,26 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         doActualizaGridTecnicos(viajeBean);
     }
 
+    private Button createRemoveButtonCen(PaginatedGrid<ViajeCentroBean> grid, ViajeCentroBean item) {
+        @SuppressWarnings("unchecked")
+        Button button = new Button(VaadinIcon.MINUS_CIRCLE.create(), clickEvent -> {
+            final ConfirmDialog dialog = new ConfirmDialog(
+                    FrmMensajes.AVISOCONFIRMACIONACCION,
+                    FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
+                    FrmMensajes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
+                        if (new ViajesDao().doBorraUnCentro(item) == true) {
+                            Notification.show(FrmMensajes.AVISODATOBORRADO);
+                        } else {
+                            Notification.show(FrmMensajes.AVISODATOERRORBORRADO);
+                        }
+
+                        doActualizaGridCentros(viajeBean);
+                    });
+            dialog.open();
+        });
+        return button;
+    }
+
     private Button createRemoveButton(PaginatedGrid<UsuarioBean> grid, UsuarioBean item) {
         @SuppressWarnings("unchecked")
         Button button = new Button(VaadinIcon.MINUS_CIRCLE.create(), clickEvent -> {
@@ -228,7 +251,11 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
                     FrmMensajes.AVISOCONFIRMACIONACCION,
                     FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
                     FrmMensajes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
-                        new ViajesDao().doBorraUnTecnico(viajeBean, item);
+                        if (new ViajesDao().doBorraUnTecnico(viajeBean, item) == true) {
+                            Notification.show(FrmMensajes.AVISODATOBORRADO);
+                        } else {
+                            Notification.show(FrmMensajes.AVISODATOERRORBORRADO);
+                        }
                         doActualizaGridTecnicos(viajeBean);
                     });
             dialog.open();
@@ -277,7 +304,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         page2.setWidthFull();
 
         centrosTab.setVisible(true);
-        tecnicoxTab.setVisible(true);
+        tecnicosTab.setVisible(true);
 
         page1.setVisible(false);
         page2.setVisible(false);
@@ -292,7 +319,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         page2.add(viajeTecnicoGrid);
 
         tabsToPages.put(centrosTab, page1);
-        tabsToPages.put(tecnicoxTab, page2);
+        tabsToPages.put(tecnicosTab, page2);
 
         contenedorIzquierda.add(contenedorBotones, contenedorBotones2, contenedorFormulario, tabs, page1, page2);
 
@@ -424,13 +451,13 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
     private void doActualizaGridCentros(ViajeBean viajeBean) {
         viajeCentrosArrayList = new ViajesDao().getViajeCentros(viajeBean);
         viajeCentroGrid.setItems(viajeCentrosArrayList);
-        centrosTab.setLabel("Centros (" + viajeCentrosArrayList + ")");
+        centrosTab.setLabel("Centros (" + viajeCentrosArrayList.size() + ")");
     }
 
     private void doActualizaGridTecnicos(ViajeBean viajeBean) {
         ArrayList<UsuarioBean> usuarioBeans = new ViajesDao().getViajeTecnicos(viajeBean);
         viajeTecnicoGrid.setItems(usuarioBeans);
-        centrosTab.setLabel("Técnicos (" + usuarioBeans.size() + ")");
+        tecnicosTab.setLabel("Técnicos (" + usuarioBeans.size() + ")");
     }
 
 }
