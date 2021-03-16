@@ -426,7 +426,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         
         try {
             connection = super.getConexionBBDD();
-            String select = " select nif,ape1,ape2,nombre,mail FROM S15_PERS@PFSACY01 where nif = '" + value + "'";
+            String select = " select nif,ape1,ape2,nombre,mail FROM usuariospersigo where nif = '" + value + "'";
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(select);
                 while (resulSet.next()) {

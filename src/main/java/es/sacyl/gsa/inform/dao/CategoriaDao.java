@@ -31,7 +31,7 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         super();
         sql = " SELECT uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ", uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
-                + " FROM usuarioscategorias uc WHERE  1=1 ";
+                + " FROM categorias uc WHERE  1=1 ";
     }
 
     public static UsuarioCategoriaBean getRegistroResulset(ResultSet rs) {
