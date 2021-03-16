@@ -224,6 +224,12 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         doActualizaGridTecnicos(viajeBean);
     }
 
+    /**
+     *
+     * @param grid
+     * @param item
+     * @return Borra un centro del viaje
+     */
     private Button createRemoveButtonCen(PaginatedGrid<ViajeCentroBean> grid, ViajeCentroBean item) {
         @SuppressWarnings("unchecked")
         Button button = new Button(VaadinIcon.MINUS_CIRCLE.create(), clickEvent -> {
@@ -244,6 +250,12 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         return button;
     }
 
+    /**
+     *
+     * @param grid
+     * @param item
+     * @return Borra un técnico del viaje
+     */
     private Button createRemoveButton(PaginatedGrid<UsuarioBean> grid, UsuarioBean item) {
         @SuppressWarnings("unchecked")
         Button button = new Button(VaadinIcon.MINUS_CIRCLE.create(), clickEvent -> {
@@ -288,6 +300,9 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
                 .bind(ViajeBean::getMatricula, ViajeBean::setMatricula);
     }
 
+    /**
+     *
+     */
     @Override
     public void doComponenesAtributos() {
         contenedorIzquierda.setWidth("50%");
@@ -310,6 +325,9 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         page2.setVisible(false);
     }
 
+    /**
+     *
+     */
     @Override
     public void doComponentesOrganizacion() {
         contenedorIzquierda.setWidth("50%");
