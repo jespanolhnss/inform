@@ -1,7 +1,5 @@
 package es.sacyl.gsa.inform.util;
 
-import com.vaadin.flow.component.UI;
-import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.ui.tablas.FrmCentro;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
