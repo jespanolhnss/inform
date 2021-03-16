@@ -437,17 +437,14 @@ public final class FrmLopdIncidenciaGestionar extends FrmMasterPantalla implemen
             lopdNotaGrid.setVisible(Boolean.TRUE);
             botonJimenaIntereconsulta.setEnabled(true);
             lopdDocumentoGrid.setVisible(Boolean.TRUE);
-            if (lopdIncidenciaBean.getPaciente() != null && !lopdIncidenciaBean.getPaciente().getNumerohc().isEmpty()) {
+            if (lopdIncidenciaBean.getPaciente() != null && lopdIncidenciaBean.getPaciente().getNumerohc() != null && !lopdIncidenciaBean.getPaciente().getNumerohc().isEmpty()) {
                 botonJimenaInforme.setEnabled(true);
                 botonJimenaRegistro.setEnabled(true);
-
                 botonHis.setEnabled(true);
-
             } else {
                 botonJimenaInforme.setEnabled(false);
                 botonJimenaRegistro.setEnabled(false);
                 botonHis.setEnabled(false);
-
             }
         } else {
             super.doControlBotones(null);

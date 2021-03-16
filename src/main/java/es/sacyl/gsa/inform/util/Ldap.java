@@ -50,17 +50,24 @@ public class Ldap {
 
             String keystore = null;
 
-            if (javaHome.indexOf("jre") != -1) {
+            if (javaHome.indexOf("jre") == -1) {
 
                 keystore = javaHome + fileSeparator + "jre" + fileSeparator + "lib" + fileSeparator + "security"
                         + fileSeparator + "ldap";
-
             } else {
-
                 keystore = javaHome + fileSeparator + "lib" + fileSeparator + "security" + fileSeparator + "ldap";
-
             }
 
+            /**
+             *
+             * keystore = javaHome + fileSeparator + "jre" + fileSeparator +
+             * "lib" + fileSeparator + "security" + fileSeparator + "ldap"; if
+             * (!new File(keystore).exists()) { keystore = javaHome +
+             * fileSeparator + "lib" + fileSeparator + "security" +
+             * fileSeparator + "ldap"; if (!new File(keystore).exists()) {
+             * Notification.show(keystore + " NO ENCONTRADO", 500,
+             * Notification.Position.MIDDLE); } }
+             */
             System.setProperty("javax.net.ssl.trustStore", keystore);
 
             System.setProperty("javax.net.ssl.trustStorePassword", "ldap123");

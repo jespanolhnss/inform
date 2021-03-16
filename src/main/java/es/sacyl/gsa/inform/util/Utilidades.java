@@ -1,5 +1,7 @@
 package es.sacyl.gsa.inform.util;
 
+import com.vaadin.flow.component.UI;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.ui.tablas.FrmCentro;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -17,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import org.apache.logging.log4j.LogManager;
@@ -602,5 +605,37 @@ public class Utilidades {
             extension = ficheroNombre.substring(posPunto, ficheroNombre.length());
         }
         return extension;
+    }
+
+    public static ArrayList<DatoGenericoBean> getInformacionCliente(UI ui) {
+        ArrayList<DatoGenericoBean> lista = new ArrayList<>();
+        /*
+        final com.vaadin.server.WebBrowser navegador = ui.getCurrent();
+
+        DatoGenericoBean dato = new DatoGenericoBean();
+        dato.setTipoDato("Navegador");
+        dato.setValor(navegador.getBrowserApplication());
+        lista.add(dato);
+
+        dato = new DatoGenericoBean();
+        dato.setTipoDato("Versión");
+        dato.setValor(navegador.getBrowserVersion());
+        lista.add(dato);
+
+        dato = new DatoGenericoBean();
+        dato.setTipoDato("Ventana");
+        dato.setValor(navegador.getScreenHeight() + "x" + navegador.getScreenWidth());
+        lista.add(dato);
+
+        dato = new DatoGenericoBean();
+        dato.setTipoDato("Locale");
+        dato.setValor(navegador.getLocale().getDisplayName());
+        lista.add(dato);
+
+        dato = new DatoGenericoBean();
+        dato.setTipoDato("Fecha");
+        dato.setValor(navegador.getCurrentDate().toString());
+         */
+        return lista;
     }
 }

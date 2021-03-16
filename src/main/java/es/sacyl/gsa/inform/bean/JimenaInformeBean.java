@@ -116,12 +116,10 @@ public class JimenaInformeBean implements Serializable {
 
     private ArrayList<JimenaCampos_iBean> listaCampos = new ArrayList<JimenaCampos_iBean>();
 
-    
     private Long interconsultaid;
-  private GfhBean interconsultaServicioDestino;
-  private CentroBean interconsultaCentroDestino;
-  
- 
+    private GfhBean interconsultaServicioDestino;
+    private CentroBean interconsultaCentroDestino;
+
     public final static int INFORME_ESTADO_EDICION = 1;
 
     public final static int INFORME_ESTADO_CONSOLIDADO = 2;
@@ -160,7 +158,7 @@ public class JimenaInformeBean implements Serializable {
     }
 
     public String getDescripcion20() {
-        if (descripcion!=null && descripcion.length() > 20) {
+        if (descripcion != null && descripcion.length() > 20) {
             return descripcion.substring(0, 20);
         } else {
             return descripcion;
@@ -173,10 +171,6 @@ public class JimenaInformeBean implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public PacienteBean getPacienteBean() {
-        return paciente;
     }
 
     public String getPacienteBeanNhc() {
@@ -614,12 +608,15 @@ public class JimenaInformeBean implements Serializable {
     public GfhBean getInterconsultaServicioDestino() {
         return interconsultaServicioDestino;
     }
-  public String  getInterconsultaServicioDestinoString() {
-      if (interconsultaServicioDestino!=null  && interconsultaServicioDestino.getCodigo()!=null)
-         return interconsultaServicioDestino.getCodigo();
-          else
-        return "";
+
+    public String getInterconsultaServicioDestinoString() {
+        if (interconsultaServicioDestino != null && interconsultaServicioDestino.getCodigo() != null) {
+            return interconsultaServicioDestino.getCodigo();
+        } else {
+            return "";
+        }
     }
+
     public void setInterconsultaServicioDestino(GfhBean interconsultaServicioDestino) {
         this.interconsultaServicioDestino = interconsultaServicioDestino;
     }
@@ -640,7 +637,6 @@ public class JimenaInformeBean implements Serializable {
         this.fechadmahhmm = fechadmahhmm;
     }
 
-    
     public String getPathAbsolutePdf() {
         return Constantes.PDFPATHABSOLUTO + "inf_" + this.id + ".pdf";
     }
@@ -669,14 +665,15 @@ public class JimenaInformeBean implements Serializable {
         if (this.servicio != null) {
             html = html.concat(this.getServicioBean().getCodigo() + " ");
         }
-
+        html = html.concat("<hr>");
         if (this.getUserid() != null) {
             html = html.concat("Dr/a:" + this.getUserid().getApellidosNombre());
         }
-        html = html.concat("</b><br>");
-
-        html = html.concat("Nhc:" + this.getPacienteBean().getNumerohc() + "&nbsp;PacienteBean:"
-                + this.getPacienteBean().getApellidosnombre() + "<hr>");
+        html = html.concat("<hr>");
+        if (this.getPaciente() != null && this.getPaciente().getNumerohc() != null) {
+            html = html.concat("Nhc:" + this.getPaciente().getNumerohc() + "&nbsp;PacienteBean:"
+                    + this.getPaciente().getApellidosnombre() + "<hr>");
+        }
         return html;
     }
 
@@ -693,9 +690,9 @@ public class JimenaInformeBean implements Serializable {
             html = html.concat("Dr/a:" + this.getUserid().getApellidosNombre());
         }
         html = html.concat("\n");
-        if(this.getPacienteBean()!=null) {
-        html = html.concat("Nhc:" + this.getPacienteBean().getNumerohc() + "&nbsp;PacienteBean:"
-                + this.getPacienteBean().getApellidosnombre() + "\n");
+        if (this.getPaciente() != null) {
+            html = html.concat("Nhc:" + this.getPaciente().getNumerohc() + "&nbsp;PacienteBean:"
+                    + this.getPaciente().getApellidosnombre() + "\n");
         }
         return html;
     }
@@ -734,19 +731,19 @@ public class JimenaInformeBean implements Serializable {
     }
 
     public String gettxtCampos_i() {
-        String html = "";
+        String html = "<b>";
         for (JimenaCampos_iBean campo : getListaCampos()) {
             if (campo.getDato() != null) {
                 try {
                     int caracteres = (int) campo.getDato().length();
                     if (campo.getDescripcion().length() > 5) {
                         if (!campo.getDescripcion().substring(0, 5).equals("DICOM")) {
-                            html = html.concat("<b>" +campo.getDescripcion() + ": </b>"
-                                    + campo.getDato().getSubString(1, caracteres) + "<hr>");
+                            html = html.concat(campo.getDescripcion() + ": "
+                                    + campo.getDato().getSubString(1, caracteres));
                             if (campo.getUnidades() != null && !campo.getUnidades().isEmpty()) {
                                 html = html.concat("  " + campo.getUnidades());
                             }
-                            html = html.concat("\n");
+                            html = html.concat("<hr>");
                         }
                     } else {
                         html = html.concat(campo.getDescripcion() + ": "
@@ -754,13 +751,14 @@ public class JimenaInformeBean implements Serializable {
                         if (campo.getUnidades() != null && !campo.getUnidades().isEmpty()) {
                             html = html.concat("  " + campo.getUnidades());
                         }
-                        html = html.concat("\n");
+                        html = html.concat("<hr>");
                     }
                 } catch (SQLException e) {
                     logger.error("Error conversión campo CLOB ", e);
                 }
             }
         }
+        html = html.concat("</b>");
         return html;
     }
 
@@ -855,7 +853,7 @@ public class JimenaInformeBean implements Serializable {
             informe.setFecha_visto(rs.getLong("fecha_visto"));
             informe.setComentario_Visto(rs.getString("comentario_visto"));
             if (conCampos_I == true) {
-                informe.setListaCampos(new JimenaDao().getListaCamposInforme(informe.getId(),estado));
+                informe.setListaCampos(new JimenaDao().getListaCamposInforme(informe.getId(), estado));
             }
         } catch (SQLException e) {
             logger.error("Error resulet ", e);

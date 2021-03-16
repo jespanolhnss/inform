@@ -3,12 +3,16 @@ package es.sacyl.gsa.inform.ui;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Page;
+import com.vaadin.flow.server.VaadinSession;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.LopdIncidenciaBean;
 import es.sacyl.gsa.inform.bean.LopdTipoBean;
 import es.sacyl.gsa.inform.bean.UbicacionBean;
+import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.ctrl.SesionCtrl;
 import es.sacyl.gsa.inform.ui.covid.FrmTarjetasCribado;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaGestionar;
@@ -35,6 +39,7 @@ import es.sacyl.gsa.inform.ui.tablas.FrmUsuarioCategoria;
 import es.sacyl.gsa.inform.ui.tablas.FrmZona;
 import es.sacyl.gsa.inform.ui.usuarios.FrmUsuariosPedir;
 import es.sacyl.gsa.inform.ui.viajes.FrmViajesRegistrar;
+import es.sacyl.gsa.inform.util.Constantes;
 import java.time.LocalDateTime;
 
 /**
@@ -184,17 +189,45 @@ public class Menu extends MenuBar {
         });
 
         tablasSubMenu = tablas.getSubMenu();
-        tablasSubMenu.addItem("Zonas Básicas alud", e -> {
+        tablasSubMenu.addItem("Zonas Básicas Salud", e -> {
             this.contenedorFormularios.removeAll();
             this.contenedorFormularios.add(new FrmZona());
         });
 
-        this.addItem("Salir", e -> {
-            this.removeAll();
+        UsuarioBean usuarioBean = ((UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME));
+        String itemNombre = "Misc";
+        if (usuarioBean != null && usuarioBean.getNombre() != null && !usuarioBean.getNombre().isEmpty()) {
+            itemNombre = usuarioBean.getNombre();
+
+        }
+        MenuItem miscelanea = this.addItem(itemNombre);
+
+        SubMenu miscelaneaSubMenu = miscelanea.getSubMenu();
+        miscelaneaSubMenu.addItem("Navegador", e -> {
+            Grid<DatoGenericoBean> grid = new Grid();
+            grid.addColumn(DatoGenericoBean::getTipoDato);
+            grid.addColumn(DatoGenericoBean::getValor);
+            //    grid.setItems(Utilidades.getInformacionCliente(getUI()));
+            //  VentanaPdf ventanaPdf = new VentanaPdf(itemNombre);
+        });
+
+        miscelaneaSubMenu.addItem("Salir", e -> {
             SesionCtrl.doDestruyeSesionUsuario();
             Page page = new Page(getUI().get());
             page.open("http://localhost:8080/inform");
         });
+
+
+        /*
+        this.addItem(
+                "Salir", e -> {
+                    this.removeAll();
+                    SesionCtrl.doDestruyeSesionUsuario();
+                    Page page = new Page(getUI().get());
+                    page.open("http://localhost:8080/inform");
+                }
+        );
+         */
     }
 
     public VerticalLayout getContenedorFormularios() {

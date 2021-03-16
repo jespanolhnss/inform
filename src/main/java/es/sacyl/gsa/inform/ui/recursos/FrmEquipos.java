@@ -40,10 +40,18 @@ import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.GridUi;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.vaadin.klaudeta.PaginatedGrid;
 
@@ -61,6 +69,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final Button ayudaIp = new ObjetosComunes().getBotonMini();
     private final Button aplicacionButton = new ObjetosComunes().getBoton("App", null, VaadinIcon.FILE_TABLE.create());
     private final Button datosGenericosButton = new ObjetosComunes().getBoton("Dat", null, VaadinIcon.TABLE.create());
+
+    private final Button etiquetaButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.BARCODE.create());
 
     private final ComboBox<String> equipoTipoComboBuscador = new CombosUi().getEquipoTipoCombo(null, 50);
 
@@ -123,8 +133,10 @@ public final class FrmEquipos extends FrmMasterPantalla {
             datosGenericosButton.setEnabled(false);
             aplicacionesTab.setEnabled(false);
             page1.setVisible(false);
+            etiquetaButton.setEnabled(false);
         } else {
             datosGenericosButton.setEnabled(true);
+            etiquetaButton.setEnabled(true);
             if (obj.getTipo().equals(EquipoBean.TIPOCPU)) {
                 aplicacionButton.setEnabled(true);
                 aplicacionesTab.setEnabled(true);
@@ -335,7 +347,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     @Override
     public void doComponentesOrganizacion() {
-        contenedorBotones.add(aplicacionButton, datosGenericosButton);
+        contenedorBotones.add(aplicacionButton, datosGenericosButton, etiquetaButton);
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
                 new FormLayout.ResponsiveStep("50px", 2),
@@ -381,30 +393,72 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     @Override
     public void doCompentesEventos() {
+        /**
+         * Esta campo esta inicialmente oculto y este evento no debería ocurrir
+         * pero por si en algún momento se hace visible para mantener el
+         * funcionamiento de la lógica de la pantalla
+         */
         autonomiaComboBuscador.addValueChangeListener(event -> {
             AutonomiaBean autonomiaBean = event.getValue();
             doActualizaComboProvinicas(provinciaComboBuscador, autonomiaBean);
         });
+
+        /**
+         * Cuando se cambia el valor en el combo de tipo de equipo se actualiza
+         * la lista de valores del grid
+         *
+         */
         equipoTipoComboBuscador.addValueChangeListener(evetn -> {
             doActualizaGrid();
         });
+
+        /**
+         * Si cambia el valor del combo de tipo de equipo, actualiza el combo de
+         * marcas.
+         *
+         */
         equipoTipoCombo.addValueChangeListener(event -> {
             equipoMarcaCombo.setItems(new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPOMARCA, event.getValue(), 100));
         });
+
+        /**
+         * Si cambia la provinca en el combo buscador actualiza el combo de
+         * centros
+         */
         provinciaComboBuscador.addValueChangeListener(event -> {
             doActualizaComboCentro();
         });
+
+        /**
+         * Si cambia en tipo de centro en el combo actualiza el combo de centros
+         */
         centroTipoComboBuscador.addValueChangeListener(event -> {
             doActualizaComboCentro();
         });
+
+        /**
+         * Si cambia el valor en el combo de centros, actualiza el grid con la
+         * lista de equipos asociados a ese centros
+         *
+         */
         centroComboBuscador.addValueChangeListener(event -> {
             doActualizaGrid();
         });
+
+        /**
+         * Si cambia el valor del combo de centro en el formulario actualiza los
+         * valores de combo hijo de ubicaciones.
+         */
         centroCombo.addValueChangeListener(event -> {
             ubicacionCombo.setItems(new UbicacionDao().getLista(null, event.getValue(), null));
             doActualizaGrid();
         });
 
+        /**
+         * Cuado seleccina un equipo en e grid, actualiza el bean, hace visibles
+         * los botones, actualiza los valores del formulario, actualiza las
+         * aplicaciones asociada y los datos genéricos del equipos
+         */
         equipoGrid.addItemClickListener(event -> {
             equipoBean = new EquipoBean();
             equipoBean = event.getItem();
@@ -491,6 +545,10 @@ public final class FrmEquipos extends FrmMasterPantalla {
             selectedPage.setVisible(true);
         });
 
+        etiquetaButton.addClickListener(event
+                -> {
+            imprimirZebra("");
+        });
     }
 
     public void doActualizaComboProvinicas(ComboBox<ProvinciaBean> combo, AutonomiaBean autonomia) {
@@ -498,6 +556,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
         combo.setItems(privinciaArrayList);
     }
 
+    /**
+     *
+     */
     public void doActualizaComboCentro() {
         ArrayList<CentroBean> centroArrayList = new CentroDao().getLista(null, autonomiaComboBuscador.getValue(),
                 provinciaComboBuscador.getValue(), null, null, centroTipoComboBuscador.getValue(), null, ConexionDao.BBDD_ACTIVOSI);
@@ -508,4 +569,53 @@ public final class FrmEquipos extends FrmMasterPantalla {
             centroComboBuscador.setValue(centroArrayList.get(0));
         }
     }
+
+    private void imprimirZebra(String etiqueta) {
+        String sDatos = " ^XSETCUT,MODE,1 "
+                + "^Q25,3"
+                + "^W45"
+                + "^D:ultimo:"
+                + "^E28"
+                + "^L"
+                + "AB,28,0,1,1,1,0,:paciente:"
+                + "AB,0,159,1,1,1,3,:contenedor:"
+                + "BQ,48,52,2,5,113,0,3,:cb:"
+                + "AB,30,20,1,1,1,0,NHC: :nhc:"
+                + "AB,188,20,1,1,1,0,HAB: :hab:"
+                + "AB,249,181,1,1,1,3,:fecha:"
+                + "AB,278,179,1,1,1,3,:hora:"
+                + "AB,326,187,1,1,1,3,:servicio:"
+                + "Es        ";
+        try {
+            // Creamos el socket.
+            java.net.Socket socket = new Socket("10.37.14.188", 9100);
+            socket.setSoTimeout(1000 * 60 * 3); // 3 minutos
+
+            // Abrimos un buffer.
+            BufferedWriter bfWriter = new BufferedWriter(
+                    new OutputStreamWriter(socket.getOutputStream(), "UTF8"));
+
+            // Envio del mensaje caracter a caracter
+            if (sDatos != null && !sDatos.equals("")) {
+                char[] d = sDatos.toCharArray();
+                for (int i = 0; i < d.length; i++) {
+                    bfWriter.write(d[i]);
+                }
+            }
+
+            bfWriter.close();
+
+            // Cerramos el socket
+            socket.close();
+        } catch (UnknownHostException ex) {
+
+            Logger.getLogger(FrmEquipos.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch (SocketException ex) {
+            Logger.getLogger(FrmEquipos.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(FrmEquipos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
 }

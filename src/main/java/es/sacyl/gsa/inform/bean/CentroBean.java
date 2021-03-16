@@ -11,9 +11,8 @@ import java.util.ArrayList;
  *
  * @author juannietopajares
  */
-public class CentroBean {
+public class CentroBean extends MasterBean {
 
-    private Long id;
     private AutonomiaBean autonomia;
     private GerenciaBean gerencia;
     private ZonaBean zona;
@@ -28,7 +27,7 @@ public class CentroBean {
     private String teleprev;
     private CentroTipoBean tipocentro;
     private NivelesAtencionBean nivatencion;
-    private Integer estado;
+
     private String mapgoogle;
     private String nomcorto;
 
@@ -39,14 +38,6 @@ public class CentroBean {
     public CentroBean() {
         this.id = new Long(0);
 
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public AutonomiaBean getAutonomia() {
@@ -196,50 +187,6 @@ public class CentroBean {
         this.nivatencion = nivatencion;
     }
 
-    public Integer getEstado() {
-        return estado;
-    }
-
-    public void setEstado(Integer estado) {
-        this.estado = estado;
-    }
-
-    public String getEstadoString() {
-        if (estado == null) {
-            return "";
-        } else {
-            if (estado == 0) {
-                return "N";
-            } else {
-                return "S";
-            }
-        }
-    }
-
-    public Boolean getEstadoBoolena() {
-        if (estado == 0) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public void setEstado(String estado) {
-        if (estado.equals("S")) {
-            this.estado = 1;
-        } else {
-            this.estado = 0;
-        }
-    }
-
-    public void setEstado(Boolean estado) {
-        if (estado == true) {
-            this.estado = 1;
-        } else {
-            this.estado = 0;
-        }
-    }
-
     public String getMapgoogle() {
         return mapgoogle;
     }
@@ -247,7 +194,7 @@ public class CentroBean {
     public void setMapgoogle(String mapgoogle) {
         this.mapgoogle = mapgoogle;
     }
-    
+
     public String getNomcorto() {
         return nomcorto;
     }

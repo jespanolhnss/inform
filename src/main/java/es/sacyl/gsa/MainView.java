@@ -16,6 +16,7 @@ import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
+import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinServlet;
 import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
@@ -28,6 +29,7 @@ import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Ldap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * The main view contains a button and a click listener.
@@ -54,22 +56,23 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
     QueryParameters qm = null;
 
     public MainView() {
+        //   this.getStyle().set("background-color", "#F2F2F2");
         Image image = new Image("icons/fondo.jpg", "Imagen");
         add(image);
 
         System.out.println(System.getProperty("user.dir"));
         System.out.println(System.getProperty("catalina.base"));
         System.out.println(VaadinServlet.getCurrent().getServletInfo());
+        System.out.println(((HttpServletRequest) VaadinRequest.getCurrent()).getPathTranslated());
 
+        System.out.println("addr" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalAddr());
+        System.out.println("name" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalName());
+        System.out.println("port" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalPort());
         /*
-        VaadinServletRequest req = (VaadinServletRequest) VaadinService.getCurrentRequest();
-        String parametro = req.getParameter("nhc");
-        String u = VaadinService.getCurrentRequest().getParameter("nhc");
-
-        Enumeration<String> enumerar = VaadinServlet.getCurrent().getInitParameterNames();
-        while (enumerar.hasMoreElements()) {
-            System.out.println(enumerar.nextElement());
-        }
+        ServletContext servletContext;
+        servletContext = (ServletContext) ServletUtils.getBaseDirectory(VaadinServlet.getCurrent());
+        System.out.println(ServletUtils.getResourcePath(servletContext,
+                ((HttpServletRequest) VaadinRequest.getCurrent()).getPathTranslated()));
          */
         this.setMargin(false);
         this.setSpacing(false);
@@ -79,6 +82,9 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         } else {
             domuestraMenu();
         }
+    }
+
+    public void init() {
 
     }
 
@@ -186,10 +192,6 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
 
     public void setContenedorFormularios(VerticalLayout contenedorFormularios) {
         this.contenedorFormularios = contenedorFormularios;
-    }
-
-    public void init() {
-
     }
 
 }

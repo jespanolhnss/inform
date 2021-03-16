@@ -1,8 +1,11 @@
 package es.sacyl.gsa.inform.ui.recursos;
 
 import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
 import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
@@ -16,6 +19,8 @@ import java.util.ArrayList;
  * @author 06551256M
  */
 public final class FrmDatosGenerico extends FrmMasterVentana {
+
+    private final Button datosGenericosButton = new ObjetosComunes().getBoton("Dat", null, VaadinIcon.TABLE.create());
 
     private final ArrayList<TextField> listaCamposTextFields = new ArrayList<>();
 
@@ -31,10 +36,16 @@ public final class FrmDatosGenerico extends FrmMasterVentana {
     public FrmDatosGenerico(String ancho, EquipoBean equipoBean) {
         super(ancho);
         this.equipoBean = equipoBean;
+        if (equipoBean == null) {
+            com.vaadin.flow.component.notification.Notification.show(" Equipo nulo ", 500, Notification.Position.TOP_START);
+            this.close();
+        }
         setDetalleEquipo(equipoBean);
         equipoBean.getDatosGenericoBeans().forEach(dato -> {
             TextField textField = new ObjetosComunes().getTextField(dato.getTipoDato());
-            textField.setValue(dato.getValor());
+            if (dato.getValor() != null) {
+                textField.setValue(dato.getValor());
+            }
             listaCamposTextFields.add(textField);
         });
         doComponentesOrganizacion();
@@ -55,7 +66,9 @@ public final class FrmDatosGenerico extends FrmMasterVentana {
             DatoGenericoBean dato = new DatoGenericoBean();
             dato.setTipoDato(textField.getLabel());
             dato.setIdDatoEqipo(equipoBean.getId());
+            dato.setValoresAut();
             lista.add(dato);
+
             if (!textField.getValue().isEmpty()) {
                 dato.setValor(textField.getValue());
             } else {
@@ -122,6 +135,8 @@ public final class FrmDatosGenerico extends FrmMasterVentana {
 
     @Override
     public void doComponentesOrganizacion() {
+        contenedorBotones.add(datosGenericosButton);
+
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("150px", 1),
                 new FormLayout.ResponsiveStep("150px", 2));
@@ -134,6 +149,14 @@ public final class FrmDatosGenerico extends FrmMasterVentana {
 
     @Override
     public void doCompentesEventos() {
+        contenedorBotones.addClickListener(event -> {
+            for (TextField textField : listaCamposTextFields) {
+                String valor = new EquipoDao().getValorDatoGenericoDemModelo(textField.getLabel(), equipoBean);
+                if (valor != null) {
+                    textField.setValue(valor);
+                }
+            }
+        });
     }
 
     public void setDetalleEquipo(EquipoBean equipoBean) {

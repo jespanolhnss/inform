@@ -74,6 +74,7 @@ public final class FrmUbicacion extends FrmMasterPantalla {
             if (new UbicacionDao().doGrabaDatos(ubicacionBean) == true) {
                 (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                 doActualizaGrid();
+                doActualizaComboPadre();
                 doLimpiar();
             } else {
                 (new Notification(FrmMensajes.AVISODATOERRORBBDD, 1000, Notification.Position.MIDDLE)).open();
@@ -105,6 +106,7 @@ public final class FrmUbicacion extends FrmMasterPantalla {
                     new UbicacionDao().doBorraDatos(ubicacionBean);
                     Notification.show(FrmMensajes.AVISODATOBORRADO);
                     doActualizaGrid();
+                    doActualizaComboPadre();
                     doLimpiar();
                 });
         dialog.open();
@@ -117,13 +119,16 @@ public final class FrmUbicacion extends FrmMasterPantalla {
     @Override
     public void doLimpiar() {
         CentroBean centroActual = centroCombo.getValue();
+        UbicacionBean ubicacionPadre = ubicacionBean.getPadre();
         ubicacionBean = new UbicacionBean();
         ubicacionBinder.readBean(ubicacionBean);
         centroCombo.setValue(centroActual);
+        ubicacionCombo.setValue(ubicacionPadre);
         descripcion.clear();
         nivel.setValue("0");
         descripcionfull.clear();
-        doActualizaGrid();
+        //  doActualizaGrid();
+        // doActualizaComboPadre();
     }
 
     @Override
@@ -161,13 +166,14 @@ public final class FrmUbicacion extends FrmMasterPantalla {
         grid.setItems(ubicacionArrayList,
                 UbicacionBean::getHijos);
         grid.expand(ubicacionArrayList);
-        doActualizaComboPadre();
+
     }
 
     @Override
     public void doBinderPropiedades() {
 
         ubicacionBinder.forField(id)
+                .withNullRepresentation("")
                 .asRequired()
                 .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(UbicacionBean::getId, null);
@@ -225,11 +231,16 @@ public final class FrmUbicacion extends FrmMasterPantalla {
 
         centroCombo.addValueChangeListener(event -> {
             doActualizaGrid();
+            doActualizaComboPadre();
 
         });
 
         ubicacionCombo.addValueChangeListener(event -> {
-            nivel.setValue(Integer.toString(event.getValue().getNivel() + 1));
+            if (event != null && event.getValue() != null && event.getValue().getNivel() != null) {
+                nivel.setValue(Integer.toString(event.getValue().getNivel() + 1));
+            } else {
+                nivel.setValue("0");
+            }
         });
 
         grid.addItemClickListener(event -> {
@@ -245,6 +256,7 @@ public final class FrmUbicacion extends FrmMasterPantalla {
     }
 
     public void doActualizaComboPadre() {
-        ubicacionCombo.setItems(new UbicacionDao().getLista(null, centroCombo.getValue(), null));
+        ArrayList<UbicacionBean> lista = new UbicacionDao().getLista(null, centroCombo.getValue(), null);
+        ubicacionCombo.setItems(lista);
     }
 }

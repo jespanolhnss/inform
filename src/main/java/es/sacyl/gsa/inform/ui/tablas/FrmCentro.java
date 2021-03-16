@@ -126,8 +126,8 @@ public final class FrmCentro extends FrmMasterPantalla {
         super();
         this.centroBean = new CentroBean();
         this.id.setValue("0");
-        googleMapsImage.setWidth("25px");
-        googleMapsImage.setHeight("19px");
+        // googleMapsImage.setWidth("25px");
+        // googleMapsImage.setHeight("19px");
         doComponentesOrganizacion();
         doGrid();
         doGridCentroFichero();
@@ -225,9 +225,9 @@ public final class FrmCentro extends FrmMasterPantalla {
         centroGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         centroGrid.setHeightByRows(true);
         centroGrid.setPageSize(14);
-        centroGrid.addColumn(CentroBean::getEstadoString).setAutoWidth(true).setHeader(new Html("<b>Código</b>"));
-        centroGrid.addColumn(CentroBean::getCodigo).setAutoWidth(true).setHeader(new Html("<b>Código</b>"));
-        centroGrid.addColumn(CentroBean::getTipocentroString).setAutoWidth(true).setHeader(new Html("<b>Tipo</b>"));
+        centroGrid.addColumn(CentroBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Act</b>"));
+        centroGrid.addColumn(CentroBean::getCodigo).setAutoWidth(true).setHeader(new Html("<b>Cód</b>"));
+        centroGrid.addColumn(CentroBean::getTipocentroString).setAutoWidth(true).setHeader(new Html("<b>T</b>"));
         centroGrid.addColumn(CentroBean::getNomcenCorto).setAutoWidth(true).setHeader(new Html("<b>Nombre</b>"));
         centroGrid.addColumn(CentroBean::getLocalidadCortoString).setAutoWidth(true).setHeader(new Html("<b>Localidad</b>"));
         doActualizaGrid();
@@ -339,6 +339,9 @@ public final class FrmCentro extends FrmMasterPantalla {
         centroGrid.setItems(centroTArrayList);
     }
 
+    /**
+     *
+     */
     @Override
     public void doBinderPropiedades() {
 
@@ -564,8 +567,8 @@ public final class FrmCentro extends FrmMasterPantalla {
             } else {
                 googleMapsImage.setVisible(false);
             }
-            // en nivel no es un campo del ben de centro y por eso se actualiza a mano
-            nivelAtencionTipoCombo.setValue(nivelesAtencionCombo.getValue().getTipo());
+            // en nivel no es un campo del bean de centro y por eso se actualiza a mano
+            nivelAtencionTipoCombo.setValue(centroBean.getNivatencion().getTipo());
             //los ficheros s asociados no se cargan en la lista
             centroBean.setCentroFicheroArrayList(new CentroFicheroDao().getLista(centroBean));
             doActualizaGridCentroFichero();

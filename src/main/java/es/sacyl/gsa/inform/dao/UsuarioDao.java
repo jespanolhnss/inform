@@ -112,12 +112,13 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
     public UsuarioBean getUsuarioDni(String dni, Boolean conFunciolidades) {
         Connection connection = null;
         UsuarioBean usuario = null;
+        String sqlDni = sql;
         try {
             connection = super.getConexionBBDD();
-            sql = sql.concat(" AND usu.dni='" + dni + "'");
-            logger.debug(sql);
+            sqlDni = sqlDni.concat(" AND usu.dni='" + dni + "'");
+            logger.debug(sqlDni);
             try (Statement statement = connection.createStatement()) {
-                ResultSet resulSet = statement.executeQuery(sql);
+                ResultSet resulSet = statement.executeQuery(sqlDni);
                 if (resulSet.next()) {
                     usuario = getRegistroResulset(resulSet);
                     if (conFunciolidades == true) {
@@ -126,7 +127,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 }
             }
         } catch (SQLException e) {
-            logger.error(sql + Utilidades.getStackTrace(e));
+            logger.error(sqlDni + Utilidades.getStackTrace(e));
         } catch (Exception e) {
             logger.error(Utilidades.getStackTrace(e));
         } finally {
@@ -418,12 +419,12 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
 
         return listaUsuarios;
     }
-    
+
     public UsuarioBean getUsuarioPersigo(String value) {
-        
+
         Connection connection = null;
         UsuarioBean usuario = new UsuarioBean();
-        
+
         try {
             connection = super.getConexionBBDD();
             String select = " select nif,ape1,ape2,nombre,mail FROM usuariospersigo where nif = '" + value + "'";
