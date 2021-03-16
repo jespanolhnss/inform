@@ -7,9 +7,8 @@ import java.util.ArrayList;
  *
  * @author juannietopajares
  */
-public class UbicacionBean {
+public class UbicacionBean extends MasterBean {
 
-    private Long id;
     private CentroBean centro;
     private String descripcion;
     private String descripcionFull;
@@ -17,17 +16,9 @@ public class UbicacionBean {
     private Integer nivel;
 
     public UbicacionBean() {
-        this.id = new Long(0);
+        super();
         this.nivel = 0;
 
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public CentroBean getCentro() {
