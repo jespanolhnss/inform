@@ -72,6 +72,7 @@ public class CentroUsuarioDao extends ConexionDao implements Serializable, Conex
                 if (resulSet.next()) {
                     centroUsuarioBean = getRegistroResulset(resulSet, null);
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {

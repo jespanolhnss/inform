@@ -90,6 +90,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                     //     usuario.setFucionalidadesArrayList(new FuncionalidadDAO().getListaFuncioUsuarioAl(usuario));
                     // }
                 }
+                statement.close();
             }
         } catch (SQLException e) {
             logger.error(sql + Utilidades.getStackTrace(e));
@@ -125,6 +126,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                         usuario.setFucionalidadesArrayList(new FuncionalidadDAO().getListaFuncioUsuarioAl(usuario));
                     }
                 }
+                statement.close();
             }
         } catch (SQLException e) {
             logger.error(sqlDni + Utilidades.getStackTrace(e));

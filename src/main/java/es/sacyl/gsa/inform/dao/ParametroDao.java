@@ -1,7 +1,5 @@
-
 package es.sacyl.gsa.inform.dao;
 
-import es.sacyl.gsa.inform.bean.NivelesAtencionBean;
 import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
@@ -17,7 +15,7 @@ import org.apache.logging.log4j.Logger;
  *
  * @author 06551256M
  */
-public class ParametroDao extends ConexionDao  implements Serializable,ConexionInterface<ParametroBean> {
+public class ParametroDao extends ConexionDao implements Serializable, ConexionInterface<ParametroBean> {
 
     private static final Logger LOGGER = LogManager.getLogger(ParametroDao.class);
     private static final long serialVersionUID = 1L;
@@ -183,6 +181,7 @@ public class ParametroDao extends ConexionDao  implements Serializable,ConexionI
             try (Statement statement = connection.createStatement()) {
                 insertadoBoolean = statement.execute(sql);
                 insertadoBoolean = true;
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {

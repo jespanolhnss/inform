@@ -99,6 +99,7 @@ public class ProveedorDao extends ConexionDao implements Serializable, ConexionI
                     if (resulSet.next()) {
                         proveedorBean = getRegistroResulset(resulSet);
                     }
+                    statement.close();;
                 }
                 LOGGER.debug(sql);
             } catch (SQLException e) {

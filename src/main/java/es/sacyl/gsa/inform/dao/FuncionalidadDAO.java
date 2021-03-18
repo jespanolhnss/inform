@@ -68,7 +68,6 @@ public class FuncionalidadDAO extends ConexionDao {
                 funcionalidad = getRegistroResulset(resulSet);
             }
             statement.close();
-            statement.close();
             logger.debug(sql);
         } catch (SQLException e) {
             logger.error(sql + Utilidades.getStackTrace(e));
@@ -96,7 +95,6 @@ public class FuncionalidadDAO extends ConexionDao {
             if (resulSet.next()) {
                 funcionalidad = getRegistroResulset(resulSet);
             }
-            statement.close();
             statement.close();
             logger.debug(sql);
         } catch (SQLException e) {

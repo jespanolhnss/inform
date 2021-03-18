@@ -58,6 +58,7 @@ public class CategoriaDao extends ConexionDao implements Serializable {
                 if (resulSet.next()) {
                     usuarioCategoriaBean = getRegistroResulset(resulSet);
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
@@ -81,6 +82,7 @@ public class CategoriaDao extends ConexionDao implements Serializable {
                 if (resulSet.next()) {
                     usuarioCategoriaBean = getRegistroResulset(resulSet);
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {

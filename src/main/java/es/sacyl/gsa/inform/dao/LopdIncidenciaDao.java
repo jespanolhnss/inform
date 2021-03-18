@@ -259,6 +259,7 @@ public class LopdIncidenciaDao extends ConexionDao {
                     statement.setNull(20, Types.DOUBLE);
                 }
                 insertado = statement.executeUpdate() > 0;
+                statement.close();
             }
             logger.debug(sql);
         } catch (SQLException e) {
@@ -289,6 +290,7 @@ public class LopdIncidenciaDao extends ConexionDao {
                     tipoI.setDescripcion(resulSet.getString("descripciontipo "));
                     incidencia = getResulset(resulSet, usuario, paciente, tipoI);
                 }
+                statement.close();
             }
             logger.debug(sql);
         } catch (SQLException e) {
@@ -363,6 +365,7 @@ public class LopdIncidenciaDao extends ConexionDao {
                     LopdIncidenciaBean incidencia = getResulset(resulSet, usuario, null, null);
                     lista.add(incidencia);
                 }
+                statement.close();
             }
 
         } catch (SQLException e) {

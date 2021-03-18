@@ -1,9 +1,6 @@
 package es.sacyl.gsa.inform.dao;
 
-import es.sacyl.gsa.inform.bean.AutonomiaBean;
-import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
-import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -66,6 +63,7 @@ public class CentroTipoDao extends ConexionDao implements Serializable, Conexion
                 if (resulSet.next()) {
                     centroTipoBean = getRegistroResulset(resulSet);
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
@@ -100,6 +98,7 @@ public class CentroTipoDao extends ConexionDao implements Serializable, Conexion
             try (Statement statement = connection.createStatement()) {
                 insertadoBoolean = statement.execute(sql);
                 insertadoBoolean = true;
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
@@ -118,12 +117,13 @@ public class CentroTipoDao extends ConexionDao implements Serializable, Conexion
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE   centrostipo  SET descripcion='" + centroTipoBean.getDescripcion()+"'"
+            sql = " UPDATE   centrostipo  SET descripcion='" + centroTipoBean.getDescripcion() + "'"
                     + ", estado=" + centroTipoBean.getEstado()
                     + " WHERE id='" + centroTipoBean.getId() + "'";
             try (Statement statement = connection.createStatement()) {
                 insertadoBoolean = statement.execute(sql);
                 insertadoBoolean = true;
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
@@ -143,17 +143,17 @@ public class CentroTipoDao extends ConexionDao implements Serializable, Conexion
      * @return
      */
     @Override
-     public ArrayList<CentroTipoBean> getLista(String texto) {
-         return getLista(texto, null);
-     }
-    
+    public ArrayList<CentroTipoBean> getLista(String texto) {
+        return getLista(texto, null);
+    }
+
     public ArrayList<CentroTipoBean> getLista(String texto, Integer estado) {
         Connection connection = null;
         ArrayList<CentroTipoBean> lista = new ArrayList<>();
         try {
             connection = super.getConexionBBDD();
-            if (estado!=null){
-                sql=sql.concat(" AND estado="+ estado);
+            if (estado != null) {
+                sql = sql.concat(" AND estado=" + estado);
             }
             if (texto != null && !texto.isEmpty()) {
                 sql = sql.concat(" AND  ( UPPER(descripcion) like'%" + texto.toUpperCase() + "%' )");
@@ -190,6 +190,7 @@ public class CentroTipoDao extends ConexionDao implements Serializable, Conexion
                     CentroTipoBean centrotipo = getRegistroResulset(resulSet);
                     listaCentroTipo.put(centrotipo.getId(), centrotipo);
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {

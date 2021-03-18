@@ -233,6 +233,7 @@ public class ComboDao extends ConexionDao implements Serializable, ConexionInter
                 while (resulSet.next()) {
                     listaCombos.add(getRegistroResulset(resulSet));
                 }
+                statement.close();
             }
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
@@ -255,6 +256,7 @@ public class ComboDao extends ConexionDao implements Serializable, ConexionInter
                 while (resulSet.next()) {
                     listaGrupos.add(resulSet.getString("grupo"));
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
@@ -277,6 +279,7 @@ public class ComboDao extends ConexionDao implements Serializable, ConexionInter
             try (Statement statement = connection.createStatement()) {
                 insertadoBoolean = statement.execute(sql);
                 insertadoBoolean = true;
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
@@ -306,7 +309,9 @@ public class ComboDao extends ConexionDao implements Serializable, ConexionInter
                     }
                     lista.add(cadena);
                 }
+                statement.close();
             }
+
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
@@ -334,6 +339,7 @@ public class ComboDao extends ConexionDao implements Serializable, ConexionInter
                     }
                     lista.add(cadena);
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
@@ -363,6 +369,7 @@ public class ComboDao extends ConexionDao implements Serializable, ConexionInter
                     }
                     lista.add(cadena);
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {

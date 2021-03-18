@@ -74,6 +74,7 @@ public class MensajeDao extends ConexionDao implements Serializable, ConexionInt
                 if (resulSet.next()) {
                     mensajeBean = getRegistroResulset(resulSet);
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {

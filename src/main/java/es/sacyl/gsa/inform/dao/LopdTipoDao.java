@@ -13,7 +13,6 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -54,7 +53,7 @@ public class LopdTipoDao extends ConexionDao {
                 incidenciaTipos.setFechaCambio(fecha);
             }
         } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(LopdTipoDao.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Utilidades.getStackTrace(ex));
         }
         return incidenciaTipos;
     }
@@ -71,7 +70,6 @@ public class LopdTipoDao extends ConexionDao {
             if (resulSet.next()) {
                 incidenciaTipos = getRegistroResulset(resulSet);
             }
-            statement.close();
             statement.close();
             logger.debug(sql);
         } catch (SQLException e) {
@@ -165,6 +163,7 @@ public class LopdTipoDao extends ConexionDao {
             try (Statement statement = connection.createStatement()) {
                 insertadoBoolean = statement.execute(sql);
                 insertadoBoolean = true;
+                statement.close();
             }
             logger.debug(sql);
         } catch (SQLException e) {
@@ -191,6 +190,7 @@ public class LopdTipoDao extends ConexionDao {
             try (Statement statement = connection.createStatement()) {
                 insertadoBoolean = statement.execute(sql);
                 insertadoBoolean = true;
+                statement.close();
             }
             logger.debug(sql);
         } catch (SQLException e) {
@@ -209,17 +209,14 @@ public class LopdTipoDao extends ConexionDao {
         try {
             UsuarioBean usuario = (UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME);
             connection = super.getConexionBBDD();
-            /*
-            sql = " UPDATE   lopd_tipos SET usucambio=" + Long.toString(usuario.getId()) + ",  fechacambio="
-                    + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ", estado=" + ConexionDao.BBDD_ACTIVONO
-                    + " WHERE id=" + incidenciaTipos.getId();
-             */
+
             sql = " UPDATE   lopd_tipos SET usucambio=" + Long.toString(usuario.getId()) + ",  fechacambio="
                     + Utilidades.getFechaLong(incidenciaTipos.getFechaCambio()) + ", estado=" + ConexionDao.BBDD_ACTIVONO
                     + " WHERE id=" + incidenciaTipos.getId();
             try (Statement statement = connection.createStatement()) {
                 insertadoBoolean = statement.execute(sql);
                 insertadoBoolean = true;
+                statement.close();
             }
             logger.debug(sql);
         } catch (SQLException e) {

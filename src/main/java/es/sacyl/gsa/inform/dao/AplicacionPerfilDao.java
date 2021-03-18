@@ -89,6 +89,7 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
                 if (resulSet.next()) {
                     aplicacionPerfilBean = getRegistroResulset(resulSet, null);
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {

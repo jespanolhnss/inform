@@ -138,6 +138,7 @@ public class LopdNotaDao extends ConexionDao {
                     nota.setUsucambio(new UsuarioDao().getPorId(resulSet.getLong("usucambio")));
                     lista.add(nota);
                 }
+                statement.close();
             }
             logger.debug(sql);
         } catch (SQLException e) {

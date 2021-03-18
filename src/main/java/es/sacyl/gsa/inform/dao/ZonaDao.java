@@ -35,12 +35,12 @@ public class ZonaDao extends ConexionDao implements Serializable {
                 + " , g.tipovia   gerenciatipovia, g.callesec   gerenciacallesec,g.numcalsec  gerencianumcalsec"
                 + ", g.estado as gerenciaestado"
                 + ", g.otrdomger as  gerenciaotrdomger, g.cpger  as  gerenciacpger, g.localger  as  gerencialocalger "
-                +" , l.codigo as localidadcodigo,l.nombre as localidadnombre,l.codprov as localidadcodpro "
+                + " , l.codigo as localidadcodigo,l.nombre as localidadnombre,l.codprov as localidadcodpro "
                 + " FROM ZONAS z "
                 + " JOIN CAUTONOM a  ON z.codauto= a.codigo "
                 + " JOIN PROVINCIA  p ON  p.codigo=z.codprov "
                 + " JOIN  GERENCIA  g On g.codigo=z.codgeren "
-                  + "  JOIN localidad l  ON l.codigo=g.LOCALGER "
+                + "  JOIN localidad l  ON l.codigo=g.LOCALGER "
                 + " WHERE  1=1  ";
     }
 
@@ -94,6 +94,7 @@ public class ZonaDao extends ConexionDao implements Serializable {
                 if (resulSet.next()) {
                     zonaBean = getRegistroResulset(resulSet, null, null, null);
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {

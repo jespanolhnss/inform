@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -77,6 +76,7 @@ public class VlanDao extends ConexionDao implements Serializable, ConexionInterf
                     if (resulSet.next()) {
                         vlanBean = getRegistroResulset(resulSet);
                     }
+                    statement.close();
                 }
                 LOGGER.debug(sql);
             } catch (SQLException e) {
@@ -131,7 +131,7 @@ public class VlanDao extends ConexionDao implements Serializable, ConexionInterf
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
         } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(AutonomiaDao.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error(sql + Utilidades.getStackTrace(ex));
         }
         return insertadoBoolean;
     }
@@ -163,7 +163,7 @@ public class VlanDao extends ConexionDao implements Serializable, ConexionInterf
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
         } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(AutonomiaDao.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error(sql + Utilidades.getStackTrace(ex));
         }
         return insertadoBoolean;
     }

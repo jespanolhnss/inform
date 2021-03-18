@@ -73,6 +73,7 @@ public class AutonomiaDao extends ConexionDao implements Serializable, ConexionI
                     if (resulSet.next()) {
                         autonomiaBean = getRegistroResulset(resulSet);
                     }
+                    statement.close();
                 }
                 LOGGER.debug(sql);
             } catch (SQLException e) {

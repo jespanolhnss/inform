@@ -332,6 +332,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
                 if (resulSet.next()) {
                     gfh = getRegistroResulset(resulSet);
                 }
+                statement.close();
             }
         } catch (SQLException e) {
             logger.error(sql);

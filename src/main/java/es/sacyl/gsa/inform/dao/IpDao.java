@@ -402,10 +402,7 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
             ResultSet resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {
                 IpBean ip = getRegistroResulset(resulSet, vlanBean, equipoBean);
-                String[] dirs = ip.getIp().split(".");
-                Long key = Math.multiplyExact(Long.parseLong(dirs[2]), new Long(1000000000))
-                        + Math.multiplyExact(Long.parseLong(dirs[1]), new Long(1000000))
-                        + Math.multiplyExact(Long.parseLong(dirs[0]), new Long(1000));
+                Long key = IpCtrl.getValorNumerico(ip.getIp());
                 lista.put(key, ip);
             }
             statement.close();

@@ -78,6 +78,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
                         viajeBean.setListaTecnicos(getViajeTecnicos(viajeBean));
                     }
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
@@ -126,6 +127,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
                 //    doInsertaCentros(viajeBean);
                 //   doInsertaTecnicos(viajeBean);
                 insertadoBoolean = true;
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
@@ -159,6 +161,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
                 //  doBorraTecnicos(viajeBean.getId());
                 //  doInsertaCentros(viajeBean);
                 insertadoBoolean = true;
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {

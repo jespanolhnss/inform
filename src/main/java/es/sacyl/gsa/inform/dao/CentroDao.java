@@ -170,6 +170,7 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
                 if (resulSet.next()) {
                     centroBean = getRegistroResulset(resulSet, autonomiaBean, null);
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {

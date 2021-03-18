@@ -108,6 +108,7 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
                 if (resulSet.next()) {
                     aplicacionesBean = getRegistroResulset(resulSet, null, null);
                 }
+                statement.close();
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
