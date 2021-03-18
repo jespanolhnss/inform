@@ -3,6 +3,7 @@ package es.sacyl.gsa.inform.dao;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.IpBean;
 import es.sacyl.gsa.inform.bean.VlanBean;
+import es.sacyl.gsa.inform.ctrl.IpCtrl;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -12,6 +13,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -54,6 +58,7 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
         try {
             ipBean.setId(rs.getLong("ipid"));
             ipBean.setIp(rs.getString("ipip").trim());
+            ipBean.setNumeroIp(IpCtrl.getValorNumerico(ipBean.getIp()));
             ipBean.setEstado(rs.getInt("ipestado"));
             if (equipoBean == null) {
                 ipBean.setEquipo(new EquipoDao().getPorId(rs.getLong("ipequipo")));
@@ -336,6 +341,72 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
             ResultSet resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {
                 lista.add(getRegistroResulset(resulSet, vlanBean, equipoBean));
+            }
+            // ordenar por numero
+            Collections.sort(lista, new Comparator<IpBean>() {
+                @Override
+                public int compare(IpBean p1, IpBean p2) {
+                    // Aqui esta el truco, ahora comparamos p2 con p1 y no al reves como antes
+                    return new Long(p2.getNumeroIp()).compareTo(new Long(p1.getNumeroIp()));
+                }
+            });
+            statement.close();
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+
+    /**
+     *
+     * @param texto
+     * @param vlanBean
+     * @param equipoBean
+     * @param estado
+     * @param libres
+     * @return
+     */
+    public HashMap<Long, IpBean> getListaMap(String texto, VlanBean vlanBean, EquipoBean equipoBean, Integer estado, String libres) {
+        Connection connection = null;
+        HashMap<Long, IpBean> lista = new HashMap<>();
+        try {
+            connection = super.getConexionBBDD();
+            if (texto != null) {
+                sql = sql.concat(" AND ip.ip LIKE '" + texto + "%'");
+            }
+            if (estado != null) {
+                sql = sql.concat(" AND ip.estado=" + estado);
+            }
+            if (vlanBean != null) {
+                sql = sql.concat(" AND ip.vlan=" + vlanBean.getId());
+            }
+            if (equipoBean != null) {
+                sql = sql.concat(" AND ip.equipo=" + equipoBean.getId());
+            }
+            if (libres != null) {
+                if (libres.equals(IpBean.IPLIBRESI)) {
+                    sql = sql.concat(" AND ip.equipo IS NULL ");
+                }
+                if (libres.equals(IpBean.IPLIBRENO)) {
+                    sql = sql.concat(" AND NOT ip.equipo IS NULL ");
+                }
+            }
+
+            sql = sql.concat(" ORDER BY ip.ip  ");
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(sql);
+            while (resulSet.next()) {
+                IpBean ip = getRegistroResulset(resulSet, vlanBean, equipoBean);
+                String[] dirs = ip.getIp().split(".");
+                Long key = Math.multiplyExact(Long.parseLong(dirs[2]), new Long(1000000000))
+                        + Math.multiplyExact(Long.parseLong(dirs[1]), new Long(1000000))
+                        + Math.multiplyExact(Long.parseLong(dirs[0]), new Long(1000));
+                lista.put(key, ip);
             }
             statement.close();
             LOGGER.debug(sql);

@@ -53,6 +53,8 @@ public final class LlamdasExternas {
             usuarioBean = new UsuarioDao().getUsuarioDni(usr, Boolean.FALSE);
             if (usuarioBean == null) {
                 usuarioBean = new JimenaDao().getUsuarioBean(usr);
+                usuarioBean.setId(new Long(0));
+                new UsuarioDao().doGrabaDatos(usuarioBean);
             }
             SesionCtrl.doCreaSesionUsuario(usuarioBean);
         }

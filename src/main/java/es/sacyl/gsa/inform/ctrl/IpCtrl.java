@@ -34,4 +34,33 @@ public class IpCtrl {
             return false;
         }
     }
+
+    /**
+     *
+     * @param ip
+     * @return Convierte la ip en formato numero para ordenar
+     *
+     * 10.36.65.10
+     *
+     * 10 * 1000 000 000 = 10 000 000 000
+     *
+     * 36 * 1000 000 = 36 000 000
+     *
+     * 65 * 1000 = 65 000
+     *
+     * 10 = 10
+     *
+     * -------------------------------------
+     *
+     * 10 036 065 010
+     */
+    public static Long getValorNumerico(String ip) {
+        String[] dirs = ip.split(".");
+        Long valor = new Long(0);
+        valor = Long.parseLong(dirs[3]) * 1000000000
+                + Long.parseLong(dirs[2]) * 1000000
+                + Long.parseLong(dirs[1]) * 1000
+                + Long.parseLong(dirs[0]);
+        return valor;
+    }
 }

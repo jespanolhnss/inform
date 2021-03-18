@@ -25,6 +25,7 @@ import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoAplicacionBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
+import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.bean.UbicacionBean;
 import es.sacyl.gsa.inform.dao.CentroDao;
@@ -32,6 +33,7 @@ import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.EquipoAplicacionDao;
 import es.sacyl.gsa.inform.dao.EquipoDao;
+import es.sacyl.gsa.inform.dao.ParametroDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
 import es.sacyl.gsa.inform.dao.UbicacionDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
@@ -40,19 +42,17 @@ import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.GridUi;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
-import java.io.BufferedWriter;
+import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.apache.logging.log4j.LogManager;
 import org.vaadin.klaudeta.PaginatedGrid;
 
 /**
@@ -61,6 +61,7 @@ import org.vaadin.klaudeta.PaginatedGrid;
  */
 public final class FrmEquipos extends FrmMasterPantalla {
 
+    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(FrmEquipos.class);
     private final ComboBox<AutonomiaBean> autonomiaComboBuscador = new CombosUi().getAutonomiaCombo(AutonomiaBean.AUTONOMIADEFECTO, null);
     private final ComboBox<ProvinciaBean> provinciaComboBuscador = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null, AutonomiaBean.AUTONOMIADEFECTO);
     private final ComboBox<CentroTipoBean> centroTipoComboBuscador = new CombosUi().getCentroTipoCombo(null);
@@ -547,7 +548,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         etiquetaButton.addClickListener(event
                 -> {
-            imprimirZebra("");
+            //    imprimirZebra("");
+            //   print();
+            imprimeEtiqueta(equipoBean);
         });
     }
 
@@ -570,6 +573,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         }
     }
 
+    /*
     private void imprimirZebra(String etiqueta) {
         String sDatos = " ^XSETCUT,MODE,1 "
                 + "^Q25,3"
@@ -586,6 +590,10 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 + "AB,278,179,1,1,1,3,:hora:"
                 + "AB,326,187,1,1,1,3,:servicio:"
                 + "Es        ";
+
+        String[] datos = new String[]{"^XA", "^FO0,0 \n", "^FO50,50^ADN,30,20^CI10^FR^FD88888888^FS \n", "^BY1,2^FO50,100^BCN,50,N,Y,N^FR^FDmmmmmmm^FS \n", "^XZ \n"};
+        ;
+
         try {
             // Creamos el socket.
             java.net.Socket socket = new Socket("10.37.14.188", 9100);
@@ -595,8 +603,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
             BufferedWriter bfWriter = new BufferedWriter(
                     new OutputStreamWriter(socket.getOutputStream(), "UTF8"));
 
-            // Envio del mensaje caracter a caracter
-            if (sDatos != null && !sDatos.equals("")) {
+            for (String dato : datos) {
                 char[] d = sDatos.toCharArray();
                 for (int i = 0; i < d.length; i++) {
                     bfWriter.write(d[i]);
@@ -615,6 +622,76 @@ public final class FrmEquipos extends FrmMasterPantalla {
             Logger.getLogger(FrmEquipos.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(FrmEquipos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void print() {
+        try (Socket socket = new Socket("10.37.14.188", 9100)) {
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            String sDatos = "^XA\n^FO0,0 \n^FO50,50^ADN,30,20^CI10^FR^FD88888888^FS \n^BY1,2^FO50,100^BCN,50,N,Y,N^FR^FDmmmmmmm^FS \n^XZ \n";
+            byte[] bytes = sDatos.getBytes();
+
+            if (sDatos != null && !sDatos.equals("")) {
+                char[] d = sDatos.toCharArray();
+                for (int i = 0; i < d.length; i++) {
+                    out.write(d[i]);
+                }
+            }
+
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+     */
+    public void imprimeEtiqueta(EquipoBean equipoBean) {
+        String inventario = "", ip = "", sn = "";
+        String valores = new ParametroDao().getPorCodigo(ParametroBean.PRINT_ETIQUETAS).getValor();
+        String ipPrinter = null;
+        try {
+            int puerto = Integer.parseInt(valores.split(",")[1]);
+            ipPrinter = valores.split(",")[0];
+            if (equipoBean.getInventario() != null) {
+                inventario = equipoBean.getInventario();
+            }
+            if (equipoBean.getIpsCadena() != null) {
+                ip = equipoBean.getIpsCadena();
+            }
+            if (equipoBean.getNumeroSerie() != null) {
+                sn = equipoBean.getNumeroSerie();
+            }
+
+            Socket clientSocket = new Socket(ipPrinter, puerto);
+            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            String[] datos = new String[]{"^XA",
+                "^BY1,2^FO50,40^BCN,50,N,Y,N^FR^FD" + inventario + "^FS",
+                "^FO50,80^ADN,40,20^FD" + ip + "^FS ",
+                "^FO50,120^ADN,40,15^FD" + sn + "^FS ",
+                /*
+                "^FO50,50^ADN,40,20^FD" + inventario + "^FS",
+                "^FO50,75^ADN,40,20^FD" + ip + "^FS",
+                "^FO50,100^ADN,40,20^FD" + sn + "^FS",
+                "^FO50,75^ADN,40,20^CI10^FR^FD" + ip + "^FS",
+                "^FO50,125^ADN,40,20^CI10^FR^FD" + sn + "^FS",
+                 */
+                "^XZ"};
+            //"^BY1,2^FO50,100^BCN,50,N,Y,N^FR^FD88888888^FS\n",
+
+            for (String dato : datos) {
+                char[] d = dato.toCharArray();
+                for (int i = 0; i < d.length; i++) {
+                    out.write(d[i]);
+                    //    System.out.println(d[i]);
+                }
+            }
+            out.flush();
+            out.close();
+            clientSocket.close();
+        } catch (UnknownHostException e) {
+            LOGGER.error("Error con impresora:" + ipPrinter + Utilidades.getStackTrace(e));
+        } catch (IOException e) {
+            LOGGER.error("Sin conexion con impresora" + ipPrinter + Utilidades.getStackTrace(e));
         }
     }
 

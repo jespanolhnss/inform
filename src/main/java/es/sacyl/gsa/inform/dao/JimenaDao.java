@@ -2,11 +2,11 @@ package es.sacyl.gsa.inform.dao;
 
 import com.vaadin.flow.component.notification.Notification;
 import es.sacyl.gsa.inform.bean.CentroBean;
+import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.JimenaCampos_iBean;
 import es.sacyl.gsa.inform.bean.JimenaInformeBean;
 import es.sacyl.gsa.inform.bean.PacienteBean;
 import es.sacyl.gsa.inform.bean.ParametroBean;
-import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.File;
@@ -32,7 +32,7 @@ public class JimenaDao {
             + ",h.nhc"
             + ", c.id as idcentro,c.codigo as codigocentro, c.descripcion as descentro,c.nemonico "
             + " , s.id as idservicio, s.codigo as codigoservicio, s.descripcion as descservcicio  "
-            + ",u.userid as usuuserid, u.apellido1 as usuapellido1,u.apellido2 as usuapellido2,u.nombre as usunombre, u.categoria as usucategoria,u.estado as usuestado "
+            + ",u.userid as usuuserid, u.apellido1 as usuapellido1,u.apellido2 as usuapellido2,u.nombre as usunombre, u.categoria as usucategoria,u.estado as usuestado"
             + " FROM informes i "
             + " JOIN centros c ON c.id=i.centro "
             + " JOIN servicios s ON s.id=i.servicio "
@@ -55,7 +55,7 @@ public class JimenaDao {
             + "JOIN historias h ON h.paciente=p.id "
             + "LEFT JOIN usuarios U ON u.userid=i.userid"
             + " JOIN interconsultas t ON t.informe=i.id  "
-            + " JOIN servicios sd ON sd.id=t.SERVICIODESTINO "            
+            + " JOIN servicios sd ON sd.id=t.SERVICIODESTINO "
             + "WHERE 1=1 ";
 
     public JimenaDao() {
@@ -216,7 +216,7 @@ public class JimenaDao {
             sql = sql.concat(sqlInformeBean);
             sql = sql.concat(" AND i.estado=" + estado);
             if (paciente != null) {
-                sql = sql.concat(" AND i.paciente='" + paciente.getNumerohc() + "'");
+                sql = sql.concat(" AND i.paciente='" + paciente.getIdJimena() + "'");
             }
             if (servicio != null && !servicio.getIdjimena().equals(new Long(0))) {
                 sql = sql.concat(" AND i.servicio=" + servicio.getIdjimena());
@@ -235,13 +235,12 @@ public class JimenaDao {
                     sql = sql.concat("  ORDER BY i.fecha DESC, i.hora DESC");
                     break;
             }
-
             logger.debug(sql);
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sql);
             int contador = 0;
             while (resulSet.next()) {
-                /*    
+                /*
                     CentroBean centroBd = new CentroBean(resulSet.getLong("idcentro"), resulSet.getString("codigocentro"),
                             resulSet.getString("descentro"), resulSet.getString("nemonico"));
                  */
@@ -306,7 +305,7 @@ public class JimenaDao {
             ResultSet resulSet = statement.executeQuery(sql);
             int contador = 0;
             while (resulSet.next()) {
-                /*    
+                /*
                     CentroBean centroBd = new CentroBean(resulSet.getLong("idcentro"), resulSet.getString("codigocentro"),
                             resulSet.getString("descentro"), resulSet.getString("nemonico"));
                  */

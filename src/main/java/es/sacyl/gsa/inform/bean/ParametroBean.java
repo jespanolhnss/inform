@@ -39,6 +39,8 @@ public class ParametroBean implements Serializable {
 
     public static String USR_INFORMATICOS = "usr.informaticos";
 
+    public static String PRINT_ETIQUETAS = "print.etitquetas";
+
     public Long getId() {
         return id;
     }

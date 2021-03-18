@@ -270,7 +270,9 @@ public final class FrmVlan extends FrmMasterPantalla {
                 new FormLayout.ResponsiveStep("50px", 2),
                 new FormLayout.ResponsiveStep("50px", 3),
                 new FormLayout.ResponsiveStep("50px", 4));
+        contenedorFormulario.add(id);
 
+        contenedorFormulario.add(nombre, 2);
         contenedorFormulario.add(id, nombre, direccion, mascara, puertaenlace, ultimaip, broadcast, numeroDirecciones, estadoRadio);
         contenedorDerecha.add(vlanGrid);
     }
@@ -296,10 +298,11 @@ public final class FrmVlan extends FrmMasterPantalla {
             public void onComponentEvent(ItemClickEvent<VlanBean> event) {
                 vlanBean = event.getItem();
                 vlanBinder.readBean(event.getItem());
-                doControlBotones(vlanArrayList);
+                doControlBotones(vlanBean);
                 // actualiza el grid con las ips de la vlan
                 vlanBean.setIpsDelRango(new IpDao().getLista(null, vlanBean, null, null, null));
                 doActualizaGridIps();
+                page1.setVisible(true);
             }
         });
 

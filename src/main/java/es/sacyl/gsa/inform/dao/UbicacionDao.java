@@ -71,7 +71,7 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
             }
             ubicacionBean.setNivel(rs.getInt("ubicacionesnivel"));
             // tiene que recuperar el padre para obtener el nombre completo en el arbol
-            ubicacionBean.setDescripcionFull(new UbicacionDao().getNombreCompleto(ubicacionBean));
+            ubicacionBean.setDescripcionFull(getNombreCompleto(ubicacionBean));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         }
@@ -89,12 +89,6 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
         UbicacionBean ubicacionBean = null;
         try {
             connection = super.getConexionBBDD();
-            /*
-            sql = " SELECT id as ubicacionesid , centro as ubicacionescentro, descripcion as ubicacionesdescripcion,"
-                    + " idpadre ubicacionesidpadre, nivel  as ubicacionesnivel  "
-                    + " FROM ubicaciones u "
-                    + " WHERE  id='" + id + "'";
-             */
             sql = sql.concat(" AND u.id=" + id);
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
@@ -103,7 +97,6 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
                 }
                 statement.close();
             }
-            //  System.err.println(sql);
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
