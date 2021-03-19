@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.sacyl.gsa.inform.dao;
 
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
@@ -137,7 +132,6 @@ public class GerenciaDao extends ConexionDao implements Serializable, ConexionIn
         return actualizado;
     }
 
-    
     @Override
     public boolean doInsertaDatos(GerenciaBean gerenciaBean) {
         Connection connection = null;
@@ -315,7 +309,7 @@ public class GerenciaDao extends ConexionDao implements Serializable, ConexionIn
 
     @Override
     public ArrayList<GerenciaBean> getLista(String texto) {
-        return getLista(texto, null, null,null);
+        return getLista(texto, null, null, null);
     }
 
     /**

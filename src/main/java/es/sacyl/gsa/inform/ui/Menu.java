@@ -110,12 +110,8 @@ public class Menu extends MenuBar {
             this.contenedorFormularios.removeAll();
             this.contenedorFormularios.add(new FrmLopdIncidenciaGestionar());
         });
-        lopdSubMenu.addItem("Interconsultas", e -> {
-            this.contenedorFormularios.removeAll();
-            this.contenedorFormularios.add(new FrmLopdIncidenciaGestionar());
-        });
-
-        lopdSubMenu.addItem("Tipos", e -> {
+        ;
+        lopdSubMenu.addItem("Tipos Incidencias", e -> {
             this.contenedorFormularios.removeAll();
             this.contenedorFormularios.add(new FrmLopdTipos(new LopdTipoBean()));
         });
@@ -183,7 +179,7 @@ public class Menu extends MenuBar {
             this.contenedorFormularios.add(new FrmUbicacion(new UbicacionBean()));
         });
 
-        tablasSubMenu.addItem("UsuarioCategorias", (ClickEvent<MenuItem> e) -> {
+        tablasSubMenu.addItem("Categorias Personal", (ClickEvent<MenuItem> e) -> {
             this.contenedorFormularios.removeAll();
             this.contenedorFormularios.add(new FrmUsuarioCategoria());
         });

@@ -205,7 +205,7 @@ public final class FrmVlan extends FrmMasterPantalla {
                 .withNullRepresentation("")
                 .asRequired()
                 .withValidator(
-                        ip -> IpCtrl.siValid(ip),
+                        ip -> IpCtrl.isValid(ip),
                         "Dirección no válida")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 20))
@@ -215,7 +215,7 @@ public final class FrmVlan extends FrmMasterPantalla {
                 .withNullRepresentation("")
                 .asRequired()
                 .withValidator(
-                        ip -> IpCtrl.siValid(ip),
+                        ip -> IpCtrl.isValid(ip),
                         "Dirección no válida")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 20))
@@ -224,7 +224,7 @@ public final class FrmVlan extends FrmMasterPantalla {
                 .withNullRepresentation("")
                 .asRequired()
                 .withValidator(
-                        ip -> IpCtrl.siValid(ip),
+                        ip -> IpCtrl.isValid(ip),
                         "Dirección no válida")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 20))
@@ -331,7 +331,7 @@ public final class FrmVlan extends FrmMasterPantalla {
             Notification.show("Error composición máscara. El formatro es direccion /valor " + valores.length);
             return false;
         }
-        if (!IpCtrl.siValid(valores[0])) {
+        if (!IpCtrl.isValid(valores[0])) {
             Notification.show("Error direccin IP");
             return false;
         }

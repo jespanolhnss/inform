@@ -1,11 +1,14 @@
-
 package es.sacyl.gsa.inform.bean;
+
+import java.io.Serializable;
 
 /**
  *
  * @author juannietopajares
  */
-public class AutonomiaBean {
+public class AutonomiaBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String codigo;
     private String nombre;
@@ -45,32 +48,40 @@ public class AutonomiaBean {
     public void setEstado(Integer estado) {
         this.estado = estado;
     }
- public String getEstadoString() {
-     if (estado==null) return "";
-     else {
-        if  ( estado==0) 
-            return "N";
-        else
-            return "S";
-     }
+
+    public String getEstadoString() {
+        if (estado == null) {
+            return "";
+        } else {
+            if (estado == 0) {
+                return "N";
+            } else {
+                return "S";
+            }
+        }
     }
 
- public Boolean  getEstadoBoolena() {
-        if  (estado==0) 
+    public Boolean getEstadoBoolena() {
+        if (estado == 0) {
             return false;
-        else
+        } else {
             return true;
+        }
     }
+
     public void setEstado(String estado) {
-        if ( estado.equals("S"))
-             this.   estado=1;
-        else 
-            this.estado=0;
+        if (estado.equals("S")) {
+            this.estado = 1;
+        } else {
+            this.estado = 0;
+        }
     }
+
     public void setEstado(Boolean estado) {
-        if ( estado==true)
-        this.   estado=1;
-        else 
-            this.estado=0;
+        if (estado == true) {
+            this.estado = 1;
+        } else {
+            this.estado = 0;
+        }
     }
 }

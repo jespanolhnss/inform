@@ -70,7 +70,7 @@ public final class FrmJimenaBorraInf extends Dialog {
         usuarioBean = ((UsuarioBean) com.vaadin.flow.server.VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME));
 
         /**
-         * Son servciosBean de informática no de jimena. Tienen el atrinuto
+         * Son servciosBean de informática no de jimena. Tienen el atributo
          * idJimena
          */
         this.servicioCombo = new CombosUi().getServicioComboJimenaPaciente(paciente.getNumerohc());

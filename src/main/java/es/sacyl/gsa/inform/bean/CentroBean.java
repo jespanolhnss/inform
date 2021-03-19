@@ -5,13 +5,16 @@
  */
 package es.sacyl.gsa.inform.bean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author juannietopajares
  */
-public class CentroBean extends MasterBean {
+public class CentroBean extends MasterBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private AutonomiaBean autonomia;
     private GerenciaBean gerencia;

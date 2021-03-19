@@ -34,8 +34,36 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
                 + " ,u.idpadre ubicacionesidpadre, u.nivel  as ubicacionesnivel  "
                 + " ,padre.id as padreid , padre.centro as padrecentro, padre.descripcion as padredescripcion"
                 + " ,padre.idpadre padreidpadre, padre.nivel  as padrenivel  "
+                + ", c.ID as centroid,c.CODAUTO as centrocodauto,c.CODGEREN   as centrocodgeren"
+                + " ,c.CODZONA as centrocodozona "
+                + " ,c.CODIGO as centrocodigo, c.NOMCEN as centronumcen ,c.TIPOVIA as centrotipovia "
+                + " ,c.CALLECEN as centrocallecen,c.NUMCALCEN as centronumcalcen,c.OTRDIRCEN as centrootrodircen"
+                + " ,c.CODLOCAL as centrocodlocal "
+                + " ,c.CPCENTRO as centrocpcentro,c.TELEPREV as centroteleprev,c.TIPOCENTRO as centrotipocentro"
+                + " ,c.NIVATENCION as centronivatencion "
+                + " ,c.estado as centroestado, c.mapgoogle as centromapggole, c.nomcorto as centronomcorto  "
+                + " ,n.id as nivelid,n.codigo as nivelcodigo,n.descripcion as niveldescripcion,n.tipo as niveltipo"
+                + " ,n.estado as nivelestado  "
+                + " ,l.codigo as localidadcodigo,l.nombre localidadnombre,l.nombre localidadprovincia "
+                + " ,p.codigo as provinciacodigo,p.nombre as provincianombre,p.nombre provinciacodauto "
+                + " ,a.codigo as autonomiacodigo, a.nombre as autonomianombre,a.estado as autonomiaestado "
+                + " ,g.codauto gerenciacodauto ,g.codigo   gerenciacodigo ,g.nombre  gerencianombre, g.tipovia   gerenciatipovia"
+                + " , g.callesec   gerenciacallesec,g.numcalsec  gerencianumcalsec "
+                + "  ,g.otrdomger  gerenciaotrdomger, g.cpger  gerenciacpger, g.localger   gerencialocalger, g.estado gerenciaestado  "
+                + " ,z.codauto  zonacodauto  ,z.codgeren  zonacodgeren,z.codigo  zonacodigo,z.nombre  zonanombre,z.codprov zonacodprov "
+                + " ,ct.id as centrotipoid, ct.descripcion as centrotipodescripcion,ct.estado as centrotipoestado  "
+                + " ,na.id as niveltipotipoid, na.descripcion as niveltipodescripcion,na.estado  as niveltipoestado  "
                 + " FROM ubicaciones u "
                 + " LEFT JOIN ubicaciones padre ON padre.id=u.idpadre"
+                + " LEFT JOIN CENTROS c  ON c.id=u.centro"
+                + " LEFT JOIN nivelesatencion n ON n.id = c.NIVATENCION  "
+                + " JOIN LOCALIDAD l ON l.codigo = c.CODLOCAL "
+                + " JOIN PROVINCIA p ON p.codigo=l.codprov "
+                + " JOIN CAUTONOM a On a.codigo=p.CODAUTO  "
+                + " JOIN GERENCIA g ON g.codauto=a.codigo AND g.codigo=c.codgeren  "
+                + " JOIN ZONAS z ON z.codauto=c.codauto AND z.codgeren=g.codigo AND z.codigo=c.codzona "
+                + " JOIN centrostipo ct ON ct.id=c.tipocentro "
+                + " JOIN  NIVELESATENCIONTIPO na  ON na.id =n.tipo"
                 + " WHERE  1=1 ";
     }
 
@@ -60,18 +88,18 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
         try {
             ubicacionBean.setId(rs.getLong("ubicacionesid"));
             ubicacionBean.setDescripcion(rs.getString("ubicacionesdescripcion"));
-
             if (centroBean == null) {
-                ubicacionBean.setCentro(new CentroDao().getPorId(rs.getLong("ubicacionescentro")));
+                //  ubicacionBean.setCentro(new CentroDao().getPorId(rs.getLong("ubicacionescentro")));
+                ubicacionBean.setCentro(new CentroDao().getRegistroResulset(rs));
             } else {
                 ubicacionBean.setCentro(centroBean);
             }
             if (rs.getLong("ubicacionesidpadre") != new Long(0)) {
-                ubicacionBean.setPadre(new UbicacionDao().getPorId(rs.getLong("ubicacionesidpadre")));
+                ubicacionBean.setPadre(getPorId(rs.getLong("ubicacionesidpadre")));
             }
             ubicacionBean.setNivel(rs.getInt("ubicacionesnivel"));
             // tiene que recuperar el padre para obtener el nombre completo en el arbol
-            ubicacionBean.setDescripcionFull(getNombreCompleto(ubicacionBean));
+            ubicacionBean.setDescripcionFull(getNombreCompleto(ubicacionBean, ubicacionBean.getCentro()));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         }
@@ -87,19 +115,20 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
     public UbicacionBean getPorId(Long id) {
         Connection connection = null;
         UbicacionBean ubicacionBean = null;
+        String sqlU = sql;
         try {
             connection = super.getConexionBBDD();
-            sql = sql.concat(" AND u.id=" + id);
+            sqlU = sqlU.concat(" AND u.id=" + id);
             try (Statement statement = connection.createStatement()) {
-                ResultSet resulSet = statement.executeQuery(sql);
+                ResultSet resulSet = statement.executeQuery(sqlU);
                 if (resulSet.next()) {
                     ubicacionBean = getRegistroResulset(resulSet, null);
                 }
                 statement.close();
             }
-            LOGGER.debug(sql);
+            LOGGER.debug(sqlU);
         } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
+            LOGGER.error(sqlU + Utilidades.getStackTrace(e));
         } catch (Exception e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         } finally {
@@ -134,12 +163,13 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
     public boolean doInsertaDatos(UbicacionBean ubicacionBean) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
+        String sqlU = "";
         try {
             connection = super.getConexionBBDD();
-            sql = " INSERT INTO  ubicaciones  (id,centro,descripcion,idpadre, nivel  ) "
+            sqlU = " INSERT INTO  ubicaciones  (id,centro,descripcion,idpadre, nivel  ) "
                     + " VALUES "
                     + "(?,?,?,?,?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = connection.prepareStatement(sqlU);
             statement.setLong(1, ubicacionBean.getId());
             if (ubicacionBean.getCentro() != null && ubicacionBean.getId() != null) {
                 statement.setLong(2, ubicacionBean.getCentro().getId());
@@ -163,9 +193,9 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
             }
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
-            LOGGER.debug(sql);
+            LOGGER.debug(sqlU);
         } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
+            LOGGER.error(sqlU + Utilidades.getStackTrace(e));
         } catch (Exception e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         } finally {
@@ -183,10 +213,11 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
     public boolean doActualizaDatos(UbicacionBean ubicacionBean) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
+        String sqlU = "";
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE   ubicaciones SET centro=?,descripcion=?,idpadre=?, nivel = ? WHERE id=?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            sqlU = " UPDATE   ubicaciones SET centro=?,descripcion=?,idpadre=?, nivel = ? WHERE id=?";
+            PreparedStatement statement = connection.prepareStatement(sqlU);
 
             if (ubicacionBean.getCentro() != null && ubicacionBean.getId() != null) {
                 statement.setLong(1, ubicacionBean.getCentro().getId());
@@ -211,9 +242,9 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
             statement.setLong(5, ubicacionBean.getId());
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
-            LOGGER.debug(sql);
+            LOGGER.debug(sqlU);
         } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
+            LOGGER.error(sqlU + Utilidades.getStackTrace(e));
         } catch (Exception e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         } finally {
@@ -231,16 +262,17 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
     public boolean doBorraDatos(UbicacionBean ubicacionBean) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
+        String sqlU = "";
         try {
             connection = super.getConexionBBDD();
-            sql = " DELETE FROM  ubicaciones WHERE ID='" + ubicacionBean.getId() + "'";
+            sqlU = " DELETE FROM  ubicaciones WHERE ID='" + ubicacionBean.getId() + "'";
             Statement statement = connection.createStatement();
             insertadoBoolean = statement.execute(sql);
             insertadoBoolean = true;
             statement.close();
-            LOGGER.debug(sql);
+            LOGGER.debug(sqlU);
         } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
+            LOGGER.error(sqlU + Utilidades.getStackTrace(e));
         } catch (Exception e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         } finally {
@@ -269,24 +301,25 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
     public ArrayList<UbicacionBean> getLista(String texto, CentroBean centroBean, UbicacionBean padre) {
         Connection connection = null;
         ArrayList<UbicacionBean> lista = new ArrayList<>();
+        String sqlU = sql;
         try {
             connection = super.getConexionBBDD();
             if (texto != null && !texto.isEmpty()) {
-                sql = sql.concat(" AND   UPPER(u.descripcion) like'%" + texto.toUpperCase() + "%'  ");
+                sqlU = sqlU.concat(" AND   UPPER(u.descripcion) like'%" + texto.toUpperCase() + "%'  ");
             }
             if (centroBean != null && centroBean.getId() != null) {
-                sql = sql.concat(" AND  u.centro=" + centroBean.getId());
+                sqlU = sqlU.concat(" AND  u.centro=" + centroBean.getId());
             }
-            sql = sql.concat(" ORDER BY  u.centro,  u.descripcion  ");
+            sqlU = sqlU.concat(" ORDER BY  u.centro,  u.descripcion  ");
             Statement statement = connection.createStatement();
-            ResultSet resulSet = statement.executeQuery(sql);
+            ResultSet resulSet = statement.executeQuery(sqlU);
             while (resulSet.next()) {
                 lista.add(getRegistroResulset(resulSet, centroBean));
             }
             statement.close();
-            LOGGER.debug(sql);
+            LOGGER.debug(sqlU);
         } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
+            LOGGER.error(sqlU + Utilidades.getStackTrace(e));
         } catch (Exception e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         } finally {
@@ -303,21 +336,22 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
     public ArrayList<UbicacionBean> getListaPadresCentro(CentroBean centroBean) {
         Connection connection = null;
         ArrayList<UbicacionBean> lista = new ArrayList<>();
+        String sqlU = sql;
         if (centroBean != null) {
             try {
                 connection = super.getConexionBBDD();
-                sql = sql.concat(" AND  u.centro=" + centroBean.getId());
-                sql = sql.concat(" AND  u.idpadre IS null ");
-                sql = sql.concat(" ORDER BY  ubicacionescentro,  ubicacionesdescripcion  ");
+                sqlU = sqlU.concat(" AND  u.centro=" + centroBean.getId());
+                sqlU = sqlU.concat(" AND  u.idpadre IS null ");
+                sqlU = sqlU.concat(" ORDER BY  ubicacionescentro,  ubicacionesdescripcion  ");
                 Statement statement = connection.createStatement();
-                ResultSet resulSet = statement.executeQuery(sql);
+                ResultSet resulSet = statement.executeQuery(sqlU);
                 while (resulSet.next()) {
                     lista.add(getRegistroResulset(resulSet, centroBean));
                 }
                 statement.close();
-                LOGGER.debug(sql);
+                LOGGER.debug(sqlU);
             } catch (SQLException e) {
-                LOGGER.error(sql + Utilidades.getStackTrace(e));
+                LOGGER.error(sqlU + Utilidades.getStackTrace(e));
             } catch (Exception e) {
                 LOGGER.error(Utilidades.getStackTrace(e));
             } finally {
@@ -335,20 +369,21 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
     public ArrayList<UbicacionBean> getListaHijos(UbicacionBean ubicacionBean) {
         Connection connection = null;
         ArrayList<UbicacionBean> lista = new ArrayList<>();
+        String sqlU = sql;
         try {
             connection = super.getConexionBBDD();
 
-            sql = sql.concat(" AND  u.idpadre = " + ubicacionBean.getId());
-            sql = sql.concat(" ORDER BY  ubicacionescentro,  ubicacionesdescripcion  ");
+            sqlU = sqlU.concat(" AND  u.idpadre = " + ubicacionBean.getId());
+            sqlU = sqlU.concat(" ORDER BY  ubicacionescentro,  ubicacionesdescripcion  ");
             Statement statement = connection.createStatement();
-            ResultSet resulSet = statement.executeQuery(sql);
+            ResultSet resulSet = statement.executeQuery(sqlU);
             while (resulSet.next()) {
                 lista.add(getRegistroResulset(resulSet, ubicacionBean.getCentro()));
             }
             statement.close();
-            LOGGER.debug(sql);
+            LOGGER.debug(sqlU);
         } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
+            LOGGER.error(sqlU + Utilidades.getStackTrace(e));
         } catch (Exception e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         } finally {
@@ -362,7 +397,7 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
      * @param ubicacion
      * @return
      */
-    public String getNombreCompleto(UbicacionBean ubicacion) {
+    public String getNombreCompletoppp(UbicacionBean ubicacion, CentroBean centroBean) {
         String nombre = "";
         while (ubicacion != null && ubicacion.getPadre() != null) {
             if (ubicacion.getDescripcion() != null) {
@@ -378,13 +413,55 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
         return nombre;
     }
 
+    public String getNombreCompleto(UbicacionBean ubicacion, CentroBean centroBean) {
+        String nombre = "";
+        Connection connection = super.getConexionBBDD();
+        try {
+            while (ubicacion != null && ubicacion.getPadre() != null) {
+                if (ubicacion.getDescripcion() != null) {
+                    nombre = ">" + ubicacion.getDescripcion() + nombre;
+                } else {
+                    nombre = ">" + nombre;
+                }
+                String sqlU = sql + " AND u.id=" + ubicacion.getPadre().getId();
+                LOGGER.debug(sqlU);
+                try (Statement statement = connection.createStatement()) {
+                    ResultSet resulSet = statement.executeQuery(sqlU);
+                    if (resulSet.next()) {
+                        ubicacion = new UbicacionBean();
+                        ubicacion.setId(resulSet.getLong("ubicacionesid"));
+                        ubicacion.setDescripcion(resulSet.getString("ubicacionesdescripcion"));
+                        // ubicacion.setCentro(new CentroDao().getRegistroResulset(resulSet));
+                        ubicacion.setCentro(centroBean);
+                        if (resulSet.getLong("ubicacionesidpadre") != 0) {
+                            // Solo con el id por que para montar el nombre no es necesario todos los campos
+                            ubicacion.setPadre(new UbicacionBean(resulSet.getLong("ubicacionesidpadre")));
+                        }
+                        ubicacion.setNivel(resulSet.getInt("ubicacionesnivel"));
+                    }
+                    statement.close();
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error(Utilidades.getStackTrace(ex));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+
+        if (ubicacion != null && ubicacion.getDescripcion() != null) {
+            nombre = ubicacion.getDescripcion() + nombre;
+        }
+        return nombre;
+    }
+
     /**
      *
      * @param codigo
      * @return
      */
     @Override
-    public UbicacionBean getPorCodigo(String codigo) {
+    public UbicacionBean getPorCodigo(String codigo
+    ) {
         return null;
     }
 }

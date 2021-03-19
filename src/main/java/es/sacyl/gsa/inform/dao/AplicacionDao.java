@@ -40,12 +40,19 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
                 + " ,l.codigo as localidadcodigo,l.nombre as localidadnombre,l.codprov as localidadcodpro"
                 + " ,p. codigo as provinciacodigo, p.nombre as provincianombre,p.codauto as provinciacodauto  "
                 + " ,a.codigo as autonomiacodigo, a.nombre as autonomianombre,a.estado as autonomiaestado   "
+                + " ,usu.id as usuarioid,usu.dni as usuariodni,usu.apellido1 as usuarioapellido1"
+                + ",usu.apellido2 as usuarioapellido2,usu.nombre as usuarionombre"
+                + ",usu.estado as usuarioestado,usu.usucambio as usuariousucambio"
+                + ",usu.fechacambio as usuariofechacambio,usu.mail as usuariomail"
+                + ",usu.telefono as usuariotelefon,usu.idgfh as usuarioidgfh"
+                + ",usu.idcategoria as usuarioidcategoria"
                 + " FROM aplicaciones ap "
                 + " LEFT  JOIN gfh  ON gfh.id=ap.gfh"
                 + " LEFT  JOIN proveedores prvee ON  prvee.id=ap.proveedor"
                 + " LEFT  JOIN localidad l ON l.codigo=prvee.localidad"
                 + " LEFT  JOIN provincia p ON p.codigo=l.codprov "
                 + " LEFT  JOIN CAUTONOM a ON a.codigo=p.CODAUTO  "
+                + " LEFT JOIN usuarios usu ON usu.id=ap.usucambio"
                 + " WHERE  1=1 ";
     }
 
@@ -76,7 +83,8 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
             }
             aplicacionesBean.setEstado(rs.getInt("aplicacionestado"));
             aplicacionesBean.setFechacambio(Utilidades.getFechaLocalDate(rs.getLong("aplicacionfechacambio")));
-            aplicacionesBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("aplicacionusucambio")));
+            // aplicacionesBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("aplicacionusucambio")));
+            aplicacionesBean.setUsucambio(new UsuarioDao().getRegistroResulset(rs));
             // lista de perfiles
             aplicacionesBean.setListaPerfiles(new AplicacionPerfilDao().getLista(null, aplicacionesBean));
             // lista equipos

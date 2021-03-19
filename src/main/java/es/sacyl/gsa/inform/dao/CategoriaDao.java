@@ -5,7 +5,7 @@
  */
 package es.sacyl.gsa.inform.dao;
 
-import es.sacyl.gsa.inform.bean.UsuarioCategoriaBean;
+import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -34,11 +34,11 @@ public class CategoriaDao extends ConexionDao implements Serializable {
                 + " FROM categorias uc WHERE  1=1 ";
     }
 
-    public static UsuarioCategoriaBean getRegistroResulset(ResultSet rs) {
-        UsuarioCategoriaBean usuarioCategoriaBean = new UsuarioCategoriaBean();
+    public static CategoriaBean getRegistroResulset(ResultSet rs) {
+        CategoriaBean usuarioCategoriaBean = new CategoriaBean();
         try {
             usuarioCategoriaBean.setId(rs.getLong("usuarioscategoriaid"));
-            usuarioCategoriaBean.setCodigo(rs.getString("usuarioscategoriacodigo"));
+            usuarioCategoriaBean.setCodigopersigo(rs.getString("usuarioscategoriacodigo"));
             usuarioCategoriaBean.setNombre(rs.getString("usuarioscategoriaanombre").trim());
             usuarioCategoriaBean.setEstado(rs.getInt("usuarioscategoriaestado"));
         } catch (SQLException e) {
@@ -47,9 +47,9 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         return usuarioCategoriaBean;
     }
 
-    public UsuarioCategoriaBean getPorCodigo(String codigo) {
+    public CategoriaBean getPorCodigo(String codigo) {
         Connection connection = null;
-        UsuarioCategoriaBean usuarioCategoriaBean = null;
+        CategoriaBean usuarioCategoriaBean = null;
         try {
             connection = super.getConexionBBDD();
             sql = sql.concat(" AND uc.CODIGOPERSIGO='" + codigo + "'");
@@ -71,9 +71,9 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         return usuarioCategoriaBean;
     }
 
-    public UsuarioCategoriaBean getPorId(Long id) {
+    public CategoriaBean getPorId(Long id) {
         Connection connection = null;
-        UsuarioCategoriaBean usuarioCategoriaBean = null;
+        CategoriaBean usuarioCategoriaBean = null;
         try {
             connection = super.getConexionBBDD();
             sql = sql.concat(" AND uc.id='" + id + "'");
@@ -95,10 +95,10 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         return usuarioCategoriaBean;
     }
 
-    public boolean doGrabaDatos(UsuarioCategoriaBean usuarioCategoriaBean) {
+    public boolean doGrabaDatos(CategoriaBean usuarioCategoriaBean) {
         boolean actualizado = false;
 
-        if (this.getPorCodigo(usuarioCategoriaBean.getCodigo()) == null) {
+        if (this.getPorCodigo(usuarioCategoriaBean.getCodigopersigo()) == null) {
             usuarioCategoriaBean.setId(getSiguienteId("categorias"));
             actualizado = this.doInsertaDatos(usuarioCategoriaBean);
         } else {
@@ -107,7 +107,7 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         return actualizado;
     }
 
-    public boolean doInsertaDatos(UsuarioCategoriaBean usuarioCategoriaBean) {
+    public boolean doInsertaDatos(CategoriaBean usuarioCategoriaBean) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
         try {
@@ -117,8 +117,8 @@ public class CategoriaDao extends ConexionDao implements Serializable {
                     + "(?,?,?,?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setLong(1, usuarioCategoriaBean.getId());
-            if (usuarioCategoriaBean.getCodigo() != null) {
-                statement.setString(2, usuarioCategoriaBean.getCodigo());
+            if (usuarioCategoriaBean.getCodigopersigo() != null) {
+                statement.setString(2, usuarioCategoriaBean.getCodigopersigo());
             } else {
                 statement.setNull(2, Types.CHAR);
             }
@@ -145,7 +145,7 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         return insertadoBoolean;
     }
 
-    public boolean doActualizaDatos(UsuarioCategoriaBean usuarioCategoriaBean) {
+    public boolean doActualizaDatos(CategoriaBean usuarioCategoriaBean) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
         try {
@@ -153,8 +153,8 @@ public class CategoriaDao extends ConexionDao implements Serializable {
             sql = " UPDATE   categorias  SET CODIGOPERSIGO=?,nombre=?, estado=?  WHERE id =?  ";
             PreparedStatement statement = connection.prepareStatement(sql);
 
-            if (usuarioCategoriaBean.getCodigo() != null) {
-                statement.setString(1, usuarioCategoriaBean.getCodigo());
+            if (usuarioCategoriaBean.getCodigopersigo() != null) {
+                statement.setString(1, usuarioCategoriaBean.getCodigopersigo());
             } else {
                 statement.setNull(1, Types.CHAR);
             }
@@ -183,7 +183,7 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         return insertadoBoolean;
     }
 
-    public boolean doBorraDatos(UsuarioCategoriaBean usuarioCategoriaBean) {
+    public boolean doBorraDatos(CategoriaBean usuarioCategoriaBean) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
         try {
@@ -204,9 +204,9 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         return insertadoBoolean;
     }
 
-    public ArrayList<UsuarioCategoriaBean> getLista(String texto) {
+    public ArrayList<CategoriaBean> getLista(String texto) {
         Connection connection = null;
-        ArrayList<UsuarioCategoriaBean> lista = new ArrayList<>();
+        ArrayList<CategoriaBean> lista = new ArrayList<>();
         try {
             connection = super.getConexionBBDD();
             if (texto != null && !texto.isEmpty()) {

@@ -186,7 +186,7 @@ public class FrmProveedor extends FrmMasterPantalla {
         proveedorBinder.forField(codpostal)
                 .withNullRepresentation("")
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 250))
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 5))
                 .bind(ProveedorBean::getCodpostal, ProveedorBean::setCodpostal);
 
         proveedorBinder.forField(telefonos)
@@ -227,6 +227,8 @@ public class FrmProveedor extends FrmMasterPantalla {
         this.contenedorFormulario.add(nombre, 3);
 
         this.contenedorFormulario.add(nombre, 4);
+
+        this.contenedorFormulario.add(direccion, 4);
 
         this.contenedorFormulario.add(codpostal);
         this.contenedorFormulario.add(telefonos, 2);

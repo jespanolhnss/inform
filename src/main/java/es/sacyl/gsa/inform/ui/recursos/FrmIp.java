@@ -130,12 +130,12 @@ public final class FrmIp extends FrmMasterPantalla {
 
     @Override
     public void doGrid() {
-        doActualizaGrid();
+        //doActualizaGrid();
     }
 
     @Override
     public void doActualizaGrid() {
-        ipArrayList = new IpDao().getLista(buscador.getValue(), vlanCombo.getValue(), null, null, ipLibre.getValue());
+        ipArrayList = new IpDao().getLista(buscador.getValue(), vlanComoboBuscador.getValue(), null, null, ipLibre.getValue());
         ipGrid.setItems(ipArrayList);
     }
 
@@ -183,7 +183,7 @@ public final class FrmIp extends FrmMasterPantalla {
             doActualizaGrid();
         });
 
-        vlanComoboBuscador.addCustomValueSetListener(event -> {
+        vlanComoboBuscador.addValueChangeListener(event -> {
             doActualizaGrid();
         });
         ipLibre.addValueChangeListener(e -> doActualizaGrid());

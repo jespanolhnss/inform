@@ -109,7 +109,7 @@ public class JimenaDao {
                 try {
                     conn.close();
                 } catch (SQLException e) {
-                    logger.error(ConexionDao.ERROR_CLOSE_BBDD_SQL, e);
+                    logger.error(Utilidades.getStackTrace(e));
                 }
             }
         }

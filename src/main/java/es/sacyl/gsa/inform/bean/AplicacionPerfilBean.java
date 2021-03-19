@@ -3,18 +3,21 @@ package es.sacyl.gsa.inform.bean;
 import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.util.Constantes;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
  *
  * @author 06551256M
  */
-public class AplicacionPerfilBean extends MasterBean {
+public class AplicacionPerfilBean extends MasterBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // id, nombre, aplicacion, categoria, codigo, comentario, estado,usucambio, fechacambio;
     private String nombre;
     private AplicacionBean aplicacion;
-    private UsuarioCategoriaBean categoria;
+    private CategoriaBean categoria;
     private String codigo;
     private String comentario;
 
@@ -41,11 +44,11 @@ public class AplicacionPerfilBean extends MasterBean {
         this.aplicacion = aplicacion;
     }
 
-    public UsuarioCategoriaBean getCategoria() {
+    public CategoriaBean getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(UsuarioCategoriaBean categoria) {
+    public void setCategoria(CategoriaBean categoria) {
         this.categoria = categoria;
     }
 

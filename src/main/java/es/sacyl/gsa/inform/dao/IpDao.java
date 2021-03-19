@@ -38,12 +38,24 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
                 + " ,e.modelo as  equipomodelo"
                 + " ,e.numeroserie as   equiponumeroserie, e.centro   equipocentro,  e.ubicacion  equipoubicacion  "
                 + " ,e.servicio as  equiposervicio, e.ip as  equipoip, e.comentario as  equipocomentario "
-                + " ,gfh.id as servicioid,gfh.codigo as serviciocodigo,gfh.descripcion as serviciodescripcion "
-                + " ,gfh.asistencial as servicioasisencial,gfh.idjimena  as servicioidjimena, gfh.estado as servicioestado "
+                + ", e.mac as equipomac"
+                + " ,e.estado as equipoestado,e.fechacambio as equipofechacambio, e.usucambio as equipousucambio "
+                + " ,gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
+                + ",gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + " ,u.id as ubicacionesid , u.centro as ubicacionescentro, u.descripcion as ubicacionesdescripcion,"
+                + " u.idpadre ubicacionesidpadre, u.nivel  as ubicacionesnivel  "
+                + " , usu.id as usuarioid,usu.dni as usuariodni,usu.apellido1 as usuarioapellido1"
+                + ",usu.apellido2 as usuarioapellido2,usu.nombre as usuarionombre"
+                + ",usu.estado as usuarioestado,usu.usucambio as usuariousucambio"
+                + ",usu.fechacambio as usuariofechacambio,usu.mail as usuariomail"
+                + ",usu.telefono as usuariotelefon,usu.idgfh as usuarioidgfh"
+                + ",usu.idcategoria as usuarioidcategoria"
                 + " FROM ips   ip "
                 + " JOIN vlan ON vlan.id=ip.vlan "
                 + " LEFT JOIN equipos e ON e.id=ip.equipo "
                 + " LEFT JOIN  gfh  ON gfh.id=e.servicio "
+                + " LEFT JOIN ubicaciones u ON u.id=e.ubicacion"
+                + " LEFT JOIN  usuarios usu ON usu.id=ip.usucambio "
                 + " WHERE  1=1 ";
 
     }
@@ -61,7 +73,10 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
             ipBean.setNumeroIp(IpCtrl.getValorNumerico(ipBean.getIp()));
             ipBean.setEstado(rs.getInt("ipestado"));
             if (equipoBean == null) {
-                ipBean.setEquipo(new EquipoDao().getPorId(rs.getLong("ipequipo")));
+                if (rs.getLong("ipequipo") != 0) {
+                    ipBean.setEquipo(new EquipoDao().getPorId(rs.getLong("ipequipo")));
+                }
+                //ipBean.setEquipo(new EquipoDao().getRegistroResulset(rs, false, false));
             } else {
                 ipBean.setEquipo(equipoBean);
             }
@@ -71,7 +86,8 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
                 ipBean.setVlan(vlanBean);
             }
             ipBean.setFechacambio(Utilidades.getFechaLocalDate(rs.getLong("ipfechacambio")));
-            ipBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("ipusucambio")));
+            // ipBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("ipusucambio")));
+            ipBean.setUsucambio(new UsuarioDao().getRegistroResulset(rs));
 
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
@@ -310,6 +326,15 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
         return getLista(texto, null, null, null, null);
     }
 
+    /**
+     *
+     * @param texto
+     * @param vlanBean
+     * @param equipoBean
+     * @param estado
+     * @param libres
+     * @return
+     */
     public ArrayList<IpBean> getLista(String texto, VlanBean vlanBean, EquipoBean equipoBean, Integer estado, String libres) {
         Connection connection = null;
         ArrayList<IpBean> lista = new ArrayList<>();

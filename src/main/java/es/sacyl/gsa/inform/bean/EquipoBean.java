@@ -1,12 +1,15 @@
 package es.sacyl.gsa.inform.bean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author 06551256M
  */
-public class EquipoBean extends MasterBean {
+public class EquipoBean extends MasterBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String tipo;
     private String inventario;
@@ -18,12 +21,15 @@ public class EquipoBean extends MasterBean {
     private UbicacionBean ubicacion;
     private GfhBean servicio;
     private String comentario;
+    private String nombredominio;
+    private UsuarioBean usuario;
     private ArrayList<IpBean> listaIps = new ArrayList<>();
     private ArrayList<EquipoAplicacionBean> aplicacinesArrayList = new ArrayList<>();
 
     private ArrayList<DatoGenericoBean> datosGenericoBeans = new ArrayList<>();
 
     public static String TIPOCPU = "Cpu";
+    public static String TIPOTELEFONO = "Teléfono";
 
     public EquipoBean() {
         super();
@@ -107,6 +113,22 @@ public class EquipoBean extends MasterBean {
 
     public void setComentario(String comentario) {
         this.comentario = comentario;
+    }
+
+    public String getNombredominio() {
+        return nombredominio;
+    }
+
+    public void setNombredominio(String nombredominio) {
+        this.nombredominio = nombredominio;
+    }
+
+    public UsuarioBean getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(UsuarioBean usuario) {
+        this.usuario = usuario;
     }
 
     public ArrayList<IpBean> getListaIps() {

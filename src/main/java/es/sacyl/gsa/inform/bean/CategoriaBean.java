@@ -1,39 +1,28 @@
- 
 package es.sacyl.gsa.inform.bean;
 
 /**
  *
  * @author 06551256M
  */
-public class CategoriaBean {
-    private Long id;
-    private String codigo;
-    private String descripcion;
+public class CategoriaBean extends MasterBean {
 
-    public Long getId() {
-        return id;
+    private String codigopersigo;
+    private String nombre;
+
+    public String getCodigopersigo() {
+        return codigopersigo;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCodigopersigo(String codigopersigo) {
+        this.codigopersigo = codigopersigo;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-    
-    
-    
 }

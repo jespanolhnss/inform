@@ -1,15 +1,18 @@
 package es.sacyl.gsa.inform.bean;
 
 import es.sacyl.gsa.inform.dao.GerenciaDao;
+import java.io.Serializable;
 
 /**
  *
  * @author juannietopajares
  */
-public class GerenciaBean {
+public class GerenciaBean implements Serializable {
 
-  //  private String codauto;
-     private AutonomiaBean autonomia;
+    private static final long serialVersionUID = 1L;
+
+    //  private String codauto;
+    private AutonomiaBean autonomia;
     private String codigo;
     private String nombre;
     private String tipovia;
@@ -20,7 +23,7 @@ public class GerenciaBean {
     private String cpger;
     private LocalidadBean localidad;
     private ProvinciaBean provincia;
-   
+
     private Integer estado;
 
     /*
@@ -37,12 +40,8 @@ localger          varchar2(4000 char)
 
            codauto ,codigo, nombre , tipovia, callesec ,numcalsec, otrdomger, cpger , localger
      */
-    
     public static final GerenciaBean GERENCIADEFECTO = new GerenciaDao().getPorCodigo("17", "01");
-  
 
-    
-    
     public AutonomiaBean getAutonomia() {
         return autonomia;
     }
@@ -50,6 +49,7 @@ localger          varchar2(4000 char)
     public void setAutonomia(AutonomiaBean autonomia) {
         this.autonomia = autonomia;
     }
+
     public String getCodigo() {
         return codigo;
     }
@@ -114,7 +114,7 @@ localger          varchar2(4000 char)
         this.localidad = localidad;
     }
 
-       public Integer getEstado() {
+    public Integer getEstado() {
         return estado;
     }
 
@@ -143,7 +143,7 @@ localger          varchar2(4000 char)
     }
 
     public void setEstado(String estado) {
-        if ( estado.equals("S")) {
+        if (estado.equals("S")) {
             this.estado = 1;
         } else {
             this.estado = 0;
@@ -165,6 +165,5 @@ localger          varchar2(4000 char)
     public void setProvincia(ProvinciaBean provincia) {
         this.provincia = provincia;
     }
-
 
 }

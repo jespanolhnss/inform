@@ -1,13 +1,16 @@
 package es.sacyl.gsa.inform.bean;
 
 import es.sacyl.gsa.inform.dao.UbicacionDao;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author juannietopajares
  */
-public class UbicacionBean extends MasterBean {
+public class UbicacionBean extends MasterBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private CentroBean centro;
     private String descripcion;
@@ -18,7 +21,10 @@ public class UbicacionBean extends MasterBean {
     public UbicacionBean() {
         super();
         this.nivel = 0;
+    }
 
+    public UbicacionBean(Long id) {
+        this.id = id;
     }
 
     public CentroBean getCentro() {

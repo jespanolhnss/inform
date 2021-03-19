@@ -1,12 +1,15 @@
 package es.sacyl.gsa.inform.bean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author 06551256M
  */
-public class VlanBean extends MasterBean {
+public class VlanBean extends MasterBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String direccion;
     private String nombre;

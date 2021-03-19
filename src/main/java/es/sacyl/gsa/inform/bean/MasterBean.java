@@ -3,6 +3,7 @@ package es.sacyl.gsa.inform.bean;
 import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.util.Constantes;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
@@ -10,7 +11,9 @@ import java.time.LocalDate;
  * @author 06551256M En esta clase se definen atributos comunes a muchas clase
  * bean
  */
-public abstract class MasterBean {
+public abstract class MasterBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     protected Long id;
     protected Integer estado;

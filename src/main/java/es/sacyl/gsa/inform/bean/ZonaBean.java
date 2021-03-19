@@ -1,10 +1,14 @@
 package es.sacyl.gsa.inform.bean;
 
+import java.io.Serializable;
+
 /**
  *
  * @author juannietopajares
  */
-public class ZonaBean {
+public class ZonaBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     //codauto,codgeren,codigo,nombre,codprov
     private AutonomiaBean autonomia;

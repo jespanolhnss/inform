@@ -1,10 +1,14 @@
 package es.sacyl.gsa.inform.bean;
 
+import java.io.Serializable;
+
 /**
  *
  * @author 06551256M
  */
-public class MensajeBean extends MasterBean {
+public class MensajeBean extends MasterBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String tipo;
     private String destinatarios;

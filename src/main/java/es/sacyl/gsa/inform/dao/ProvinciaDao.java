@@ -1,7 +1,6 @@
 package es.sacyl.gsa.inform.dao;
 
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
-import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
@@ -20,7 +19,7 @@ import org.apache.logging.log4j.Logger;
  * @version 23.5.2018
  *
  */
-public class ProvinciaDao extends  ConexionDao implements Serializable,ConexionInterface<ProvinciaBean> {
+public class ProvinciaDao extends ConexionDao implements Serializable, ConexionInterface<ProvinciaBean> {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LogManager.getLogger(ProvinciaDao.class);
@@ -42,14 +41,17 @@ public class ProvinciaDao extends  ConexionDao implements Serializable,ConexionI
      * @return
      */
     @Override
-      public  ProvinciaBean getRegistroResulset(ResultSet rs) {
-          return getRegistroResulset(rs, null);
-      }
+    public ProvinciaBean getRegistroResulset(ResultSet rs) {
+        return getRegistroResulset(rs, null);
+    }
+
     public static ProvinciaBean getRegistroResulset(ResultSet rs, AutonomiaBean autonamia) {
         ProvinciaBean provinciaBean = new ProvinciaBean();
         try {
+
             provinciaBean.setCodigo(rs.getString("provinciacodigo"));
-            provinciaBean.setNombre(rs.getString("provincianombre").trim());
+
+            provinciaBean.setNombre(rs.getString("provincianombre"));
             if (autonamia == null) {
                 AutonomiaBean autonomiaBean = new AutonomiaDao().getRegistroResulset(rs);
                 provinciaBean.setAutonomia(autonomiaBean);
@@ -119,7 +121,7 @@ public class ProvinciaDao extends  ConexionDao implements Serializable,ConexionI
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE   PROVINCIA  SET nombre='" + provinciaBean.getNombre()+"'"
+            sql = " UPDATE   PROVINCIA  SET nombre='" + provinciaBean.getNombre() + "'"
                     + " WHERE codigo='" + provinciaBean.getCodigo() + "'";
             try (Statement statement = connection.createStatement()) {
                 insertadoBoolean = statement.execute(sql);
@@ -171,10 +173,11 @@ public class ProvinciaDao extends  ConexionDao implements Serializable,ConexionI
      * @return
      */
     @Override
-     public ArrayList<ProvinciaBean> getLista(String cadena) {
-     return getLista(cadena,null);
-     
-     }
+    public ArrayList<ProvinciaBean> getLista(String cadena) {
+        return getLista(cadena, null);
+
+    }
+
     /**
      * Gets the lista provincias.
      *
@@ -244,7 +247,7 @@ public class ProvinciaDao extends  ConexionDao implements Serializable,ConexionI
 
     @Override
     public ProvinciaBean getPorId(Long id) {
-return null;
+        return null;
     }
 
 }

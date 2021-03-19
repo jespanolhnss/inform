@@ -5,6 +5,7 @@ import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
+import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -32,6 +33,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + " ,e.modelo as  equipomodelo"
                 + " ,e.numeroserie as   equiponumeroserie, e.centro   equipocentro,  e.ubicacion  equipoubicacion  "
                 + " ,e.servicio as  equiposervicio, e.ip as  equipoip, e.comentario as  equipocomentario,e.mac as equipomac "
+                + " ,e.usuario as equipousuario, e.nombredominio sa equiponombredominio"
                 + " ,gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
                 + ",gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
                 + " ,u.id as ubicacionesid , u.centro as ubicacionescentro, u.descripcion as ubicacionesdescripcion,"
@@ -74,13 +76,28 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + " ,e.numeroserie as   equiponumeroserie, e.centro   equipocentro,  e.ubicacion  equipoubicacion  "
                 + " ,e.servicio as  equiposervicio, e.ip as  equipoip, e.comentario as  equipocomentario,e.mac as equipomac "
                 + " ,e.estado as equipoestado,e.fechacambio as equipofechacambio, e.usucambio as equipousucambio "
+                + " ,e.usuario as equipousuario, e.nombredominio as equiponombredominio"
                 + " ,gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
-                + " ,u.id as ubicacionesid , u.centro as ubicacionescentro, u.descripcion as ubicacionesdescripcion,"
-                + " u.idpadre ubicacionesidpadre, u.nivel  as ubicacionesnivel  "
+                + " ,gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + " ,u.id as ubicacionesid , u.centro as ubicacionescentro, u.descripcion as ubicacionesdescripcion"
+                + " ,u.idpadre ubicacionesidpadre, u.nivel  as ubicacionesnivel  "
+                + " ,usu.id as usuarioid,usu.dni as usuariodni,usu.apellido1 as usuarioapellido1"
+                + ",usu.apellido2 as usuarioapellido2,usu.nombre as usuarionombre"
+                + ",usu.estado as usuarioestado,usu.usucambio as usuariousucambio"
+                + ",usu.fechacambio as usuariofechacambio,usu.mail as usuariomail"
+                + ",usu.telefono as usuariotelefon,usu.idgfh as usuarioidgfh"
+                + ",usu.idcategoria as usuarioidcategoria"
+                + ",usue.id as usueid,usue.dni as usuedni,usue.apellido1 as usueapellido1"
+                + ",usue.apellido2 as apellido2,usue.nombre as nombre"
+                + ",usue.estado as estado,usue.usucambio as usucambio"
+                + ",usue.fechacambio as fechacambio,usue.mail as mail"
+                + ",usue.telefono as telefon,usue.idgfh as idgfh"
+                + ",usue.idcategoria as idcategoria"
                 + " FROM equipos e  "
                 + " LEFT JOIN  gfh  ON gfh.id=e.servicio"
                 + " LEFT JOIN ubicaciones u ON u.id=e.ubicacion"
+                + " LEFT JOIN usuarios usu ON usu.id=e.usucambio"
+                + " LEFT JOIN usuarios usue ON usue.id=e.usuario"
                 + " WHERE  1=1 ";
     }
 
@@ -91,7 +108,11 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      */
     @Override
     public EquipoBean getRegistroResulset(ResultSet rs) {
-        return getRegistroResulset(rs, null, null);
+        return getRegistroResulset(rs, null, null, null, null);
+    }
+
+    public EquipoBean getRegistroResulset(ResultSet rs, Boolean conAplicaciones, Boolean conIps) {
+        return getRegistroResulset(rs, null, null, conAplicaciones, conIps);
     }
 
     /**
@@ -101,7 +122,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      * @param servicio
      * @return
      */
-    public static EquipoBean getRegistroResulset(ResultSet rs, CentroBean centro, GfhBean servicio) {
+    public static EquipoBean getRegistroResulset(ResultSet rs, CentroBean centro, GfhBean servicio, Boolean conAplicaciones, Boolean conIps) {
         EquipoBean equipoBean = new EquipoBean();
         try {
             equipoBean.setId(rs.getLong("equipoid"));
@@ -128,18 +149,45 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             //   equipoBean.setIp(rs.getString("equipoip"));
             equipoBean.setComentario(rs.getString("equipocomentario"));
             equipoBean.setMacadress(rs.getString("equipomac"));
+            equipoBean.setNombredominio(rs.getString("equiponombredominio"));
+            equipoBean.setUsuario(getRegistroResulsetUsuario(rs));
 
             equipoBean.setEstado(rs.getInt("equipoestado"));
             equipoBean.setFechacambio(Utilidades.getFechaLocalDate(rs.getLong("equipofechacambio")));
-            equipoBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("equipousucambio")));
+            //   equipoBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("equipousucambio")));
+            equipoBean.setUsucambio(new UsuarioDao().getRegistroResulset(rs));
 // actualiza ip
-            equipoBean.setListaIps(new IpDao().getLista(null, null, equipoBean, null, null));
+
+            if (conIps == true) {
+                equipoBean.setListaIps(new IpDao().getLista(null, null, equipoBean, null, null));
+            }
+
             // actualiza app instaladas
-            equipoBean.setAplicacinesArrayList(new EquipoAplicacionDao().getLista(null, equipoBean, null));
+            if (conAplicaciones == true) {
+                equipoBean.setAplicacinesArrayList(new EquipoAplicacionDao().getLista(null, equipoBean, null));
+            }
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         }
         return equipoBean;
+    }
+
+    public static UsuarioBean getRegistroResulsetUsuario(ResultSet resulSet) {
+        UsuarioBean usuario = null;
+        try {
+            usuario = new UsuarioBean();
+            usuario.setId(resulSet.getLong("usueid"));
+            usuario.setDni(resulSet.getString("usuedni"));
+            usuario.setApellido1(resulSet.getString("usueapellido1"));
+            usuario.setApellido2(resulSet.getString("usueapellido2"));
+            usuario.setNombre(resulSet.getString("usuenombre"));
+            usuario.setMail(resulSet.getString("usuemail"));
+            usuario.setTelefono(resulSet.getString("usuetelefon"));
+            usuario.setEstado(resulSet.getInt("usueestado"));
+        } catch (SQLException e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        }
+        return usuario;
     }
 
     /**
@@ -171,7 +219,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
-                    equipoBean = getRegistroResulset(resulSet, null, null);
+                    equipoBean = getRegistroResulset(resulSet, null, null, true, true);
                 }
                 statement.close();
             }
@@ -437,7 +485,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {
-                lista.add(getRegistroResulset(resulSet, centro, servicio));
+                lista.add(getRegistroResulset(resulSet, centro, servicio, true, true));
             }
             statement.close();
             LOGGER.debug(sql);

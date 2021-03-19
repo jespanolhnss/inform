@@ -11,8 +11,8 @@ import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.bean.AplicacionBean;
 import es.sacyl.gsa.inform.bean.AplicacionPerfilBean;
+import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
-import es.sacyl.gsa.inform.bean.UsuarioCategoriaBean;
 import es.sacyl.gsa.inform.dao.AplicacionPerfilDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
@@ -36,7 +36,7 @@ public final class FrmAplicacionesPerfiles extends FrmMasterVentana {
     private ComboBox<AplicacionBean> aplicacionCombo = new CombosUi().getAplicacionCombo(null, null, null, null);
     private final TextField id = new ObjetosComunes().getTextField("Id");
     private final TextField nombre = new ObjetosComunes().getTextField("Nombre");
-    private ComboBox<UsuarioCategoriaBean> usuarioCategoriaCombo = new CombosUi().getUsuarioCategoriaCombo(null, null);
+    private ComboBox<CategoriaBean> usuarioCategoriaCombo = new CombosUi().getCategoriaCombo(null, null);
 
     private final TextField codigo = new ObjetosComunes().getTextField("Codigo APP");
     private final TextField comentario = new ObjetosComunes().getTextField("Comentario");

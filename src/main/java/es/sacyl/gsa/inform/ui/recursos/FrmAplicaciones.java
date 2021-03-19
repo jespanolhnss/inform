@@ -67,7 +67,7 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
     private final ComboBox<ProveedorBean> proveedorCombo = new CombosUi().getProveedorCombo(null, null);
 
     private final ComboBox<String> ambitoCombo = new CombosUi().getCombodeTabla("Ambito App", null, ComboBean.APPAMBITO, 25);
-    private final ComboBox<String> gestionUsuariosComco = new CombosUi().getCombodeTabla("Usuarios", null, ComboBean.APPGESTIONUSUARIOS, 25);
+    private final ComboBox<String> gestionUsuariosComco = new CombosUi().getCombodeTabla("Quién gestiona usuarios?", null, ComboBean.APPGESTIONUSUARIOS, 25);
 
     private final TextArea descripcion = new ObjetosComunes().getTextArea("Descripción ");
     private final ComboBox<GfhBean> gfhCombo = new CombosUi().getServicioCombo(null, null);
@@ -297,14 +297,14 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
                 .withNullRepresentation("")
                 .asRequired()
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 99))
                 .bind(AplicacionBean::getGestionUsuarios, AplicacionBean::setGestionUsuarios);
 
         aplicacionesBinder.forField(descripcion)
                 .withNullRepresentation("")
                 .asRequired()
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 499))
                 .bind(AplicacionBean::getDescripcion, AplicacionBean::setDescripcion);
 
         aplicacionesBinder.forField(gfhCombo)

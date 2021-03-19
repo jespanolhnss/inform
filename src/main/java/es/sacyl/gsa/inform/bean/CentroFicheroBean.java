@@ -3,6 +3,7 @@ package es.sacyl.gsa.inform.bean;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.sql.Blob;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,7 +12,9 @@ import java.util.ArrayList;
  *
  * @author juannietopajares
  */
-public class CentroFicheroBean {
+public class CentroFicheroBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Long id;
     private CentroBean centro;
@@ -66,9 +69,11 @@ public class CentroFicheroBean {
     }
 
     public String getDescripcionCorta() {
-        if (descripcion==null) return "";
-        
-        if (descripcion!=null &&  descripcion.length() < 30) {
+        if (descripcion == null) {
+            return "";
+        }
+
+        if (descripcion != null && descripcion.length() < 30) {
             return descripcion;
         } else {
             return descripcion.substring(0, 29) + "....";
@@ -139,10 +144,10 @@ public class CentroFicheroBean {
         return Constantes.PDFPATHRELATIVO + nombreFichero;
     }
 
-    
     public String getPathRelativoMiniatura() {
         return Constantes.PDFPATHRELATIVO + nombreFicheroMiniatura;
     }
+
     public String getUrlFichero() {
         return "http://localhost:8080" + Constantes.PDFURL + nombreFichero;
     }

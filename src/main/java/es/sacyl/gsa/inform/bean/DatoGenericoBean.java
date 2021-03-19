@@ -1,10 +1,14 @@
 package es.sacyl.gsa.inform.bean;
 
+import java.io.Serializable;
+
 /**
  *
  * @author 06551256M
  */
-public class DatoGenericoBean extends MasterBean {
+public class DatoGenericoBean extends MasterBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Long idDatoEqipo;
     private String tipoDato;

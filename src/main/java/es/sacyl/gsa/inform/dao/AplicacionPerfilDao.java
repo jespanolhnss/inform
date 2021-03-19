@@ -37,9 +37,16 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
                 + " ,ap.usucambio as aplicacionusucambio,ap. fechacambio as aplicacionfechacambio  "
                 + " ,gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
                 + " ,gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + " ,usu.id as usuarioid,usu.dni as usuariodni,usu.apellido1 as usuarioapellido1"
+                + ",usu.apellido2 as usuarioapellido2,usu.nombre as usuarionombre"
+                + ",usu.estado as usuarioestado,usu.usucambio as usuariousucambio"
+                + ",usu.fechacambio as usuariofechacambio,usu.mail as usuariomail"
+                + ",usu.telefono as usuariotelefon,usu.idgfh as usuarioidgfh"
+                + ",usu.idcategoria as usuarioidcategoria"
                 + " FROM aplicacionesPerfiles  appp "
                 + " JOIN aplicaciones ap ON ap.id=appp.idaplicaciones "
                 + " LEFT  JOIN gfh ON gfh.id=ap.gfh"
+                + " LEFT JOIN usuarios usu ON usu.id=appp.usucambio"
                 + " WHERE 1=1 ";
     }
 
@@ -61,7 +68,8 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
             aplicacionPerfilBean.setCodigo(rs.getString("appperfilcodigo"));
             aplicacionPerfilBean.setEstado(rs.getInt("appperfilestado"));
             aplicacionPerfilBean.setFechacambio(Utilidades.getFechaLocalDate(rs.getLong("appperfilfechacambio")));
-            aplicacionBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("appperfilusucambio")));
+            // aplicacionBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("appperfilusucambio")));
+            aplicacionPerfilBean.setUsucambio(new UsuarioDao().getRegistroResulset(rs));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         }

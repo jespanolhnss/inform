@@ -5,13 +5,16 @@
  */
 package es.sacyl.gsa.inform.bean;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
  *
  * @author 06551256M
  */
-public class EquipoAplicacionBean {
+public class EquipoAplicacionBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Long id;
     private EquipoBean equipo;

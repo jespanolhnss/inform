@@ -8,14 +8,9 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
-import com.vaadin.flow.data.converter.StringToBigIntegerConverter;
 import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
-import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
-import es.sacyl.gsa.inform.bean.UsuarioCategoriaBean;
-import es.sacyl.gsa.inform.dao.AutonomiaDao;
-import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.GfhDao;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
@@ -33,12 +28,11 @@ import org.vaadin.klaudeta.PaginatedGrid;
 public final class FrmGfh extends FrmMasterPantalla {
 
     private final TextField id = new ObjetosComunes().getTextField("Id");
-   private final TextField idjimena = new ObjetosComunes().getTextField("IdJimena");
+    private final TextField idjimena = new ObjetosComunes().getTextField("IdJimena");
     private final TextField codigo = new ObjetosComunes().getTextField("Código", "codigo", 10, "150px", "50px");
     private final TextField descripcion = new ObjetosComunes().getTextField("Nombre", "nombre", 10, "300px", "50px");
-    private final RadioButtonGroup<String>  estadoRadio = new ObjetosComunes().getEstadoRadio();
-    private final RadioButtonGroup<String>  asistencialRadio = new ObjetosComunes().getSNRadio("Asistencial");
- 
+    private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
+    private final RadioButtonGroup<String> asistencialRadio = new ObjetosComunes().getSNRadio("Asistencial");
 
     private GfhBean servicioBean = null;
     private final Binder<GfhBean> servicioBinder = new Binder<>();
@@ -71,7 +65,7 @@ public final class FrmGfh extends FrmMasterPantalla {
     @Override
     public void doGrabar() {
         if (servicioBinder.writeBeanIfValid(servicioBean)) {
-            if (servicioBean.getIdjimena()==null){
+            if (servicioBean.getIdjimena() == null) {
                 servicioBean.setIdjimena(new Long(0));
             }
             if (new GfhDao().doGrabaDatos(servicioBean) == true) {
@@ -138,13 +132,13 @@ public final class FrmGfh extends FrmMasterPantalla {
         servicioGrid.addColumn(GfhBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Estado</b>"));
         servicioGrid.addColumn(GfhBean::getCodigo).setAutoWidth(true).setHeader(new Html("<b>Cod</b>"));
         servicioGrid.addColumn(GfhBean::getDescripcion).setAutoWidth(true).setHeader(new Html("<b>Nombre</b>"));
-       
+
         doActualizaGrid();
     }
 
     @Override
     public void doActualizaGrid() {
-        servicioLista = new GfhDao().getLista(buscador.getValue(),null);
+        servicioLista = new GfhDao().getLista(buscador.getValue(), null);
         servicioGrid.setItems(servicioLista);
     }
 
@@ -155,31 +149,30 @@ public final class FrmGfh extends FrmMasterPantalla {
                 .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(GfhBean::getId, null);
         servicioBinder.forField(codigo)
-                 .asRequired()
+                .asRequired()
                 .withNullRepresentation("")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 3))
                 .bind(GfhBean::getCodigo, GfhBean::setCodigo);
         servicioBinder.forField(descripcion)
-                 .asRequired()
+                .asRequired()
                 .withNullRepresentation("")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 50))
                 .bind(GfhBean::getDescripcion, GfhBean::setDescripcion);
-        
-        
+
         servicioBinder.forField(estadoRadio)
                 .asRequired()
                 .bind(GfhBean::getEstadoString, GfhBean::setEstado);
 
- servicioBinder.forField(asistencialRadio)
-         .asRequired()
+        servicioBinder.forField(asistencialRadio)
+                .asRequired()
                 .bind(GfhBean::getAsistencialString, GfhBean::setAsistencia);
 
         servicioBinder.forField(idjimena)
                 .withNullRepresentation("")
                 .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
-                 .bind(GfhBean::getIdjimena,GfhBean:: setIdjimena);
+                .bind(GfhBean::getIdjimena, GfhBean::setIdjimena);
     }
 
     @Override
@@ -190,7 +183,7 @@ public final class FrmGfh extends FrmMasterPantalla {
 
     @Override
     public void doComponentesOrganizacion() {
-        this.contenedorFormulario.add(id, codigo, descripcion, estadoRadio,idjimena,asistencialRadio );
+        this.contenedorFormulario.add(id, codigo, descripcion, estadoRadio, idjimena, asistencialRadio);
         this.contenedorBuscadores.add(buscador);
         this.contenedorDerecha.removeAll();
         this.contenedorDerecha.add(contenedorBuscadores, servicioGrid);
@@ -198,7 +191,7 @@ public final class FrmGfh extends FrmMasterPantalla {
 
     @Override
     public void doCompentesEventos() {
-buscador.addValueChangeListener(event -> {
+        buscador.addValueChangeListener(event -> {
             doActualizaGrid();
         });
 

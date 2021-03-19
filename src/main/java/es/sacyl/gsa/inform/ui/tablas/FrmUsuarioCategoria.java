@@ -10,7 +10,7 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
-import es.sacyl.gsa.inform.bean.UsuarioCategoriaBean;
+import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.dao.CategoriaDao;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
@@ -32,14 +32,14 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
     private final TextField nombre = new ObjetosComunes().getTextField("Nombre");
     private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
 
-    private UsuarioCategoriaBean usuarioCategoriaBean;
-    private final Binder<UsuarioCategoriaBean> usuarioCategoriaBinder = new Binder<>();
-    private final PaginatedGrid<UsuarioCategoriaBean> usuarioCategoriaGrid = new PaginatedGrid<>();
-    private ArrayList<UsuarioCategoriaBean> usuarioCategoriaArrayList = new ArrayList<>();
+    private CategoriaBean categoriaBean;
+    private final Binder<CategoriaBean> usuarioCategoriaBinder = new Binder<>();
+    private final PaginatedGrid<CategoriaBean> usuarioCategoriaGrid = new PaginatedGrid<>();
+    private ArrayList<CategoriaBean> usuarioCategoriaArrayList = new ArrayList<>();
 
     public FrmUsuarioCategoria() {
         super();
-        this.usuarioCategoriaBean = new UsuarioCategoriaBean();
+        this.categoriaBean = new CategoriaBean();
         doComponentesOrganizacion();
         doGrid();
         doComponenesAtributos();
@@ -62,8 +62,8 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
 
     @Override
     public void doGrabar() {
-        if (usuarioCategoriaBinder.writeBeanIfValid(usuarioCategoriaBean)) {
-            if (new CategoriaDao().doGrabaDatos(usuarioCategoriaBean) == true) {
+        if (usuarioCategoriaBinder.writeBeanIfValid(categoriaBean)) {
+            if (new CategoriaDao().doGrabaDatos(categoriaBean) == true) {
                 (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                 doActualizaGrid();
                 doLimpiar();
@@ -72,7 +72,7 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
             }
             // this.close();
         } else {
-            BinderValidationStatus<UsuarioCategoriaBean> validate = usuarioCategoriaBinder.validate();
+            BinderValidationStatus<CategoriaBean> validate = usuarioCategoriaBinder.validate();
             String errorText = validate.getFieldValidationStatuses()
                     .stream().filter(BindingValidationStatus::isError)
                     .map(BindingValidationStatus::getMessage)
@@ -94,7 +94,7 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
                 FrmMensajes.AVISOCONFIRMACIONACCION,
                 FrmMensajes.AVISOCONFIRMACIONACCIONSEGURO,
                 FrmMensajes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
-                    new CategoriaDao().doBorraDatos(usuarioCategoriaBean);
+                    new CategoriaDao().doBorraDatos(categoriaBean);
                     Notification.show(FrmMensajes.AVISODATOBORRADO);
                     doActualizaGrid();
                     doLimpiar();
@@ -108,8 +108,8 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
 
     @Override
     public void doLimpiar() {
-        usuarioCategoriaBean = new UsuarioCategoriaBean();
-        usuarioCategoriaBinder.readBean(usuarioCategoriaBean);
+        categoriaBean = new CategoriaBean();
+        usuarioCategoriaBinder.readBean(categoriaBean);
         codigo.setReadOnly(false);
         doControlBotones(null);
     }
@@ -123,10 +123,10 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
         usuarioCategoriaGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         usuarioCategoriaGrid.setHeightByRows(true);
         usuarioCategoriaGrid.setPageSize(14);
-        usuarioCategoriaGrid.addColumn(UsuarioCategoriaBean::getId).setAutoWidth(true).setHeader(new Html("<b>Id</b>"));
-        usuarioCategoriaGrid.addColumn(UsuarioCategoriaBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Estado</b>"));
-        usuarioCategoriaGrid.addColumn(UsuarioCategoriaBean::getCodigo).setAutoWidth(true).setHeader(new Html("<b>Código</b>"));
-        usuarioCategoriaGrid.addColumn(UsuarioCategoriaBean::getNombre).setAutoWidth(true).setHeader(new Html("<b>Nombre</b>"));
+        usuarioCategoriaGrid.addColumn(CategoriaBean::getId).setAutoWidth(true).setHeader(new Html("<b>Id</b>"));
+        usuarioCategoriaGrid.addColumn(CategoriaBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Estado</b>"));
+        usuarioCategoriaGrid.addColumn(CategoriaBean::getCodigopersigo).setAutoWidth(true).setHeader(new Html("<b>Código</b>"));
+        usuarioCategoriaGrid.addColumn(CategoriaBean::getNombre).setAutoWidth(true).setHeader(new Html("<b>Nombre</b>"));
         doActualizaGrid();
     }
 
@@ -141,24 +141,24 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
         usuarioCategoriaBinder.forField(id)
                 .withNullRepresentation("")
                 .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
-                .bind(UsuarioCategoriaBean::getId, null);
+                .bind(CategoriaBean::getId, null);
         usuarioCategoriaBinder.forField(codigo)
                 .withNullRepresentation("")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 25))
-                .bind(UsuarioCategoriaBean::getCodigo, UsuarioCategoriaBean::setCodigo);
+                .bind(CategoriaBean::getCodigopersigo, CategoriaBean::setCodigopersigo);
 
         usuarioCategoriaBinder.forField(nombre)
                 .withNullRepresentation("")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 25))
-                .bind(UsuarioCategoriaBean::getNombre, UsuarioCategoriaBean::setNombre);
+                .bind(CategoriaBean::getNombre, CategoriaBean::setNombre);
 
         usuarioCategoriaBinder.forField(estadoRadio)
                 .withNullRepresentation("")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
-                .bind(UsuarioCategoriaBean::getEstadoString, UsuarioCategoriaBean::setEstado);
+                .bind(CategoriaBean::getEstadoString, CategoriaBean::setEstado);
 
     }
 
@@ -185,9 +185,9 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
             doActualizaGrid();
         });
         usuarioCategoriaGrid.addItemClickListener(event -> {
-            usuarioCategoriaBean = event.getItem();
+            categoriaBean = event.getItem();
             usuarioCategoriaBinder.readBean(event.getItem());
-            doControlBotones(usuarioCategoriaBean);
+            doControlBotones(categoriaBean);
         }
         );
     }

@@ -3,6 +3,7 @@ package es.sacyl.gsa.inform.ui;
 import com.vaadin.flow.component.combobox.ComboBox;
 import es.sacyl.gsa.inform.bean.AplicacionBean;
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
+import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
 import es.sacyl.gsa.inform.bean.ComboBean;
@@ -17,7 +18,6 @@ import es.sacyl.gsa.inform.bean.ProveedorBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.bean.UbicacionBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
-import es.sacyl.gsa.inform.bean.UsuarioCategoriaBean;
 import es.sacyl.gsa.inform.bean.VlanBean;
 import es.sacyl.gsa.inform.bean.ZonaBean;
 import es.sacyl.gsa.inform.dao.AplicacionDao;
@@ -34,8 +34,8 @@ import es.sacyl.gsa.inform.dao.LocalidadDao;
 import es.sacyl.gsa.inform.dao.LopdTipoDao;
 import es.sacyl.gsa.inform.dao.NivelesAtencionDao;
 import es.sacyl.gsa.inform.dao.NivelesAtencionTipoDao;
+import es.sacyl.gsa.inform.dao.ProveedorDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
-import es.sacyl.gsa.inform.dao.UbicacionDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.dao.VlanDao;
 import es.sacyl.gsa.inform.dao.ZonaDao;
@@ -281,12 +281,7 @@ public class CombosUi {
     public ComboBox<ProveedorBean> getProveedorCombo(ProveedorBean valor, String cadena) {
         ComboBox<ProveedorBean> combo = new ComboBox<>();
         combo = new ComboBox<>("Proveedor");
-        ArrayList<ProveedorBean> lista = new ArrayList<>();
-        lista.add(new ProveedorBean(new Long(1), "APD"));
-        lista.add(new ProveedorBean(new Long(2), "IBM"));
-        lista.add(new ProveedorBean(new Long(3), "HABITUAL"));
-        lista.add(new ProveedorBean(new Long(4), "WFREM"));
-        lista.add(new ProveedorBean(new Long(5), "ABBOTS"));
+        ArrayList<ProveedorBean> lista = new ProveedorDao().getLista(null, null, ConexionDao.BBDD_ACTIVOSI);
         combo.setItems(lista);
         combo.setItemLabelGenerator(ProveedorBean::getNombre);
         if (valor != null) {
@@ -388,6 +383,7 @@ public class CombosUi {
             combo.setValue(valor);
         }
         combo.setWidth("150px");
+        combo.setClearButtonVisible(true);
         return combo;
     }
 
@@ -506,7 +502,7 @@ public class CombosUi {
     public ComboBox<UbicacionBean> getUbicacionCombo(String texto, CentroBean centroBean, UbicacionBean padre, UbicacionBean valor
     ) {
         ComboBox<UbicacionBean> combo = new ComboBox<>("Ubicación Padre  ");
-        combo.setItems(new UbicacionDao().getLista(texto, centroBean, padre));
+        //  combo.setItems(new UbicacionDao().getLista(texto, centroBean, padre));
         combo.setItemLabelGenerator(UbicacionBean::getDescripcionFull);
         if (valor != null) {
             combo.setValue(valor);
@@ -522,11 +518,11 @@ public class CombosUi {
      * @param valor
      * @return
      */
-    public ComboBox<UsuarioCategoriaBean> getUsuarioCategoriaCombo(String texto, UsuarioCategoriaBean valor
+    public ComboBox<CategoriaBean> getCategoriaCombo(String texto, CategoriaBean valor
     ) {
-        ComboBox<UsuarioCategoriaBean> combo = new ComboBox<>("Ubicación Padre  ");
+        ComboBox<CategoriaBean> combo = new ComboBox<>("Ubicación Padre  ");
         combo.setItems(new CategoriaDao().getLista(texto));
-        combo.setItemLabelGenerator(UsuarioCategoriaBean::getNombre);
+        combo.setItemLabelGenerator(CategoriaBean::getNombre);
         if (valor != null) {
             combo.setValue(valor);
         }
@@ -599,11 +595,11 @@ public class CombosUi {
      * @param valor
      * @return
      */
-    public ComboBox<UsuarioCategoriaBean> getCategoriasUsuarios(UsuarioCategoriaBean valor) {
-        ComboBox<UsuarioCategoriaBean> combo;
+    public ComboBox<CategoriaBean> getCategoriasUsuarios(CategoriaBean valor) {
+        ComboBox<CategoriaBean> combo;
         combo = new ComboBox<>("Categorias");
         combo.setItems(new CategoriaDao().getLista(null));
-        combo.setItemLabelGenerator(UsuarioCategoriaBean::getNombre);
+        combo.setItemLabelGenerator(CategoriaBean::getNombre);
         if (valor != null) {
             combo.setValue(valor);
         }

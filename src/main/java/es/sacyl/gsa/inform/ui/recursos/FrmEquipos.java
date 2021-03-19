@@ -28,6 +28,7 @@ import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.bean.UbicacionBean;
+import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
@@ -36,6 +37,7 @@ import es.sacyl.gsa.inform.dao.EquipoDao;
 import es.sacyl.gsa.inform.dao.ParametroDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
 import es.sacyl.gsa.inform.dao.UbicacionDao;
+import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
@@ -84,6 +86,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final TextField modelo = new ObjetosComunes().getTextField("Modelo");
     private final TextField numeroSerie = new ObjetosComunes().getTextField("N.Serie");
     private final TextField macAdress = new ObjetosComunes().getTextField("Mac");
+    private final TextField nombredominio = new ObjetosComunes().getTextField("Nombre");
+    private final TextField dni = new ObjetosComunes().getDni();
+    private final TextField nombreusuario = new ObjetosComunes().getTextField("Nombre Usuario habitual");
 
     private final ComboBox<CentroBean> centroCombo = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPOCENTROSALUD, null, null);
     private final ComboBox<UbicacionBean> ubicacionCombo = new CombosUi().getUbicacionCombo(null, centroCombo.getValue(), null, null);
@@ -93,6 +98,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final TextField ip = new ObjetosComunes().getTextField("Ip");
     private final TextField comentario = new ObjetosComunes().getTextField("Comentario");
 
+    private UsuarioBean usuarioHabitual = null;
     private EquipoBean equipoBean = null;
     private final Binder<EquipoBean> equipoBinder = new Binder<>();
     private final PaginatedGrid<EquipoBean> equipoGrid = new GridUi().getEquipoGridPaginado();
@@ -155,6 +161,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     @Override
     public void doGrabar() {
         if (equipoBinder.writeBeanIfValid(equipoBean)) {
+            equipoBean.setUsuario(usuarioHabitual);
             equipoBean.setValoresAut();
             if (new EquipoDao().doGrabaDatos(equipoBean) == true) {
                 (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
@@ -381,13 +388,17 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         contenedorFormulario.add(ip, 3);
         contenedorFormulario.add(ayudaIp);
-        contenedorFormulario.add(macAdress, 2);
+        contenedorFormulario.add(macAdress);
+        contenedorFormulario.add(nombredominio);
 
         contenedorFormulario.add(centroCombo, 3);
         contenedorFormulario.add(servicioCombo, 3);
 
         contenedorFormulario.add(ubicacionCombo, 5);
         contenedorFormulario.add(ayudaUbicacion);
+        contenedorFormulario.add(dni);
+        contenedorFormulario.add(nombreusuario, 5);
+
         contenedorFormulario.add(comentario, 6);
 
     }
@@ -420,6 +431,13 @@ public final class FrmEquipos extends FrmMasterPantalla {
          */
         equipoTipoCombo.addValueChangeListener(event -> {
             equipoMarcaCombo.setItems(new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPOMARCA, event.getValue(), 100));
+            if (equipoTipoCombo.getValue().equals(EquipoBean.TIPOCPU) || equipoTipoCombo.getValue().equals(EquipoBean.TIPOTELEFONO)) {
+                dni.setVisible(true);
+                nombreusuario.setVisible(true);
+            } else {
+                dni.setVisible(false);
+                nombreusuario.setVisible(false);
+            }
         });
 
         /**
@@ -470,9 +488,19 @@ public final class FrmEquipos extends FrmMasterPantalla {
             doActualizaGridAplicacion();
             doActualizaGridDatosGenericos();
             page1.setVisible(true);
+            if (equipoBean.getTipo().equals(EquipoBean.TIPOCPU) || equipoBean.getTipo().equals(EquipoBean.TIPOTELEFONO)) {
+                dni.setVisible(true);
+                nombreusuario.setVisible(true);
+            } else {
+                dni.setVisible(false);
+                nombreusuario.setVisible(false);
+            }
         }
         );
 
+        /**
+         * Ventana de ayuda para elegir ubicación
+         */
         ayudaUbicacion.addClickListener(event -> {
             if (centroCombo.getValue() != null) {
                 FrmBuscaUbicacion frmBuscaUbicacion = new FrmBuscaUbicacion(centroCombo.getValue());
@@ -488,6 +516,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
             }
         });
 
+        /**
+         * Ventana de ayuda para elegir IP
+         */
         ayudaIp.addClickListener(evento -> {
             if (equipoBean != null && equipoBean.getId() != null && !equipoBean.getId().equals(new Long(0))) {
                 FrmBuscaIp frmBuscaIp = new FrmBuscaIp(equipoBean);
@@ -504,6 +535,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
         }
         );
 
+        /**
+         * Ventana para añadir aplicaciones el equipo tiene que ser cpu
+         */
         aplicacionButton.addClickListener(event -> {
             EquipoAplicacionBean equipoAplicacionBean = new EquipoAplicacionBean();
             equipoAplicacionBean.setEquipo(equipoBean);
@@ -551,6 +585,28 @@ public final class FrmEquipos extends FrmMasterPantalla {
             //    imprimirZebra("");
             //   print();
             imprimeEtiqueta(equipoBean);
+        });
+
+        /**
+         * Si hay valor en el campo usuario habitual, verifica que exista
+         */
+        dni.addBlurListener(event -> {
+            if (!dni.getValue().isEmpty()) {
+                usuarioHabitual = new UsuarioDao().getUsuarioDni(dni.getValue(), Boolean.FALSE);
+                if (usuarioHabitual == null) {
+                    Notification.show("Usuario no encontgrado");
+                    dni.focus();
+                } else {
+                    nombreusuario.setValue(usuarioHabitual.getApellidosNombre());
+                }
+            } else {
+                nombreusuario.clear();
+            }
+        });
+        dni.addValueChangeListener(event -> {
+            if (dni.getValue().isEmpty()) {
+                nombreusuario.clear();
+            }
         });
     }
 

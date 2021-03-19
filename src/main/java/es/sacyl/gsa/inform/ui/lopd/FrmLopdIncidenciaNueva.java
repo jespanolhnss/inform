@@ -39,6 +39,7 @@ import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Utilidades;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -196,12 +197,12 @@ public final class FrmLopdIncidenciaNueva extends FrmMasterPantalla {
         ArrayList<LopdIncidenciaBean> listaIncidencias = new ArrayList<>();
         if (buscador.getValue() != null && !buscador.getValue().isEmpty()) {
             if (Utilidades.isNumero(buscador.getValue())) {
-                listaIncidencias = new LopdIncidenciaDao().getListaInicidencias(null, null, null, usuRegistraBean, null, null, buscador.getValue());
+                listaIncidencias = new LopdIncidenciaDao().getListaInicidencias(LocalDate.now().minusDays(30), LocalDate.now(), null, usuRegistraBean, null, null, buscador.getValue());
             } else {
-                listaIncidencias = new LopdIncidenciaDao().getListaInicidencias(null, null, null, usuRegistraBean, null, buscador.getValue(), null);
+                listaIncidencias = new LopdIncidenciaDao().getListaInicidencias(LocalDate.now().minusDays(3), LocalDate.now(), null, usuRegistraBean, null, buscador.getValue(), null);
             }
         } else {
-            listaIncidencias = new LopdIncidenciaDao().getListaInicidencias(null, null, null, usuRegistraBean, null, null, null);
+            listaIncidencias = new LopdIncidenciaDao().getListaInicidencias(LocalDate.now().minusDays(30), LocalDate.now(), null, usuRegistraBean, null, null, null);
         }
         if (listaIncidencias != null && listaIncidencias.size() > 0) {
             lopdIncidenciaGrid.setItems(listaIncidencias);

@@ -29,7 +29,15 @@ public class VlanDao extends ConexionDao implements Serializable, ConexionInterf
         sql = " SELECT vlan.id as vlanid,vlan.direccion as vlandireccion,vlan.nombre as vlannombre,vlan.puertaenlace as vlanpuertaenlace"
                 + ",vlan.estado  as vlanestado,vlan.usucambio as vlanusucambio ,vlan.fechacambio  as vlanfechacmabio"
                 + ", vlan.comentario as vlancomentario "
-                + " FROM vlan  WHERE  1=1 ";
+                + " , usu.id as usuarioid,usu.dni as usuariodni,usu.apellido1 as usuarioapellido1"
+                + ",usu.apellido2 as usuarioapellido2,usu.nombre as usuarionombre"
+                + ",usu.estado as usuarioestado,usu.usucambio as usuariousucambio"
+                + ",usu.fechacambio as usuariofechacambio,usu.mail as usuariomail"
+                + ",usu.telefono as usuariotelefon,usu.idgfh as usuarioidgfh"
+                + ",usu.idcategoria as usuarioidcategoria"
+                + " FROM vlan  "
+                + " LEFT JOIN  usuarios usu ON usu.id=vlan.usucambio "
+                + " WHERE  1=1 ";
     }
 
     @Override
@@ -41,7 +49,8 @@ public class VlanDao extends ConexionDao implements Serializable, ConexionInterf
             vlanBean.setNombre(rs.getString("vlannombre"));
             vlanBean.setPuertaenlace(rs.getString("vlanpuertaenlace"));
             vlanBean.setEstado(rs.getInt("vlanestado"));
-            vlanBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("vlanusucambio")));
+            // vlanBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("vlanusucambio")));
+            vlanBean.setUsucambio(new UsuarioDao().getRegistroResulset(rs));
             vlanBean.setFechacambio(Utilidades.getFechaLocalDate(rs.getLong("vlanfechacmabio")));
             vlanBean.setComentario(rs.getString("vlancomentario"));
             vlanBean.setMascara(VlanCtrl.getCalculaMascara(vlanBean.getDireccion()));

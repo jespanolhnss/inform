@@ -6,6 +6,7 @@
 package es.sacyl.gsa.inform.ctrl;
 
 import es.sacyl.gsa.inform.util.PatronesExpRegulares;
+import es.sacyl.gsa.inform.util.Utilidades;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -16,7 +17,7 @@ import java.util.regex.PatternSyntaxException;
  */
 public class IpCtrl {
 
-    public static Boolean siValid(String ip) {
+    public static Boolean isValid(String ip) {
 
         if (ip == null || ip.isEmpty()) {
             return false;
@@ -55,12 +56,14 @@ public class IpCtrl {
      * 10 036 065 010
      */
     public static Long getValorNumerico(String ip) {
-        String[] dirs = ip.split(".");
+        String[] dirs = ip.split("\\.");
         Long valor = new Long(0);
-        valor = Long.parseLong(dirs[3]) * 1000000000
-                + Long.parseLong(dirs[2]) * 1000000
-                + Long.parseLong(dirs[1]) * 1000
-                + Long.parseLong(dirs[0]);
+        if (isValid(ip) && Utilidades.isNumeric(dirs[0]) && Utilidades.isNumeric(dirs[1]) && Utilidades.isNumeric(dirs[2]) && Utilidades.isNumeric(dirs[3])) {
+            valor = Long.parseLong(dirs[3]) * 1000000000
+                    + Long.parseLong(dirs[2]) * 1000000
+                    + Long.parseLong(dirs[1]) * 1000
+                    + Long.parseLong(dirs[0]);
+        }
         return valor;
     }
 }

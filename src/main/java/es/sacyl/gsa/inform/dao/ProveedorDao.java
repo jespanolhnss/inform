@@ -34,9 +34,9 @@ public class ProveedorDao extends ConexionDao implements Serializable, ConexionI
                 + " ,p. codigo as provinciacodigo, p.nombre as provincianombre,p.codauto as provinciacodauto  "
                 + " ,a.codigo as autonomiacodigo, a.nombre as autonomianombre,a.estado as autonomiaestado   "
                 + " FROM proveedores prvee "
-                + " JOIN localidad l ON l.codigo=prvee.localidad"
-                + " JOIN provincia p ON p.codigo=l.codprov "
-                + " JOIN CAUTONOM a ON a.codigo=p.CODAUTO  "
+                + " LEFT JOIN localidad l ON l.codigo=prvee.localidad"
+                + " LEFT JOIN provincia p ON p.codigo=l.codprov "
+                + " LEFT JOIN CAUTONOM a ON a.codigo=p.CODAUTO  "
                 + "WHERE  1=1 ";
     }
 
@@ -324,7 +324,7 @@ public class ProveedorDao extends ConexionDao implements Serializable, ConexionI
                 sql = sql.concat(" AND provincia='" + provinciaBean.getCodigo() + "'");
             }
             if (texto != null && !texto.isEmpty()) {
-                sql = sql.concat(" AND  ( UPPER(prvee.nombre) like'%" + texto.toUpperCase() + "%'  ");
+                sql = sql.concat(" AND   UPPER(prvee.nombre) like'%" + texto.toUpperCase() + "%'  ");
             }
             if (estado != null) {
                 sql = sql.concat(" AND prvee.estado = " + estado);

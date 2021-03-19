@@ -1,5 +1,6 @@
 package es.sacyl.gsa.inform.bean;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -7,7 +8,9 @@ import java.util.ArrayList;
  *
  * @author 06551256M
  */
-public class AplicacionBean extends MasterBean {
+public class AplicacionBean extends MasterBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     //id,nombre,proveedor,ambito,gestionusuarios,descripcion,servicio,fechainstalacion,estado,usucambio,fechacambio
     private String nombre;

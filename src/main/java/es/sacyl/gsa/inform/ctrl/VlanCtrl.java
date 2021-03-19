@@ -279,7 +279,7 @@ public class VlanCtrl implements Serializable {
         if (valores.length != 2) {
             return -1;
         }
-        if (!IpCtrl.siValid(valores[0])) {
+        if (!IpCtrl.isValid(valores[0])) {
             return -2;
         }
         if (Utilidades.isNumero(valores[1])) {
