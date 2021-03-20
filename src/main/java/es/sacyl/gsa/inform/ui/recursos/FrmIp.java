@@ -41,6 +41,7 @@ public final class FrmIp extends FrmMasterPantalla {
     private final RadioButtonGroup<String> ipLibre = new ObjetosComunes().getSNRadio("Ip Libre");
 
     private final TextField id = new ObjetosComunes().getTextField("Id");
+    private final TextField numeroorden = new ObjetosComunes().getTextField("N");
     private final ComboBox<VlanBean> vlanCombo = new CombosUi().getVlanCombo(null, null);
     private final TextField ip = new ObjetosComunes().getTextField("IP");
     private final TextField equipo = new ObjetosComunes().getTextField("Id Equipo");
@@ -146,6 +147,11 @@ public final class FrmIp extends FrmMasterPantalla {
                 .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(IpBean::getId, null);
 
+        ipBinder.forField(numeroorden)
+                .withNullRepresentation("")
+                .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
+                .bind(IpBean::getNumeroIp, null);
+
         ipBinder.forField(vlanCombo)
                 .asRequired()
                 .bind(IpBean::getVlan, IpBean::setVlan);
@@ -171,7 +177,7 @@ public final class FrmIp extends FrmMasterPantalla {
                 new FormLayout.ResponsiveStep("150px", 1),
                 new FormLayout.ResponsiveStep("150px", 2));
 
-        contenedorFormulario.add(id, vlanCombo, ip, equipo, ayudaEquipo, equipoDetalle);
+        contenedorFormulario.add(id, vlanCombo, ip, numeroorden, equipo, ayudaEquipo, equipoDetalle);
         contenedorBuscadores.add(buscador, vlanComoboBuscador, ipLibre);
         contenedorDerecha.add(contenedorBuscadores, ipGrid);
     }

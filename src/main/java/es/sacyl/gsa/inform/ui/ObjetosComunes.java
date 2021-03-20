@@ -449,6 +449,14 @@ public class ObjetosComunes {
         return campo;
     }
 
+    public TextField getMacAdress() {
+        TextField campo = getTextField("Mac", null, 17, "95px", "95px");
+        campo.setMaxWidth("170px");
+        campo.setMinWidth("170px");
+        campo.setWidth("170px");
+        return campo;
+    }
+
     /**
      *
      * @return

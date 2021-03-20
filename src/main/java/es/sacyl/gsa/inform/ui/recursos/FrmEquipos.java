@@ -9,6 +9,7 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
@@ -87,7 +88,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     //  private final TextField marca = new ObjetosComunes().getTextField("Marca");
     private final TextField modelo = new ObjetosComunes().getTextField("Modelo");
     private final TextField numeroSerie = new ObjetosComunes().getTextField("N.Serie");
-    private final TextField macAdress = new ObjetosComunes().getTextField("Mac");
+    private final TextField macAdress = new ObjetosComunes().getMacAdress();
     private final TextField nombredominio = new ObjetosComunes().getTextField("Nombre");
     private final TextField dni = new ObjetosComunes().getDni();
     private final TextField nombreusuario = new ObjetosComunes().getTextField("Nombre Usuario habitual");
@@ -162,7 +163,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     /**
      *
-     * @return
+     * @return Verificaciones y acualizaciones del equipo en la tabla de ip
      */
     public Boolean controlIp() {
         Boolean control = true;
@@ -172,6 +173,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
             return true;
         }
         if (!ip.getValue().contains(",")) {
+            new IpDao().doLiberaIpsEquipo(equipoBean);
             // si la ip no esta en blanco comprueba que este libre y la ocupa
             control = doGestionaUnaIp(ip.getValue());
         } else {
@@ -196,7 +198,6 @@ public final class FrmEquipos extends FrmMasterPantalla {
         Boolean control = true;
         if (IpCtrl.isValid(unaIp)) { // este control es redundante por que ya lo hace el evento blur
             if (IpCtrl.isLibre(unaIp, equipoBean) == true) {
-                new IpDao().doLiberaIpsEquipo(equipoBean);
                 IpBean ipBean = new IpDao().getPorCodigo(unaIp);
                 ipBean.setEquipo(equipoBean);
                 new IpDao().doActualizaEquipo(ipBean);
@@ -225,7 +226,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 if (new EquipoDao().doGrabaDatos(equipoBean) == true) {
                     (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                     doActualizaGrid();
-                    doLimpiar();
+                    // doLimpiar();
                 } else {
                     (new Notification(FrmMensajes.AVISODATOERRORBBDD, 1000, Notification.Position.MIDDLE)).open();
                 }
@@ -414,6 +415,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
         ubicacionCombo.setLabel("Ubicación");
         buscador.setLabel("Valores a buscar");
 
+        nombredominio.setMinWidth("170px");
+        //  nombredominio.setWidth("170px");
         wwwimage.setVisible(false);
 
         page1.setWidthFull();
@@ -465,7 +468,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorFormulario.add(ip, 2);
         contenedorFormulario.add(ayudaIp, wwwimage);
         contenedorFormulario.add(macAdress);
-        contenedorFormulario.add(nombredominio, 2);
+        contenedorFormulario.add(nombredominio);
 
         contenedorFormulario.add(centroCombo, 3);
         contenedorFormulario.add(servicioCombo, 3);
@@ -642,13 +645,17 @@ public final class FrmEquipos extends FrmMasterPantalla {
             selectedPage.setVisible(true);
         });
 
+        /**
+         *
+         */
         etiquetaButton.addClickListener(event
                 -> {
-            //    imprimirZebra("");
-            //   print();
             imprimeEtiqueta(equipoBean);
         });
 
+        /**
+         *
+         */
         ip.addBlurListener(event -> {
             if (!ip.getValue().contains(",")) {
                 /*
@@ -687,7 +694,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
         });
 
         /**
-         * Si hay valor en el campo usuario habitual, verifica que exista
+         * Si hay valor en el campo usuario habitual, verifica que exista y
+         * recupera en nombre en el usuarioHabitual
          */
         dni.addBlurListener(event -> {
             if (!dni.getValue().isEmpty()) {
@@ -702,10 +710,27 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 nombreusuario.clear();
             }
         });
+        /**
+         * Si el dni en blanco, borra el nombre del usuario
+         */
         dni.addValueChangeListener(event -> {
             if (dni.getValue().isEmpty()) {
                 nombreusuario.clear();
             }
+        });
+
+        /**
+         * Monta la url Si hay varias IP coje la primera
+         */
+        wwwimage.addClickListener(event -> {
+            String url = null;
+            Page page = new Page(getUI().get());
+            if (ip.getValue().contains(",")) {
+                url = ip.getValue().split(",")[0];
+            } else {
+                url = "http://" + ip.getValue();
+            }
+            page.open(url, "_blank");
         });
     }
 

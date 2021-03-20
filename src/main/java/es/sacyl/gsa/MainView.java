@@ -59,6 +59,10 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         //   this.getStyle().set("background-color", "#F2F2F2");
         Image image = new Image("icons/fondo.jpg", "Imagen");
         add(image);
+        contenedorMenu.setMargin(false);
+        contenedorFormularios.setMargin(false);
+        contenedorFormularios.setSpacing(false);
+        contenedorFormularios.setPadding(false);
 
         System.out.println(System.getProperty("user.dir"));
         System.out.println(System.getProperty("catalina.base"));

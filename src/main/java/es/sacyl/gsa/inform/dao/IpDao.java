@@ -370,7 +370,7 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
             // ordenar por numero
             Collections.sort(lista, new Comparator<IpBean>() {
                 @Override
-                public int compare(IpBean p1, IpBean p2) {
+                public int compare(IpBean p2, IpBean p1) {
                     // Aqui esta el truco, ahora comparamos p2 con p1 y no al reves como antes
                     return new Long(p2.getNumeroIp()).compareTo(new Long(p1.getNumeroIp()));
                 }

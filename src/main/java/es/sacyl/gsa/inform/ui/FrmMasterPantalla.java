@@ -96,11 +96,11 @@ public abstract class FrmMasterPantalla extends HorizontalLayout {
          */
         this.setSizeUndefined();
         /**
-         * Quit marge y espacio entre objetos
+         * Quita margen y espacio entre objetos
          */
         this.setMargin(false);
         this.setSpacing(false);
-
+        this.setPadding(false);
         contenedorBotones.setMargin(false);
 
         contenedorBuscadores.setMargin(false);
