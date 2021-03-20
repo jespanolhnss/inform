@@ -48,6 +48,14 @@ public abstract class FrmMasterVentana extends Dialog {
     public FrmMasterVentana(String ancho) {
         this.setWidth(ancho);
         this.setSizeUndefined();
+        doHazVentana();
+    }
+
+    public FrmMasterVentana() {
+        doHazVentana();
+    }
+
+    public void doHazVentana() {
         this.add(contenedorVentana);
         contenedorVentana.add(contenedorIzquierda, contenedorDerecha);
 

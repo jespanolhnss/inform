@@ -1,10 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.sacyl.gsa.inform.ctrl;
 
+import es.sacyl.gsa.inform.bean.EquipoBean;
+import es.sacyl.gsa.inform.bean.IpBean;
+import es.sacyl.gsa.inform.dao.IpDao;
 import es.sacyl.gsa.inform.util.PatronesExpRegulares;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.util.regex.Matcher;
@@ -17,10 +15,15 @@ import java.util.regex.PatternSyntaxException;
  */
 public class IpCtrl {
 
+    /**
+     *
+     * @param ip
+     * @return
+     */
     public static Boolean isValid(String ip) {
 
         if (ip == null || ip.isEmpty()) {
-            return false;
+            return true;
         }
         ip = ip.trim();
         if ((ip.length() < 6) & (ip.length() > 15)) {
@@ -34,6 +37,28 @@ public class IpCtrl {
         } catch (PatternSyntaxException ex) {
             return false;
         }
+    }
+
+    /**
+     *
+     * @param ip
+     * @return
+     */
+    public static Boolean isLibre(String ip) {
+        Boolean libre = false;
+        if (new IpDao().getPorCodigo(ip).getEquipo() == null) {
+            libre = true;
+        }
+        return libre;
+    }
+
+    public static Boolean isLibre(String ip, EquipoBean equipoBean) {
+        Boolean libre = false;
+        IpBean ipBean = new IpDao().getPorCodigo(ip);
+        if (ipBean.getEquipo() == null || ipBean.getEquipo().getId().equals(equipoBean.getId())) {
+            libre = true;
+        }
+        return libre;
     }
 
     /**
@@ -65,5 +90,48 @@ public class IpCtrl {
                     + Long.parseLong(dirs[0]);
         }
         return valor;
+    }
+
+    /**
+     *
+     * @param lista
+     * @return valita que la lista de ips separadas por , sea valida
+     */
+    public static Boolean listaIpsValidas(String lista) {
+        Boolean valida = true;
+        String[] listaIps = lista.split(",");
+        for (String unaIp : listaIps) {
+            if (!isValid(unaIp)) {
+                valida = false;
+            }
+        }
+        return valida;
+    }
+
+    /**
+     *
+     * @param lista
+     * @return
+     */
+    public static Boolean listaIpsLibres(String lista) {
+        Boolean valida = true;
+        String[] listaIps = lista.split(",");
+        for (String unaIp : listaIps) {
+            if (!isLibre(unaIp)) {
+                valida = false;
+            }
+        }
+        return valida;
+    }
+
+    public static Boolean listaIpsLibres(String lista, EquipoBean equipoBean) {
+        Boolean valida = true;
+        String[] listaIps = lista.split(",");
+        for (String unaIp : listaIps) {
+            if (!isLibre(unaIp, equipoBean)) {
+                valida = false;
+            }
+        }
+        return valida;
     }
 }

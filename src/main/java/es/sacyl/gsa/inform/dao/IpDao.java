@@ -125,14 +125,14 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
     }
 
     @Override
-    public IpBean getPorCodigo(String codigo) {
+    public IpBean getPorCodigo(String ip) {
         Connection connection = null;
         IpBean ipBean = null;
 
         try {
             connection = super.getConexionBBDD();
 
-            sql = sql.concat(" AND ip.ip='" + codigo + "'");
+            sql = sql.concat(" AND ip.ip='" + ip + "'");
 
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);

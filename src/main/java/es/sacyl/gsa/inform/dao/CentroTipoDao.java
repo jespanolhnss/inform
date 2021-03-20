@@ -1,6 +1,7 @@
 package es.sacyl.gsa.inform.dao;
 
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
+import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -25,6 +26,29 @@ public class CentroTipoDao extends ConexionDao implements Serializable, Conexion
         super();
         sql = " SELECT ct.id as centrotipoid, ct.descripcion as centrotipodescripcion,ct.estado as centrotipoestado  "
                 + " FROM centrostipo ct WHERE  1=1 ";
+    }
+
+    /**
+     *
+     * @return Recupera el valor por defecto definido en la tabla parámetros con
+     * la clave valordefecto.tipocentro
+     */
+    public static CentroTipoBean getCentroTipoDefecto() {
+        CentroTipoBean centroTipoBean = null;
+        String cadena = new ParametroDao().getPorCodigo(ParametroBean.VALORDEFECTO_TIPOCENTRO).getValor();
+        String[] partes = cadena.split(",");
+        /**
+         * Valida el formato de la cadena 1,HOSPITAL 1 id del tipo de centro
+         * HOSPITAL descripción del tipo de centro
+         */
+        if (Utilidades.isNumeric(partes[0]) && partes.length == 2) {
+            centroTipoBean = new CentroTipoBean();
+            centroTipoBean.setId(Long.parseLong(partes[0]));
+            centroTipoBean.setDescripcion(partes[1]);
+        } else {
+            LOGGER.error("Error definición centro por defecto :" + ParametroBean.VALORDEFECTO_TIPOCENTRO + "=" + cadena);
+        }
+        return centroTipoBean;
     }
 
     @Override

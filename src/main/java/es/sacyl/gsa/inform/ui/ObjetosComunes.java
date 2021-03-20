@@ -91,6 +91,7 @@ public class ObjetosComunes {
         RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
         radioGroup.setLabel("Activo");
         radioGroup.setItems("S", "N");
+        radioGroup.setValue("S");
         return radioGroup;
     }
 
@@ -131,61 +132,63 @@ public class ObjetosComunes {
         checkboxGroup.setItemLabelGenerator(CentroBean::getNomcen);
         return checkboxGroup;
     }
-    
-     /**
-     * 
-     * @return 
-     */    
+
+    /**
+     *
+     * @return
+     */
     public CheckboxGroup<AplicacionBean> getAplicacionesCheckboxGroup() {
         CheckboxGroup<AplicacionBean> checkboxGroup;
         checkboxGroup = new CheckboxGroup<AplicacionBean>();
         checkboxGroup.setLabel("Aplicaciones");
         checkboxGroup.setItems(new AplicacionDao().getLista(null));
         checkboxGroup.setItemLabelGenerator(AplicacionBean::getNombre);
-        
+
         return checkboxGroup;
     }
-    
+
     /**
-     * 
+     *
      * @param id
-     * @return 
+     * @return
      */
     public CheckboxGroup<AplicacionPerfilBean> getAplicacionesPerfilesPorIdCheckboxGroup(Long id) {
         AplicacionBean aplicacion = new AplicacionBean();
         aplicacion.setId(id);
         CheckboxGroup<AplicacionPerfilBean> checkboxGroup;
         checkboxGroup = new CheckboxGroup<>();
-        checkboxGroup.setItems(new AplicacionPerfilDao().getLista(null,aplicacion));
+        checkboxGroup.setItems(new AplicacionPerfilDao().getLista(null, aplicacion));
         checkboxGroup.setItemLabelGenerator(AplicacionPerfilBean::getNombre);
-   
+
         return checkboxGroup;
     }
-    
-     /**
+
+    /**
      * Devuelve un checkboxGroup con los tipos de centro
-     * @return 
+     *
+     * @return
      */
     public CheckboxGroup<CentroTipoBean> getTipoCentroCecheckboxGroup() {
         CheckboxGroup<CentroTipoBean> tipoCentro = new CheckboxGroup<>();
         ArrayList<CentroTipoBean> tiposArrayList = new CentroTipoDao().getLista(null, ConexionDao.BBDD_ACTIVOSI);
         tipoCentro.setItems(tiposArrayList);
         tipoCentro.setItemLabelGenerator(CentroTipoBean::getDescripcion);
-        return tipoCentro;        
+        return tipoCentro;
     }
-    
+
     /**
      * Devuelve un checkboxGroup con los centros de Ávila
-     * @return 
+     *
+     * @return
      */
     public CheckboxGroup<CentroBean> getCentrosCheckboxGroup() {
         CheckboxGroup<CentroBean> centros = new CheckboxGroup<>();
         ArrayList<CentroBean> centrosArrayList = new CentroDao().getLista(null, AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, null, null, ConexionDao.BBDD_ACTIVOSI);
         centros.setItems(centrosArrayList);
         centros.setItemLabelGenerator(CentroBean::getNomcorto);
-        return centros;        
+        return centros;
     }
-    
+
     /**
      *
      * @param valor el valor que esté seleccionado del combo
@@ -244,6 +247,14 @@ public class ObjetosComunes {
      */
     public Button getBotonMini() {
         Button boton = getBoton(null, null, VaadinIcon.QUESTION_CIRCLE.create());
+        boton.setWidth("30px");
+        boton.setMaxWidth("30px");
+        boton.setMinWidth("30px");
+        return boton;
+    }
+
+    public Button getBotonMini(Icon icon) {
+        Button boton = getBoton(null, null, icon);
         boton.setWidth("30px");
         boton.setMaxWidth("30px");
         boton.setMinWidth("30px");

@@ -74,6 +74,31 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         return usuario;
     }
 
+    /**
+     *
+     * @param resulSet
+     * @return Este méto se usa cuando una tabla tiene el susucambio y un campo
+     * usuarionormal. Monta la sql con otros nombre s de columnas usueid,
+     * usue....
+     */
+    public static UsuarioBean getRegistroResulsetUsuario(ResultSet resulSet) {
+        UsuarioBean usuario = null;
+        try {
+            usuario = new UsuarioBean();
+            usuario.setId(resulSet.getLong("usueid"));
+            usuario.setDni(resulSet.getString("usuedni"));
+            usuario.setApellido1(resulSet.getString("usueapellido1"));
+            usuario.setApellido2(resulSet.getString("usueapellido2"));
+            usuario.setNombre(resulSet.getString("usuenombre"));
+            usuario.setMail(resulSet.getString("usuemail"));
+            usuario.setTelefono(resulSet.getString("usuetelefon"));
+            usuario.setEstado(resulSet.getInt("usueestado"));
+        } catch (SQLException e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        }
+        return usuario;
+    }
+
     @Override
     public UsuarioBean getPorId(Long id) {
         Connection connection = null;

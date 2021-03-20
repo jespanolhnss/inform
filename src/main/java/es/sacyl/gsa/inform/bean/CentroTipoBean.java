@@ -12,9 +12,9 @@ public class CentroTipoBean implements Serializable {
 
     private Long id;
     private String descripcion;
-     private Integer estado;
-    public static CentroTipoBean CENTROTIPOCENTROSALUD = new CentroTipoBean( new Long(2),"C.SALUD");
-    
+    private Integer estado;
+    public static CentroTipoBean CENTROTIPOCENTROSALUD = new CentroTipoBean(new Long(2), "C.SALUD");
+    public static CentroTipoBean CENTROTIPODEFECTO = new CentroTipoBean(new Long(1), "HOSPITAL");
 
     public CentroTipoBean() {
 
@@ -41,7 +41,7 @@ public class CentroTipoBean implements Serializable {
         this.descripcion = descripcion;
     }
 
-       public Integer getEstado() {
+    public Integer getEstado() {
         return estado;
     }
 

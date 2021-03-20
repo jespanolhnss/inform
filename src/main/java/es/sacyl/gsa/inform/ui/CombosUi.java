@@ -153,8 +153,16 @@ public class CombosUi {
         if (valor != null) {
             combo.setValue(valor);
         } else {
-            if (listaArrayList.size() > 0) {
-                combo.setValue(listaArrayList.get(0));
+            /**
+             * Valor por defecto definido en la tabla parámetros
+             */
+            CentroTipoBean centroTipoBean = CentroTipoDao.getCentroTipoDefecto();
+            if (centroTipoBean != null) {
+                combo.setValue(centroTipoBean);
+            } else {
+                if (listaArrayList.size() > 0) {
+                    combo.setValue(listaArrayList.get(0));
+                }
             }
         }
         combo.setWidth("150px");

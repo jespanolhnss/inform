@@ -40,6 +40,7 @@ import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.CentroFicheroDao;
 import es.sacyl.gsa.inform.dao.CentroUsuarioDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
+import es.sacyl.gsa.inform.dao.GerenciaDao;
 import es.sacyl.gsa.inform.dao.LocalidadDao;
 import es.sacyl.gsa.inform.dao.NivelesAtencionDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
@@ -63,6 +64,7 @@ import org.vaadin.klaudeta.PaginatedGrid;
  */
 public final class FrmCentro extends FrmMasterPantalla {
 
+    private final static GerenciaBean GERENCIADEFECTO = new GerenciaDao().getGerenciaDefecto();
     private final Button ficheroBoton = new ObjetosComunes().getBoton(null, null, VaadinIcon.CAMERA.create());
     private final Button usuarioBoton = new ObjetosComunes().getBoton(null, null, VaadinIcon.USERS.create());
     private final VerticalLayout contenedorFotos = new VerticalLayout();
@@ -78,7 +80,7 @@ public final class FrmCentro extends FrmMasterPantalla {
     //  private final TextField codgeren = new ObjetosComunes().getTextField("CodGeren");
     private final ComboBox<GerenciaBean> gerenciaCombo = new CombosUi().getGerenciaCombo(null, AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO);
     // private final TextField codzona = new ObjetosComunes().getTextField("Cozona");
-    private final ComboBox<ZonaBean> zonacombo = new CombosUi().getZonaCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, GerenciaBean.GERENCIADEFECTO, null);
+    private final ComboBox<ZonaBean> zonacombo = new CombosUi().getZonaCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, GERENCIADEFECTO, null);
     private final TextField codigo = new ObjetosComunes().getTextField("Código");
     private final TextField nomcen = new ObjetosComunes().getTextField("Nombre");
     private final TextField tipovia = new ObjetosComunes().getTextField("Tipo de via");
@@ -205,7 +207,7 @@ public final class FrmCentro extends FrmMasterPantalla {
         centroBinder.readBean(centroBean);
         autonomiaCombo.setValue(AutonomiaBean.AUTONOMIADEFECTO);
         provinciaCombo.setValue(ProvinciaBean.PROVINCIA_DEFECTO);
-        gerenciaCombo.setValue(GerenciaBean.GERENCIADEFECTO);
+        gerenciaCombo.setValue(GERENCIADEFECTO);
 
         // borra el contenido de los tabs
         centroUsuarioGrid.setItems(new ArrayList<>());

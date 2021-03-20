@@ -5,7 +5,6 @@ import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
-import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -88,11 +87,11 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + ",usu.telefono as usuariotelefon,usu.idgfh as usuarioidgfh"
                 + ",usu.idcategoria as usuarioidcategoria"
                 + ",usue.id as usueid,usue.dni as usuedni,usue.apellido1 as usueapellido1"
-                + ",usue.apellido2 as apellido2,usue.nombre as nombre"
-                + ",usue.estado as estado,usue.usucambio as usucambio"
-                + ",usue.fechacambio as fechacambio,usue.mail as mail"
-                + ",usue.telefono as telefon,usue.idgfh as idgfh"
-                + ",usue.idcategoria as idcategoria"
+                + ",usue.apellido2 as usueapellido2,usue.nombre as usuenombre"
+                + ",usue.estado as usueestado,usue.usucambio as usueusucambio"
+                + ",usue.fechacambio as usuefechacambio,usue.mail as usuemail"
+                + ",usue.telefono as usuetelefon,usue.idgfh as usueidgfh"
+                + ",usue.idcategoria as usueidcategoria"
                 + " FROM equipos e  "
                 + " LEFT JOIN  gfh  ON gfh.id=e.servicio"
                 + " LEFT JOIN ubicaciones u ON u.id=e.ubicacion"
@@ -150,7 +149,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             equipoBean.setComentario(rs.getString("equipocomentario"));
             equipoBean.setMacadress(rs.getString("equipomac"));
             equipoBean.setNombredominio(rs.getString("equiponombredominio"));
-            equipoBean.setUsuario(getRegistroResulsetUsuario(rs));
+            equipoBean.setUsuario(UsuarioDao.getRegistroResulsetUsuario(rs));
 
             equipoBean.setEstado(rs.getInt("equipoestado"));
             equipoBean.setFechacambio(Utilidades.getFechaLocalDate(rs.getLong("equipofechacambio")));
@@ -170,24 +169,6 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             LOGGER.error(Utilidades.getStackTrace(e));
         }
         return equipoBean;
-    }
-
-    public static UsuarioBean getRegistroResulsetUsuario(ResultSet resulSet) {
-        UsuarioBean usuario = null;
-        try {
-            usuario = new UsuarioBean();
-            usuario.setId(resulSet.getLong("usueid"));
-            usuario.setDni(resulSet.getString("usuedni"));
-            usuario.setApellido1(resulSet.getString("usueapellido1"));
-            usuario.setApellido2(resulSet.getString("usueapellido2"));
-            usuario.setNombre(resulSet.getString("usuenombre"));
-            usuario.setMail(resulSet.getString("usuemail"));
-            usuario.setTelefono(resulSet.getString("usuetelefon"));
-            usuario.setEstado(resulSet.getInt("usueestado"));
-        } catch (SQLException e) {
-            LOGGER.error(Utilidades.getStackTrace(e));
-        }
-        return usuario;
     }
 
     /**
@@ -216,6 +197,30 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         try {
             connection = super.getConexionBBDD();
             sql = sql.concat(" AND e.id='" + id + "'");
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sql);
+                if (resulSet.next()) {
+                    equipoBean = getRegistroResulset(resulSet, null, null, true, true);
+                }
+                statement.close();
+            }
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return equipoBean;
+    }
+
+    public EquipoBean getPorIP(String ip) {
+        Connection connection = null;
+        EquipoBean equipoBean = null;
+        try {
+            connection = super.getConexionBBDD();
+            sql = sql.concat(" AND e.id IN (SELECT equipo FROm ips WHERE ip='" + ip + "')");
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {

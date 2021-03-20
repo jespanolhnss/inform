@@ -1,6 +1,5 @@
 package es.sacyl.gsa.inform.bean;
 
-import es.sacyl.gsa.inform.dao.GerenciaDao;
 import java.io.Serializable;
 
 /**
@@ -40,8 +39,7 @@ localger          varchar2(4000 char)
 
            codauto ,codigo, nombre , tipovia, callesec ,numcalsec, otrdomger, cpger , localger
      */
-    public static final GerenciaBean GERENCIADEFECTO = new GerenciaDao().getPorCodigo("17", "01");
-
+    //  public static final GerenciaBean GERENCIADEFECTO = new GerenciaDao().getPorCodigo("17", "01");
     public AutonomiaBean getAutonomia() {
         return autonomia;
     }

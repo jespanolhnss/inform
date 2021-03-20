@@ -71,6 +71,10 @@ public class GerenciaDao extends ConexionDao implements Serializable, ConexionIn
         return gerenciaBean;
     }
 
+    public GerenciaBean getGerenciaDefecto() {
+        return getPorCodigo("17", "01");
+    }
+
     /**
      *
      * @param id
