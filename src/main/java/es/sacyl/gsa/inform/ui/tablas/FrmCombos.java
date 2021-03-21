@@ -3,7 +3,6 @@ package es.sacyl.gsa.inform.ui.tablas;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
@@ -40,7 +39,7 @@ public final class FrmCombos extends FrmMasterPantalla {
     private final TextField valor = new ObjetosComunes().getTextField("Valor", "valor", 100, "200px", "50px");
     private ComboBox<String> grupoCombo = new ComboBox<>();
 
-      private ComboBox<String> ramaCombo =  new ComboBox<>();
+    private ComboBox<String> ramaCombo = new ComboBox<>();
 
     private ArrayList<ComboBean> listaCombos = new ArrayList<>();
     private final Binder<ComboBean> combobinder = new Binder<>();
@@ -51,7 +50,7 @@ public final class FrmCombos extends FrmMasterPantalla {
         super();
         ArrayList<String> lista = new ComboDao().getListaGruposCombos();
         grupoCombo = new CombosUi().getStringCombo("Grupos", null, lista, "250px");
-         ramaCombo = new CombosUi().getGrupoRamaCombo(grupoCombo.getValue(),null,"Rama");
+        ramaCombo = new CombosUi().getGrupoRamaCombo(grupoCombo.getValue(), null, "Rama");
         doGrid();
         doComponentesOrganizacion();
         doComponenesAtributos();
@@ -67,8 +66,8 @@ public final class FrmCombos extends FrmMasterPantalla {
                 doActualizaGrid();
                 id.clear();
                 valor.clear();
-                comboBean=new ComboBean();
-                    
+                comboBean = new ComboBean();
+
             } else {
                 (new Notification(FrmMensajes.AVISODATOERRORBBDD, 1000, Notification.Position.MIDDLE)).open();
             }
@@ -118,7 +117,7 @@ public final class FrmCombos extends FrmMasterPantalla {
 
     @Override
     public void doActualizaGrid() {
-            listaCombos = new ComboDao().getLista(buscador.getValue().toString(), grupoCombo.getValue().toString(),ramaCombo.getValue());
+        listaCombos = new ComboDao().getLista(buscador.getValue().toString(), grupoCombo.getValue().toString(), ramaCombo.getValue());
         grid.setItems(listaCombos);
     }
 
@@ -192,7 +191,7 @@ public final class FrmCombos extends FrmMasterPantalla {
         contenedorFormulario.add(rama, 2);
         contenedorFormulario.add(valor, 2);
 
-        contenedorBuscadores.add(buscador, grupoCombo,ramaCombo);
+        contenedorBuscadores.add(buscador, grupoCombo, ramaCombo);
         contenedorDerecha.add(grid);
     }
 
@@ -209,8 +208,8 @@ public final class FrmCombos extends FrmMasterPantalla {
 
     @Override
     public void doCompentesEventos() {
-        
-        buscador.addValueChangeListener(evegtn->{
+
+        buscador.addValueChangeListener(evegtn -> {
             doActualizaGrid();
         });
         /**
@@ -224,14 +223,14 @@ public final class FrmCombos extends FrmMasterPantalla {
                 Notification.show(FrmMensajes.AVISODATOERRORRECUPERANDO + comboBean.toString());
             }
         });
-        grupoCombo.addValueChangeListener(event->{
-          ramaCombo.setItems(new ComboDao().getListaGruposRama(event.getValue(),100));
+        grupoCombo.addValueChangeListener(event -> {
+            ramaCombo.setItems(new ComboDao().getListaGruposRama(event.getValue(), 100));
         });
-        
-        ramaCombo.addValueChangeListener(evetn->{
-        doActualizaGrid();
+
+        ramaCombo.addValueChangeListener(evetn -> {
+            doActualizaGrid();
         });
-        
+
     }
 
     @Override

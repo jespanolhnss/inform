@@ -329,7 +329,43 @@ public class ComboDao extends ConexionDao implements Serializable, ConexionInter
         ArrayList<String> lista = new ArrayList<>();
         try {
             connection = super.getConexionBBDD();
-            sql = " SELECT UNIQUE rama FROM combos_informatica WHERE grupo='" + grupo + "' ORDER BY rama";
+            sql = " SELECT UNIQUE rama FROM combos_informatica WHERE grupo='" + grupo + "'";
+
+            sql = sql.concat(" ORDER BY rama");
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sql);
+                while (resulSet.next()) {
+                    String cadena = resulSet.getString("rama");
+                    if (cadena.length() > anchoCadena) {
+                        cadena = cadena.substring(0, anchoCadena);
+                    }
+                    lista.add(cadena);
+                }
+                statement.close();
+            }
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+
+    public ArrayList<String> getListaGruposRamaAprox(String grupo, Integer anchoCadena, String cadenabusca) {
+        Connection connection = null;
+
+        ArrayList<String> lista = new ArrayList<>();
+        try {
+            connection = super.getConexionBBDD();
+            sql = " SELECT UNIQUE rama FROM combos_informatica WHERE grupo='" + grupo + "'";
+            if (cadenabusca != null) {
+                sql = sql.concat(" AND UPPER(rama) like '" + cadenabusca + "%' ");
+            }
+
+            sql = sql.concat(" ORDER BY rama");
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 while (resulSet.next()) {
@@ -360,6 +396,36 @@ public class ComboDao extends ConexionDao implements Serializable, ConexionInter
             connection = super.getConexionBBDD();
             sql = " SELECT UNIQUE valor FROM combos_informatica WHERE grupo='" + grupo + "'"
                     + " AND rama='" + rama + "'  ";
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sql);
+                while (resulSet.next()) {
+                    String cadena = resulSet.getString("valor");
+                    if (cadena.length() > anchoCadena) {
+                        cadena = cadena.substring(0, anchoCadena);
+                    }
+                    lista.add(cadena);
+                }
+                statement.close();
+            }
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+
+    public ArrayList<String> getListaGruposRamaValorAprox(String grupo, String rama, Integer anchoCadena) {
+        Connection connection = null;
+
+        ArrayList<String> lista = new ArrayList<>();
+        try {
+            connection = super.getConexionBBDD();
+            sql = " SELECT UNIQUE valor FROM combos_informatica WHERE grupo='" + grupo + "'"
+                    + " AND UPPER(rama) LIKE '%" + rama + "%'  ";
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 while (resulSet.next()) {

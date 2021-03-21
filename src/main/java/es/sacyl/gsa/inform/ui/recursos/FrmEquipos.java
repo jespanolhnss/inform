@@ -37,6 +37,7 @@ import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.EquipoAplicacionDao;
 import es.sacyl.gsa.inform.dao.EquipoDao;
+import es.sacyl.gsa.inform.dao.GalenoDao;
 import es.sacyl.gsa.inform.dao.IpDao;
 import es.sacyl.gsa.inform.dao.ParametroDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
@@ -70,9 +71,10 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final ComboBox<AutonomiaBean> autonomiaComboBuscador = new CombosUi().getAutonomiaCombo(AutonomiaBean.AUTONOMIADEFECTO, null);
     private final ComboBox<ProvinciaBean> provinciaComboBuscador = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null, AutonomiaBean.AUTONOMIADEFECTO);
     private final ComboBox<CentroTipoBean> centroTipoComboBuscador = new CombosUi().getCentroTipoCombo(null);
-    private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPOCENTROSALUD, null, null);
+    private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPODEFECTO, null, null);
     private final Button ayudaUbicacion = new ObjetosComunes().getBotonMini();
     private final Button ayudaIp = new ObjetosComunes().getBotonMini();
+    private final Button ayudaInventario = new ObjetosComunes().getBotonMini();
     private final Button aplicacionButton = new ObjetosComunes().getBoton("App", null, VaadinIcon.FILE_TABLE.create());
     private final Button datosGenericosButton = new ObjetosComunes().getBoton("Dat", null, VaadinIcon.TABLE.create());
 
@@ -461,7 +463,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorFormulario.add(equipoTipoCombo, 2);
         contenedorFormulario.add(equipoMarcaCombo, 2);
 
-        contenedorFormulario.add(inventario, 2);
+        contenedorFormulario.add(inventario, ayudaInventario);
         contenedorFormulario.add(modelo, 2);
         contenedorFormulario.add(numeroSerie, 2);
 
@@ -599,6 +601,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
             }
         }
         );
+        ayudaInventario.addClickListener(evet -> {
+            inventario.setValue(new EquipoDao().getSiguienteInventario());
+        });
 
         /**
          * Ventana para añadir aplicaciones el equipo tiene que ser cpu
@@ -651,6 +656,36 @@ public final class FrmEquipos extends FrmMasterPantalla {
         etiquetaButton.addClickListener(event
                 -> {
             imprimeEtiqueta(equipoBean);
+        });
+
+        /**
+         * Recupera el equipo de la tabla y si no existe lo intenta recuperar de
+         * his
+         */
+        inventario.addBlurListener(event -> {
+            ArrayList<DatoGenericoBean> datoGenericoBeansArrayList = new ArrayList<>();
+            if (!inventario.getValue().isEmpty()) {
+                EquipoBean recuperado = new EquipoDao().getPorInventario(inventario.getValue());
+                if (recuperado != null) {
+                    doActualizaDatosBotones(recuperado);
+                } else {
+                    datoGenericoBeansArrayList = new GalenoDao().getEquipo(inventario.getValue());
+                    if (datoGenericoBeansArrayList.size() > 0) {
+                        FrmBuscaInventarioOld frmBuscaInventarioOld = new FrmBuscaInventarioOld(inventario.getValue(), datoGenericoBeansArrayList);
+                        frmBuscaInventarioOld.addDetachListener(event1 -> {
+                            doActualizaDatosBotones(frmBuscaInventarioOld.getEquipoBean());
+                            ip.setValue(frmBuscaInventarioOld.getIpValor());
+                            //  doGestionaUnaIp(ip.getValue());
+                        });
+                        frmBuscaInventarioOld.addDialogCloseActionListener(event1 -> {
+                            doActualizaDatosBotones(frmBuscaInventarioOld.getEquipoBean());
+                            ip.setValue(frmBuscaInventarioOld.getIpValor());
+                            //doGestionaUnaIp(ip.getValue());
+                        });
+                        frmBuscaInventarioOld.open();
+                    }
+                }
+            }
         });
 
         /**
@@ -735,27 +770,30 @@ public final class FrmEquipos extends FrmMasterPantalla {
     }
 
     public void doActualizaDatosBotones(EquipoBean equipoBean) {
-        this.equipoBean = equipoBean;
-        equipoBinder.readBean(equipoBean);
+
         // actualiza lista de ips
-        ip.setValue(equipoBean.getIpsCadena());
-        // Estos datos sólo los carga cuando hace clic en el grid
-        equipoBean.setDatosGenericoBeans(new EquipoDao().getListaDatosGenericos(equipoBean));
-        doControlBotones(equipoBean);
-        doActualizaGridAplicacion();
-        doActualizaGridDatosGenericos();
-        page1.setVisible(true);
-        if (equipoBean.getTipo().equals(EquipoBean.TIPOCPU) || equipoBean.getTipo().equals(EquipoBean.TIPOTELEFONO)) {
-            dni.setVisible(true);
-            nombreusuario.setVisible(true);
-        } else {
-            dni.setVisible(false);
-            nombreusuario.setVisible(false);
-        }
-        if (equipoBean != null && !equipoBean.getListaIps().isEmpty()) {
-            wwwimage.setVisible(true);
-        } else {
-            wwwimage.setVisible(false);
+        if (this.equipoBean != null) {
+            this.equipoBean = equipoBean;
+            equipoBinder.readBean(equipoBean);
+            ip.setValue(equipoBean.getIpsCadena());
+            // Estos datos sólo los carga cuando hace clic en el grid
+            equipoBean.setDatosGenericoBeans(new EquipoDao().getListaDatosGenericos(equipoBean));
+            doControlBotones(equipoBean);
+            doActualizaGridAplicacion();
+            doActualizaGridDatosGenericos();
+            page1.setVisible(true);
+            if (equipoBean.getTipo().equals(EquipoBean.TIPOCPU) || equipoBean.getTipo().equals(EquipoBean.TIPOTELEFONO)) {
+                dni.setVisible(true);
+                nombreusuario.setVisible(true);
+            } else {
+                dni.setVisible(false);
+                nombreusuario.setVisible(false);
+            }
+            if (equipoBean != null && !equipoBean.getListaIps().isEmpty()) {
+                wwwimage.setVisible(true);
+            } else {
+                wwwimage.setVisible(false);
+            }
         }
     }
 

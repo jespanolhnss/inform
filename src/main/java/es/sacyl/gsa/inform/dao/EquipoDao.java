@@ -171,6 +171,30 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         return equipoBean;
     }
 
+    public EquipoBean getPorInventario(String inventario) {
+        Connection connection = null;
+        EquipoBean equipoBean = null;
+        try {
+            connection = super.getConexionBBDD();
+            sql = sql.concat(" AND e.inventario='" + inventario + "'");
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sql);
+                if (resulSet.next()) {
+                    equipoBean = getRegistroResulset(resulSet, null, null, true, true);
+                }
+                statement.close();
+            }
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return equipoBean;
+    }
+
     /**
      *
      * @param codigo
@@ -502,6 +526,34 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             this.doCierraConexion(connection);
         }
         return lista;
+    }
+
+    public String getSiguienteInventario() {
+        Connection connection = null;
+        String valor = null;
+        String sqlinv = null;
+        try {
+            connection = super.getConexionBBDD();
+            sqlinv = " SELECT inventario FROM equipos WHERE NOT inventario IS NULL ORDER BY id desc ";
+
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(sqlinv);
+            if (resulSet.next()) {
+                valor = resulSet.getString("inventario");
+                if (Utilidades.isNumeric(valor)) {
+                    valor = Long.toString(Long.parseLong(valor) + 1);
+                }
+            }
+            statement.close();
+            LOGGER.debug(sqlinv);
+        } catch (SQLException e) {
+            LOGGER.error(sqlinv + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return valor;
     }
 
     /*
