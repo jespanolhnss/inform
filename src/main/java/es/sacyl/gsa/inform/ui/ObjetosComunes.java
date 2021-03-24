@@ -246,15 +246,11 @@ public class ObjetosComunes {
      * @return
      */
     public Button getBotonMini() {
-        Button boton = getBoton(null, null, VaadinIcon.QUESTION_CIRCLE.create());
-        boton.setWidth("30px");
-        boton.setMaxWidth("30px");
-        boton.setMinWidth("30px");
-        return boton;
+        return getBotonMini(VaadinIcon.QUESTION_CIRCLE.create());
     }
 
-    public Button getBotonMini(Icon icon) {
-        Button boton = getBoton(null, null, icon);
+    public Button getBotonMini(Icon icono) {
+        Button boton = getBoton(null, null, icono);
         boton.setWidth("30px");
         boton.setMaxWidth("30px");
         boton.setMinWidth("30px");

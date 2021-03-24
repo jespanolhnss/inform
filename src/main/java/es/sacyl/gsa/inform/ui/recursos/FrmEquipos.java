@@ -74,7 +74,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPODEFECTO, null, null);
     private final Button ayudaUbicacion = new ObjetosComunes().getBotonMini();
     private final Button ayudaIp = new ObjetosComunes().getBotonMini();
-    private final Button ayudaInventario = new ObjetosComunes().getBotonMini();
+    private final Button ayudaUsuario = new ObjetosComunes().getBotonMini();
+    private final Button ayudaInventario = new ObjetosComunes().getBotonMini(VaadinIcon.PLUS.create());
+    //private final Button nuevoInventario = new ObjetosComunes().getBotonMini(VaadinIcon.PLUS.create());
     private final Button aplicacionButton = new ObjetosComunes().getBoton("App", null, VaadinIcon.FILE_TABLE.create());
     private final Button datosGenericosButton = new ObjetosComunes().getBoton("Dat", null, VaadinIcon.TABLE.create());
 
@@ -106,7 +108,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final TextField comentario = new ObjetosComunes().getTextField("Comentario");
 
     private UsuarioBean usuarioHabitual = null;
-    private EquipoBean equipoBean = null;
+    private EquipoBean equipoBean = new EquipoBean();
     private final Binder<EquipoBean> equipoBinder = new Binder<>();
     private final PaginatedGrid<EquipoBean> equipoGrid = new GridUi().getEquipoGridPaginado();
     private ArrayList<EquipoBean> equipoArrayList = new ArrayList<>();
@@ -127,7 +129,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     public FrmEquipos() {
         super();
-        this.equipoBean = new EquipoBean();
+        equipoBinder.readBean(equipoBean);
         doComponentesOrganizacion();
         doGrid();
         doComponenesAtributos();
@@ -221,6 +223,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
      */
     @Override
     public void doGrabar() {
+        System.out.println(equipoBean);
         if (equipoBinder.writeBeanIfValid(equipoBean)) {
             equipoBean.setUsuario(usuarioHabitual);
             equipoBean.setValoresAut();
@@ -232,8 +235,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 } else {
                     (new Notification(FrmMensajes.AVISODATOERRORBBDD, 1000, Notification.Position.MIDDLE)).open();
                 }
+            } else {
+                (new Notification("Error validano ip", 1000, Notification.Position.MIDDLE)).open();
             }
-
         } else {
             BinderValidationStatus<EquipoBean> validate = equipoBinder.validate();
             String errorText = validate.getFieldValidationStatuses()
@@ -364,8 +368,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         equipoBinder.forField(inventario)
                 .withNullRepresentation("")
-                .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(EquipoBean::getInventario, EquipoBean::setInventario);
 
         equipoBinder.forField(equipoMarcaCombo)
@@ -772,6 +775,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     public void doActualizaDatosBotones(EquipoBean equipoBean) {
 
         // actualiza lista de ips
+        // actualiza datos usuarios
         if (this.equipoBean != null) {
             this.equipoBean = equipoBean;
             equipoBinder.readBean(equipoBean);
@@ -781,6 +785,12 @@ public final class FrmEquipos extends FrmMasterPantalla {
             doControlBotones(equipoBean);
             doActualizaGridAplicacion();
             doActualizaGridDatosGenericos();
+            if (equipoBean.getUsuario() != null && equipoBean.getUsuario().getDni() != null) {
+                dni.setValue(equipoBean.getUsuario().getDni());
+            }
+            if (equipoBean.getUsuario() != null && equipoBean.getUsuario().getApellidosNombre() != null) {
+                nombreusuario.setValue(equipoBean.getUsuario().getApellidosNombre());
+            }
             page1.setVisible(true);
             if (equipoBean.getTipo().equals(EquipoBean.TIPOCPU) || equipoBean.getTipo().equals(EquipoBean.TIPOTELEFONO)) {
                 dni.setVisible(true);
@@ -896,7 +906,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
             int puerto = Integer.parseInt(valores.split(",")[1]);
             ipPrinter = valores.split(",")[0];
             if (equipoBean.getInventario() != null) {
-                inventario = equipoBean.getInventario();
+                inventario = equipoBean.getInventario().toString();
             }
             if (equipoBean.getIpsCadena() != null) {
                 ip = equipoBean.getIpsCadena();

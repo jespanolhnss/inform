@@ -126,7 +126,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         try {
             equipoBean.setId(rs.getLong("equipoid"));
             equipoBean.setTipo(rs.getString("equipotipo"));
-            equipoBean.setInventario(rs.getString("equipoinventario"));
+            equipoBean.setInventario(rs.getLong("equipoinventario"));
             equipoBean.setMarca(rs.getString("equipomarca"));
             equipoBean.setModelo(rs.getString("equipomodelo"));
             equipoBean.setNumeroSerie(rs.getString("equiponumeroserie"));
@@ -299,7 +299,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             if (equipoBean.getInventario() == null) {
                 statement.setNull(3, Types.VARCHAR);
             } else {
-                statement.setString(3, equipoBean.getInventario());
+                statement.setLong(3, equipoBean.getInventario());
             }
             if (equipoBean.getMarca() == null) {
                 statement.setNull(4, Types.VARCHAR);
@@ -378,7 +378,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             if (equipoBean.getInventario() == null) {
                 statement.setNull(2, Types.VARCHAR);
             } else {
-                statement.setString(2, equipoBean.getInventario());
+                statement.setLong(2, equipoBean.getInventario());
             }
             if (equipoBean.getMarca() == null) {
                 statement.setNull(3, Types.VARCHAR);
