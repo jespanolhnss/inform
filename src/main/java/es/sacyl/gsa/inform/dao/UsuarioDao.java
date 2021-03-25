@@ -1,6 +1,7 @@
 package es.sacyl.gsa.inform.dao;
 
 import com.vaadin.flow.server.VaadinSession;
+import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.bean.FuncionalidadBean;
 import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
@@ -387,6 +388,62 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             logger.debug(sql);
         } catch (SQLException e) {
             logger.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+
+    /**
+     *
+     * @param dni
+     * @param apellido1
+     * @param apellido2
+     * @param nombre
+     * @param categoriaBean
+     * @param registros
+     * @return
+     */
+    public ArrayList<UsuarioBean> getLista(String dni, String apellido1, String apellido2, String nombre,
+            CategoriaBean categoriaBean, Integer registros) {
+        Connection connection = null;
+        ArrayList<UsuarioBean> lista = new ArrayList<>();
+        String sqlusu = sql;
+        try {
+            connection = super.getConexionBBDD();
+            if (apellido1 != null && !apellido1.isEmpty()) {
+                sqlusu = sqlusu.concat(" AND UPPER(apellido1) LIKE '" + apellido1.toUpperCase() + "%'");
+            }
+            if (apellido2 != null && !apellido2.isEmpty()) {
+                sqlusu = sqlusu.concat(" AND UPPER(apellido2) LIKE '" + apellido2.toUpperCase() + "%'");
+            }
+            if (nombre != null && !nombre.isEmpty()) {
+                sqlusu = sqlusu.concat(" AND UPPER(nombre) LIKE '" + nombre.toUpperCase() + "%'");
+            }
+            if (dni != null && !dni.isEmpty()) {
+                sqlusu = sqlusu.concat(" AND  UPPER(dni) LIKE '" + dni.toUpperCase() + "%'");
+            }
+            if (categoriaBean != null && categoriaBean.getId() != null) {
+                sqlusu = sqlusu.concat(" AND idcategoria ='" + categoriaBean.getId() + "'");
+            }
+            if (registros != 0) {
+                sqlusu = sqlusu.concat(" AND rownum<=" + registros);
+            }
+            sqlusu = sqlusu.concat(" AND estado=" + ConexionDao.BBDD_ACTIVOSI);
+            sqlusu = sqlusu.concat(" ORDER BY apellido1,apellido2,nombre	");
+
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(sqlusu);
+            while (resulSet.next()) {
+                UsuarioBean usuario = getRegistroResulset(resulSet);
+                lista.add(usuario);
+            }
+            statement.close();
+            logger.debug(sqlusu);
+        } catch (SQLException e) {
+            logger.error(sqlusu + Utilidades.getStackTrace(e));
         } catch (Exception e) {
             logger.error(Utilidades.getStackTrace(e));
         } finally {

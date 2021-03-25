@@ -49,6 +49,7 @@ import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.GridUi;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
+import es.sacyl.gsa.inform.ui.usuarios.FrmBuscaUsuario;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -223,10 +224,10 @@ public final class FrmEquipos extends FrmMasterPantalla {
      */
     @Override
     public void doGrabar() {
-        System.out.println(equipoBean);
         if (equipoBinder.writeBeanIfValid(equipoBean)) {
             equipoBean.setUsuario(usuarioHabitual);
             equipoBean.setValoresAut();
+            equipoBean.setUsuario(usuarioHabitual);
             if (controlIp() == true) {
                 if (new EquipoDao().doGrabaDatos(equipoBean) == true) {
                     (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
@@ -480,8 +481,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         contenedorFormulario.add(ubicacionCombo, 5);
         contenedorFormulario.add(ayudaUbicacion);
-        contenedorFormulario.add(dni);
-        contenedorFormulario.add(nombreusuario, 5);
+        contenedorFormulario.add(dni, ayudaUsuario);
+        contenedorFormulario.add(nombreusuario, 4);
 
         contenedorFormulario.add(comentario, 6);
 
@@ -518,9 +519,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
             if (equipoTipoCombo.getValue().equals(EquipoBean.TIPOCPU) || equipoTipoCombo.getValue().equals(EquipoBean.TIPOTELEFONO)) {
                 dni.setVisible(true);
                 nombreusuario.setVisible(true);
+                ayudaUsuario.setVisible(true);
             } else {
                 dni.setVisible(false);
                 nombreusuario.setVisible(false);
+                ayudaUsuario.setVisible(false);
             }
         });
 
@@ -604,10 +607,36 @@ public final class FrmEquipos extends FrmMasterPantalla {
             }
         }
         );
+
+        /**
+         * Para generar el siguiente numero de inventario
+         */
         ayudaInventario.addClickListener(evet -> {
             inventario.setValue(new EquipoDao().getSiguienteInventario());
         });
 
+        /**
+         * click en ayuda de buscar usuario
+         */
+        ayudaUsuario.addClickListener(event -> {
+            FrmBuscaUsuario frmBuscaUsuario = new FrmBuscaUsuario();
+            frmBuscaUsuario.addDialogCloseActionListener(event1 -> {
+                if (frmBuscaUsuario.getUsuarioBean() != null) {
+                    usuarioHabitual = frmBuscaUsuario.getUsuarioBean();
+                    dni.setValue(usuarioHabitual.getDni());
+                    nombreusuario.setValue(usuarioHabitual.getApellidosNombre());
+                }
+            });
+            frmBuscaUsuario.addDetachListener(event1 -> {
+                if (frmBuscaUsuario.getUsuarioBean() != null) {
+                    usuarioHabitual = frmBuscaUsuario.getUsuarioBean();
+                    dni.setValue(usuarioHabitual.getDni());
+                    nombreusuario.setValue(usuarioHabitual.getApellidosNombre());
+                }
+            });
+
+            frmBuscaUsuario.open();
+        });
         /**
          * Ventana para añadir aplicaciones el equipo tiene que ser cpu
          */
@@ -787,9 +816,13 @@ public final class FrmEquipos extends FrmMasterPantalla {
             doActualizaGridDatosGenericos();
             if (equipoBean.getUsuario() != null && equipoBean.getUsuario().getDni() != null) {
                 dni.setValue(equipoBean.getUsuario().getDni());
+            } else {
+                dni.clear();
             }
             if (equipoBean.getUsuario() != null && equipoBean.getUsuario().getApellidosNombre() != null) {
                 nombreusuario.setValue(equipoBean.getUsuario().getApellidosNombre());
+            } else {
+                dni.clear();
             }
             page1.setVisible(true);
             if (equipoBean.getTipo().equals(EquipoBean.TIPOCPU) || equipoBean.getTipo().equals(EquipoBean.TIPOTELEFONO)) {

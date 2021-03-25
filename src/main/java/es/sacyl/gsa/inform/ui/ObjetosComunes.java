@@ -439,9 +439,9 @@ public class ObjetosComunes {
      */
     public TextField getDni() {
         TextField campo = getTextField("DNI", "dni", 9, "95px", "95px");
-        campo.setMaxWidth("100px");
-        campo.setMinWidth("100px");
-        campo.setWidth("100px");
+        campo.setMaxWidth("110px");
+        campo.setMinWidth("110px");
+        campo.setWidth("110px");
         return campo;
     }
 
