@@ -246,15 +246,11 @@ public class ObjetosComunes {
      * @return
      */
     public Button getBotonMini() {
-        Button boton = getBoton(null, null, VaadinIcon.QUESTION_CIRCLE.create());
-        boton.setWidth("30px");
-        boton.setMaxWidth("30px");
-        boton.setMinWidth("30px");
-        return boton;
+        return getBotonMini(VaadinIcon.QUESTION_CIRCLE.create());
     }
 
-    public Button getBotonMini(Icon icon) {
-        Button boton = getBoton(null, null, icon);
+    public Button getBotonMini(Icon icono) {
+        Button boton = getBoton(null, null, icono);
         boton.setWidth("30px");
         boton.setMaxWidth("30px");
         boton.setMinWidth("30px");
@@ -443,9 +439,17 @@ public class ObjetosComunes {
      */
     public TextField getDni() {
         TextField campo = getTextField("DNI", "dni", 9, "95px", "95px");
-        campo.setMaxWidth("100px");
-        campo.setMinWidth("100px");
-        campo.setWidth("100px");
+        campo.setMaxWidth("110px");
+        campo.setMinWidth("110px");
+        campo.setWidth("110px");
+        return campo;
+    }
+
+    public TextField getMacAdress() {
+        TextField campo = getTextField("Mac", null, 17, "95px", "95px");
+        campo.setMaxWidth("170px");
+        campo.setMinWidth("170px");
+        campo.setWidth("170px");
         return campo;
     }
 

@@ -123,9 +123,10 @@ public class Menu extends MenuBar {
             this.contenedorFormularios.add(new FrmAutonomias());
         });
 
-        tablasSubMenu.addItem("Centros", e -> {
-            this.contenedorFormularios.removeAll();
-            this.contenedorFormularios.add(new FrmCentro());
+        tablasSubMenu.addItem("Centros", (ClickEvent<MenuItem> e) -> {
+            Menu.this.contenedorFormularios.removeAll();
+            FrmCentro frmCentro = new FrmCentro();
+            Menu.this.contenedorFormularios.add(frmCentro);
         });
 
         tablasSubMenu.addItem("CentrosTipos", e -> {

@@ -15,10 +15,14 @@ public class Constantes {
      */
     public static final String PDFPATHRELATIVO
             = System.getProperty("file.separator") + PDFDIRECTORIO + System.getProperty("file.separator");
+
     /**
      * PDFPATHABSOLUTO: Ruta absoluta para guardar los pdf.
      */
-    public static final String PDFPATHABSOLUTO = System.getProperty("catalina.home") + System.getProperty("file.separator") + PDFDIRECTORIO + System.getProperty("file.separator");
+    // public static final String PDFPATHABSOLUTO = System.getProperty("catalina.home") + System.getProperty("file.separator") + PDFDIRECTORIO + System.getProperty("file.separator");
+    public static final String PDFPATHABSOLUTO = System.getProperty("catalina.base") + System.getProperty("file.separator") + PDFDIRECTORIO + System.getProperty("file.separator");
+
+    //   (HttpServletRequest) VaadinRequest.getCurrent()).getPathTranslated()
     /**
      * PDFURL: Url del fichero accesible desde el navegador
      */

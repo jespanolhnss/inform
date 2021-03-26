@@ -12,7 +12,7 @@ public class EquipoBean extends MasterBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String tipo;
-    private String inventario;
+    private Long inventario;
     private String marca;
     private String modelo;
     private String numeroSerie;
@@ -43,11 +43,11 @@ public class EquipoBean extends MasterBean implements Serializable {
         this.tipo = tipo;
     }
 
-    public String getInventario() {
+    public Long getInventario() {
         return inventario;
     }
 
-    public void setInventario(String inventario) {
+    public void setInventario(Long inventario) {
         this.inventario = inventario;
     }
 
@@ -183,7 +183,7 @@ public class EquipoBean extends MasterBean implements Serializable {
         cadena = cadena.concat("<hr> ");
         cadena = cadena.concat("Inventario:   ");
         if (inventario != null) {
-            cadena = cadena.concat(inventario);
+            cadena = cadena.concat(inventario.toString());
         } else {
             cadena = cadena.concat(" ");
         }

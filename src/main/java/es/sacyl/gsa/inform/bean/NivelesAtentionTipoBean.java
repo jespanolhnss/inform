@@ -10,12 +10,14 @@ public class NivelesAtentionTipoBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long  id;
+    private Long id;
     private String descripcion;
-private Integer estado;
+    private Integer estado;
+
+    public static final NivelesAtentionTipoBean ESPECIALIZADA = new NivelesAtentionTipoBean(new Long(1), "A.ESPECIALIZADA");
 
     public NivelesAtentionTipoBean() {
-        this.id=new Long(0);
+        this.id = new Long(0);
     }
 
     public NivelesAtentionTipoBean(Long id, String descripcion) {
@@ -39,7 +41,7 @@ private Integer estado;
         this.descripcion = descripcion;
     }
 
-       public Integer getEstado() {
+    public Integer getEstado() {
         return estado;
     }
 

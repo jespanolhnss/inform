@@ -131,7 +131,10 @@ public class CentroFicheroDao extends ConexionDao implements Serializable, Conex
                          */
                         centroFicheroBean.setNombreFicheroMiniatura(centroFicheroBean.getNombreFicheroNoExtension() + "." + Constantes.MINIATURAEXTENSION);
                         Utilidades.getMinitauraDeUnPdf(centroFicheroBean.getNombreFicheroMiniatura(), blob);
+                        LOGGER.debug("Fichero path absoluto miniatura" + Constantes.PDFPATHABSOLUTO + centroFicheroBean.getNombreFichero());
+
                         Utilidades.bloBtoFile(blob, Constantes.PDFPATHABSOLUTO + centroFicheroBean.getNombreFichero()); // image = new Image(Constantes.PDFPATHRELATIVO + Utilidades.getMinitauraDeUnPdf(nombre, blob), centroFicheroBean.getNombre());
+                        LOGGER.debug("Fichero path absoluto fichero pdf " + Constantes.PDFPATHABSOLUTO + centroFicheroBean.getNombreFichero());
                         //   centroFicheroBean.setImagen(image);
                         break;
                     case ".gif":
@@ -145,6 +148,8 @@ public class CentroFicheroDao extends ConexionDao implements Serializable, Conex
                          */
                         centroFicheroBean.setNombreFicheroMiniatura(centroFicheroBean.getNombreFichero());
                         Utilidades.bloBtoFile(centroFicheroBean.getFicheroBlobs(), centroFicheroBean.getPathAbsoluto());
+                        LOGGER.debug("Fichero path absoluto fichero imagen " + centroFicheroBean.getPathAbsoluto());
+
                         break;
                     default:
 

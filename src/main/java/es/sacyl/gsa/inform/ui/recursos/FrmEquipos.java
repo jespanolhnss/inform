@@ -9,6 +9,7 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
@@ -36,6 +37,7 @@ import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.EquipoAplicacionDao;
 import es.sacyl.gsa.inform.dao.EquipoDao;
+import es.sacyl.gsa.inform.dao.GalenoDao;
 import es.sacyl.gsa.inform.dao.IpDao;
 import es.sacyl.gsa.inform.dao.ParametroDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
@@ -47,6 +49,7 @@ import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.GridUi;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
+import es.sacyl.gsa.inform.ui.usuarios.FrmBuscaUsuario;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -69,9 +72,12 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final ComboBox<AutonomiaBean> autonomiaComboBuscador = new CombosUi().getAutonomiaCombo(AutonomiaBean.AUTONOMIADEFECTO, null);
     private final ComboBox<ProvinciaBean> provinciaComboBuscador = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null, AutonomiaBean.AUTONOMIADEFECTO);
     private final ComboBox<CentroTipoBean> centroTipoComboBuscador = new CombosUi().getCentroTipoCombo(null);
-    private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPOCENTROSALUD, null, null);
+    private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPODEFECTO, null, null);
     private final Button ayudaUbicacion = new ObjetosComunes().getBotonMini();
     private final Button ayudaIp = new ObjetosComunes().getBotonMini();
+    private final Button ayudaUsuario = new ObjetosComunes().getBotonMini();
+    private final Button ayudaInventario = new ObjetosComunes().getBotonMini(VaadinIcon.PLUS.create());
+    //private final Button nuevoInventario = new ObjetosComunes().getBotonMini(VaadinIcon.PLUS.create());
     private final Button aplicacionButton = new ObjetosComunes().getBoton("App", null, VaadinIcon.FILE_TABLE.create());
     private final Button datosGenericosButton = new ObjetosComunes().getBoton("Dat", null, VaadinIcon.TABLE.create());
 
@@ -87,7 +93,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     //  private final TextField marca = new ObjetosComunes().getTextField("Marca");
     private final TextField modelo = new ObjetosComunes().getTextField("Modelo");
     private final TextField numeroSerie = new ObjetosComunes().getTextField("N.Serie");
-    private final TextField macAdress = new ObjetosComunes().getTextField("Mac");
+    private final TextField macAdress = new ObjetosComunes().getMacAdress();
     private final TextField nombredominio = new ObjetosComunes().getTextField("Nombre");
     private final TextField dni = new ObjetosComunes().getDni();
     private final TextField nombreusuario = new ObjetosComunes().getTextField("Nombre Usuario habitual");
@@ -103,7 +109,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final TextField comentario = new ObjetosComunes().getTextField("Comentario");
 
     private UsuarioBean usuarioHabitual = null;
-    private EquipoBean equipoBean = null;
+    private EquipoBean equipoBean = new EquipoBean();
     private final Binder<EquipoBean> equipoBinder = new Binder<>();
     private final PaginatedGrid<EquipoBean> equipoGrid = new GridUi().getEquipoGridPaginado();
     private ArrayList<EquipoBean> equipoArrayList = new ArrayList<>();
@@ -124,7 +130,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     public FrmEquipos() {
         super();
-        this.equipoBean = new EquipoBean();
+        equipoBinder.readBean(equipoBean);
         doComponentesOrganizacion();
         doGrid();
         doComponenesAtributos();
@@ -162,7 +168,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     /**
      *
-     * @return
+     * @return Verificaciones y acualizaciones del equipo en la tabla de ip
      */
     public Boolean controlIp() {
         Boolean control = true;
@@ -172,6 +178,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
             return true;
         }
         if (!ip.getValue().contains(",")) {
+            new IpDao().doLiberaIpsEquipo(equipoBean);
             // si la ip no esta en blanco comprueba que este libre y la ocupa
             control = doGestionaUnaIp(ip.getValue());
         } else {
@@ -196,7 +203,6 @@ public final class FrmEquipos extends FrmMasterPantalla {
         Boolean control = true;
         if (IpCtrl.isValid(unaIp)) { // este control es redundante por que ya lo hace el evento blur
             if (IpCtrl.isLibre(unaIp, equipoBean) == true) {
-                new IpDao().doLiberaIpsEquipo(equipoBean);
                 IpBean ipBean = new IpDao().getPorCodigo(unaIp);
                 ipBean.setEquipo(equipoBean);
                 new IpDao().doActualizaEquipo(ipBean);
@@ -221,16 +227,18 @@ public final class FrmEquipos extends FrmMasterPantalla {
         if (equipoBinder.writeBeanIfValid(equipoBean)) {
             equipoBean.setUsuario(usuarioHabitual);
             equipoBean.setValoresAut();
+            equipoBean.setUsuario(usuarioHabitual);
             if (controlIp() == true) {
                 if (new EquipoDao().doGrabaDatos(equipoBean) == true) {
                     (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                     doActualizaGrid();
-                    doLimpiar();
+                    // doLimpiar();
                 } else {
                     (new Notification(FrmMensajes.AVISODATOERRORBBDD, 1000, Notification.Position.MIDDLE)).open();
                 }
+            } else {
+                (new Notification("Error validano ip", 1000, Notification.Position.MIDDLE)).open();
             }
-
         } else {
             BinderValidationStatus<EquipoBean> validate = equipoBinder.validate();
             String errorText = validate.getFieldValidationStatuses()
@@ -361,8 +369,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         equipoBinder.forField(inventario)
                 .withNullRepresentation("")
-                .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(EquipoBean::getInventario, EquipoBean::setInventario);
 
         equipoBinder.forField(equipoMarcaCombo)
@@ -414,6 +421,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
         ubicacionCombo.setLabel("Ubicación");
         buscador.setLabel("Valores a buscar");
 
+        nombredominio.setMinWidth("170px");
+        //  nombredominio.setWidth("170px");
         wwwimage.setVisible(false);
 
         page1.setWidthFull();
@@ -458,22 +467,22 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorFormulario.add(equipoTipoCombo, 2);
         contenedorFormulario.add(equipoMarcaCombo, 2);
 
-        contenedorFormulario.add(inventario, 2);
+        contenedorFormulario.add(inventario, ayudaInventario);
         contenedorFormulario.add(modelo, 2);
         contenedorFormulario.add(numeroSerie, 2);
 
         contenedorFormulario.add(ip, 2);
         contenedorFormulario.add(ayudaIp, wwwimage);
         contenedorFormulario.add(macAdress);
-        contenedorFormulario.add(nombredominio, 2);
+        contenedorFormulario.add(nombredominio);
 
         contenedorFormulario.add(centroCombo, 3);
         contenedorFormulario.add(servicioCombo, 3);
 
         contenedorFormulario.add(ubicacionCombo, 5);
         contenedorFormulario.add(ayudaUbicacion);
-        contenedorFormulario.add(dni);
-        contenedorFormulario.add(nombreusuario, 5);
+        contenedorFormulario.add(dni, ayudaUsuario);
+        contenedorFormulario.add(nombreusuario, 4);
 
         contenedorFormulario.add(comentario, 6);
 
@@ -510,9 +519,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
             if (equipoTipoCombo.getValue().equals(EquipoBean.TIPOCPU) || equipoTipoCombo.getValue().equals(EquipoBean.TIPOTELEFONO)) {
                 dni.setVisible(true);
                 nombreusuario.setVisible(true);
+                ayudaUsuario.setVisible(true);
             } else {
                 dni.setVisible(false);
                 nombreusuario.setVisible(false);
+                ayudaUsuario.setVisible(false);
             }
         });
 
@@ -598,6 +609,35 @@ public final class FrmEquipos extends FrmMasterPantalla {
         );
 
         /**
+         * Para generar el siguiente numero de inventario
+         */
+        ayudaInventario.addClickListener(evet -> {
+            inventario.setValue(new EquipoDao().getSiguienteInventario());
+        });
+
+        /**
+         * click en ayuda de buscar usuario
+         */
+        ayudaUsuario.addClickListener(event -> {
+            FrmBuscaUsuario frmBuscaUsuario = new FrmBuscaUsuario();
+            frmBuscaUsuario.addDialogCloseActionListener(event1 -> {
+                if (frmBuscaUsuario.getUsuarioBean() != null) {
+                    usuarioHabitual = frmBuscaUsuario.getUsuarioBean();
+                    dni.setValue(usuarioHabitual.getDni());
+                    nombreusuario.setValue(usuarioHabitual.getApellidosNombre());
+                }
+            });
+            frmBuscaUsuario.addDetachListener(event1 -> {
+                if (frmBuscaUsuario.getUsuarioBean() != null) {
+                    usuarioHabitual = frmBuscaUsuario.getUsuarioBean();
+                    dni.setValue(usuarioHabitual.getDni());
+                    nombreusuario.setValue(usuarioHabitual.getApellidosNombre());
+                }
+            });
+
+            frmBuscaUsuario.open();
+        });
+        /**
          * Ventana para añadir aplicaciones el equipo tiene que ser cpu
          */
         aplicacionButton.addClickListener(event -> {
@@ -642,13 +682,47 @@ public final class FrmEquipos extends FrmMasterPantalla {
             selectedPage.setVisible(true);
         });
 
+        /**
+         *
+         */
         etiquetaButton.addClickListener(event
                 -> {
-            //    imprimirZebra("");
-            //   print();
             imprimeEtiqueta(equipoBean);
         });
 
+        /**
+         * Recupera el equipo de la tabla y si no existe lo intenta recuperar de
+         * his
+         */
+        inventario.addBlurListener(event -> {
+            ArrayList<DatoGenericoBean> datoGenericoBeansArrayList = new ArrayList<>();
+            if (!inventario.getValue().isEmpty()) {
+                EquipoBean recuperado = new EquipoDao().getPorInventario(inventario.getValue());
+                if (recuperado != null) {
+                    doActualizaDatosBotones(recuperado);
+                } else {
+                    datoGenericoBeansArrayList = new GalenoDao().getEquipo(inventario.getValue());
+                    if (datoGenericoBeansArrayList.size() > 0) {
+                        FrmBuscaInventarioOld frmBuscaInventarioOld = new FrmBuscaInventarioOld(inventario.getValue(), datoGenericoBeansArrayList);
+                        frmBuscaInventarioOld.addDetachListener(event1 -> {
+                            doActualizaDatosBotones(frmBuscaInventarioOld.getEquipoBean());
+                            ip.setValue(frmBuscaInventarioOld.getIpValor());
+                            //  doGestionaUnaIp(ip.getValue());
+                        });
+                        frmBuscaInventarioOld.addDialogCloseActionListener(event1 -> {
+                            doActualizaDatosBotones(frmBuscaInventarioOld.getEquipoBean());
+                            ip.setValue(frmBuscaInventarioOld.getIpValor());
+                            //doGestionaUnaIp(ip.getValue());
+                        });
+                        frmBuscaInventarioOld.open();
+                    }
+                }
+            }
+        });
+
+        /**
+         *
+         */
         ip.addBlurListener(event -> {
             if (!ip.getValue().contains(",")) {
                 /*
@@ -687,7 +761,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
         });
 
         /**
-         * Si hay valor en el campo usuario habitual, verifica que exista
+         * Si hay valor en el campo usuario habitual, verifica que exista y
+         * recupera en nombre en el usuarioHabitual
          */
         dni.addBlurListener(event -> {
             if (!dni.getValue().isEmpty()) {
@@ -702,35 +777,66 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 nombreusuario.clear();
             }
         });
+        /**
+         * Si el dni en blanco, borra el nombre del usuario
+         */
         dni.addValueChangeListener(event -> {
             if (dni.getValue().isEmpty()) {
                 nombreusuario.clear();
             }
         });
+
+        /**
+         * Monta la url Si hay varias IP coje la primera
+         */
+        wwwimage.addClickListener(event -> {
+            String url = null;
+            Page page = new Page(getUI().get());
+            if (ip.getValue().contains(",")) {
+                url = ip.getValue().split(",")[0];
+            } else {
+                url = "http://" + ip.getValue();
+            }
+            page.open(url, "_blank");
+        });
     }
 
     public void doActualizaDatosBotones(EquipoBean equipoBean) {
-        this.equipoBean = equipoBean;
-        equipoBinder.readBean(equipoBean);
+
         // actualiza lista de ips
-        ip.setValue(equipoBean.getIpsCadena());
-        // Estos datos sólo los carga cuando hace clic en el grid
-        equipoBean.setDatosGenericoBeans(new EquipoDao().getListaDatosGenericos(equipoBean));
-        doControlBotones(equipoBean);
-        doActualizaGridAplicacion();
-        doActualizaGridDatosGenericos();
-        page1.setVisible(true);
-        if (equipoBean.getTipo().equals(EquipoBean.TIPOCPU) || equipoBean.getTipo().equals(EquipoBean.TIPOTELEFONO)) {
-            dni.setVisible(true);
-            nombreusuario.setVisible(true);
-        } else {
-            dni.setVisible(false);
-            nombreusuario.setVisible(false);
-        }
-        if (equipoBean != null && !equipoBean.getListaIps().isEmpty()) {
-            wwwimage.setVisible(true);
-        } else {
-            wwwimage.setVisible(false);
+        // actualiza datos usuarios
+        if (this.equipoBean != null) {
+            this.equipoBean = equipoBean;
+            equipoBinder.readBean(equipoBean);
+            ip.setValue(equipoBean.getIpsCadena());
+            // Estos datos sólo los carga cuando hace clic en el grid
+            equipoBean.setDatosGenericoBeans(new EquipoDao().getListaDatosGenericos(equipoBean));
+            doControlBotones(equipoBean);
+            doActualizaGridAplicacion();
+            doActualizaGridDatosGenericos();
+            if (equipoBean.getUsuario() != null && equipoBean.getUsuario().getDni() != null) {
+                dni.setValue(equipoBean.getUsuario().getDni());
+            } else {
+                dni.clear();
+            }
+            if (equipoBean.getUsuario() != null && equipoBean.getUsuario().getApellidosNombre() != null) {
+                nombreusuario.setValue(equipoBean.getUsuario().getApellidosNombre());
+            } else {
+                dni.clear();
+            }
+            page1.setVisible(true);
+            if (equipoBean.getTipo().equals(EquipoBean.TIPOCPU) || equipoBean.getTipo().equals(EquipoBean.TIPOTELEFONO)) {
+                dni.setVisible(true);
+                nombreusuario.setVisible(true);
+            } else {
+                dni.setVisible(false);
+                nombreusuario.setVisible(false);
+            }
+            if (equipoBean != null && !equipoBean.getListaIps().isEmpty()) {
+                wwwimage.setVisible(true);
+            } else {
+                wwwimage.setVisible(false);
+            }
         }
     }
 
@@ -833,7 +939,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
             int puerto = Integer.parseInt(valores.split(",")[1]);
             ipPrinter = valores.split(",")[0];
             if (equipoBean.getInventario() != null) {
-                inventario = equipoBean.getInventario();
+                inventario = equipoBean.getInventario().toString();
             }
             if (equipoBean.getIpsCadena() != null) {
                 ip = equipoBean.getIpsCadena();

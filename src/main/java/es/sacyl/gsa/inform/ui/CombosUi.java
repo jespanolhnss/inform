@@ -134,7 +134,9 @@ public class CombosUi {
         if (valor != null) {
             combo.setValue(valor);
         }
+        combo.setMaxWidth("300px");
         combo.setWidth("300px");
+        combo.setMaxWidth("300px");
         combo.setClearButtonVisible(true);
         return combo;
     }
@@ -528,7 +530,7 @@ public class CombosUi {
      */
     public ComboBox<CategoriaBean> getCategoriaCombo(String texto, CategoriaBean valor
     ) {
-        ComboBox<CategoriaBean> combo = new ComboBox<>("Ubicación Padre  ");
+        ComboBox<CategoriaBean> combo = new ComboBox<>("Categoria  ");
         combo.setItems(new CategoriaDao().getLista(texto));
         combo.setItemLabelGenerator(CategoriaBean::getNombre);
         if (valor != null) {
@@ -570,7 +572,9 @@ public class CombosUi {
                 combo.setValue(lista.get(0));
             }
         }
-        combo.setWidth("120px");
+        combo.setWidth("210px");
+        combo.setMaxWidth("210px");
+        combo.setMinWidth("210px");
         combo.setClearButtonVisible(true);
         return combo;
     }

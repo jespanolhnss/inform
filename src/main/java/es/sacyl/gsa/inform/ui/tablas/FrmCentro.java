@@ -56,6 +56,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.klaudeta.PaginatedGrid;
 
 /**
@@ -63,6 +65,8 @@ import org.vaadin.klaudeta.PaginatedGrid;
  * @author juannietopajares
  */
 public final class FrmCentro extends FrmMasterPantalla {
+
+    private static final Logger LOGGER = LogManager.getLogger(FrmCentro.class);
 
     private final static GerenciaBean GERENCIADEFECTO = new GerenciaDao().getGerenciaDefecto();
     private final Button ficheroBoton = new ObjetosComunes().getBoton(null, null, VaadinIcon.CAMERA.create());
@@ -96,7 +100,7 @@ public final class FrmCentro extends FrmMasterPantalla {
     private final ComboBox<NivelesAtentionTipoBean> nivelAtencionTipoCombo = new CombosUi().getNivelestTipoCombo(null);
     private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
     private final TextField mapgoogle = new ObjetosComunes().getTextField("Google Map");
-    private Image googleMapsImage = new Image("icons/googlemap.jpg", "Mapa");
+    private final Image googleMapsImage = new Image("icons/googlemap.jpg", "Mapa");
     private CentroBean centroBean = null;
     private final Binder<CentroBean> centroBinder = new Binder<>();
     private final PaginatedGrid<CentroBean> centroGrid = new PaginatedGrid<>();
@@ -105,8 +109,7 @@ public final class FrmCentro extends FrmMasterPantalla {
 
     private ArrayList<CentroBean> centroTArrayList = new ArrayList<>();
 
-    private final ArrayList<CentroFicheroBean> centroFicheroArrayList = new ArrayList<>();
-
+    //   private final ArrayList<CentroFicheroBean> centroFicheroArrayList = new ArrayList<>();
     private int miniaturasConntador = 0;
     private final int miniaturasPorFila = 5;
     private HorizontalLayout miniaturasHorizontalLayout = new HorizontalLayout();
@@ -571,7 +574,7 @@ public final class FrmCentro extends FrmMasterPantalla {
             }
             // en nivel no es un campo del bean de centro y por eso se actualiza a mano
             nivelAtencionTipoCombo.setValue(centroBean.getNivatencion().getTipo());
-            //los ficheros s asociados no se cargan en la lista
+            //los ficheros  asociados no se cargan en la lista
             centroBean.setCentroFicheroArrayList(new CentroFicheroDao().getLista(centroBean));
             doActualizaGridCentroFichero();
             doActualizaGridCentroUsuario();
@@ -646,7 +649,9 @@ public final class FrmCentro extends FrmMasterPantalla {
                 contenedorFotos.add(miniaturasHorizontalLayout);
             }
             //  image = registro.getImagen();
-            //  System.out.println(registro.getPathRelativoMiniatura());
+            LOGGER.debug("Path relativo" + registro.getPathRelativoMiniatura());
+            LOGGER.debug("Fichero nombre" + registro.getNombreFicheroMiniatura());
+            //  System            .out.println(registro.getPathRelativoMiniatura());
             //    System.out.println(registro.getNombreFicheroMiniatura());
             image = new Image(registro.getPathRelativoMiniatura(), registro.getNombreFicheroMiniatura());
             if (image != null) {
