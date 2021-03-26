@@ -37,12 +37,8 @@ public class GalenoDao {
 
     public Connection conecta() {
         Connection conn = null;
-
         cadena = new ParametroDao().getPorCodigo(ParametroBean.URL_CONEXION_GALENO).getValor();
-//10.40.37.233:1527/clihis:informixserver=clinica;user=galeno;password=torozo
-
         String dbURL2 = "jdbc:informix-sqli://" + cadena;
-
         try {
             Class.forName("com.informix.jdbc.IfxDriver");
             conn = DriverManager.getConnection(dbURL2);

@@ -126,7 +126,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         try {
             equipoBean.setId(rs.getLong("equipoid"));
             equipoBean.setTipo(rs.getString("equipotipo"));
-            equipoBean.setInventario(rs.getString("equipoinventario"));
+            equipoBean.setInventario(rs.getLong("equipoinventario"));
             equipoBean.setMarca(rs.getString("equipomarca"));
             equipoBean.setModelo(rs.getString("equipomodelo"));
             equipoBean.setNumeroSerie(rs.getString("equiponumeroserie"));
@@ -149,6 +149,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             equipoBean.setComentario(rs.getString("equipocomentario"));
             equipoBean.setMacadress(rs.getString("equipomac"));
             equipoBean.setNombredominio(rs.getString("equiponombredominio"));
+
             equipoBean.setUsuario(UsuarioDao.getRegistroResulsetUsuario(rs));
 
             equipoBean.setEstado(rs.getInt("equipoestado"));
@@ -287,8 +288,9 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         try {
             connection = super.getConexionBBDD();
             sql = sql = "INSERT INTO     equipos  "
-                    + "( id,tipo,  inventario,  marca,  modelo,  numeroserie,  centro,  ubicacion, servicio,    comentario, estado,fechacambio,usucambio,mac )"
-                    + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    + "( id,tipo,  inventario,  marca,  modelo,  numeroserie,  centro,  ubicacion, servicio"
+                    + ",    comentario, estado,fechacambio,usucambio,mac, usuario )"
+                    + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setLong(1, equipoBean.getId());
             if (equipoBean.getTipo() == null) {
@@ -299,7 +301,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             if (equipoBean.getInventario() == null) {
                 statement.setNull(3, Types.VARCHAR);
             } else {
-                statement.setString(3, equipoBean.getInventario());
+                statement.setLong(3, equipoBean.getInventario());
             }
             if (equipoBean.getMarca() == null) {
                 statement.setNull(4, Types.VARCHAR);
@@ -346,6 +348,12 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             } else {
                 statement.setString(14, equipoBean.getMacadress());
             }
+
+            if (equipoBean.getUsuario() != null && equipoBean.getUsuario().getId() != null) {
+                statement.setLong(15, equipoBean.getUsuario().getId());
+            } else {
+                statement.setNull(15, Types.INTEGER);
+            }
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
         } catch (SQLException e) {
@@ -368,7 +376,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
 
             sql = sql = "UPDATE     equipos  SET "
                     + "tipo=?, inventario=?,  marca=?,  modelo=?,  numeroserie=?,  centro=?,  ubicacion=?, servicio=?,   comentario=? "
-                    + " , fechacambio=?, usucambio=? ,mac=? WHERE id=?";
+                    + " , fechacambio=?, usucambio=? ,mac=? , usuario=? WHERE id=?";
             PreparedStatement statement = connection.prepareStatement(sql);
             if (equipoBean.getTipo() == null) {
                 statement.setNull(1, Types.VARCHAR);
@@ -378,7 +386,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             if (equipoBean.getInventario() == null) {
                 statement.setNull(2, Types.VARCHAR);
             } else {
-                statement.setString(2, equipoBean.getInventario());
+                statement.setLong(2, equipoBean.getInventario());
             }
             if (equipoBean.getMarca() == null) {
                 statement.setNull(3, Types.VARCHAR);
@@ -424,7 +432,14 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             } else {
                 statement.setString(12, equipoBean.getMacadress());
             }
-            statement.setLong(13, equipoBean.getId());
+
+            if (equipoBean.getUsuario() != null && equipoBean.getUsuario().getId() != null) {
+                statement.setLong(13, equipoBean.getUsuario().getId());
+            } else {
+                statement.setNull(13, Types.INTEGER);
+            }
+
+            statement.setLong(14, equipoBean.getId());
 
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();

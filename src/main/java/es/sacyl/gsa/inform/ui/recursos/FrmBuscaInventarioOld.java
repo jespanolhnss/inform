@@ -8,6 +8,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
@@ -132,8 +133,7 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
 
         equipoBinder.forField(inventario)
                 .withNullRepresentation("")
-                .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(EquipoBean::getInventario, EquipoBean::setInventario);
 
         equipoBinder.forField(equipoMarcaCombo)
@@ -163,6 +163,9 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
 
     }
 
+    /**
+     *
+     */
     @Override
     public void doComponenesAtributos() {
         botonAyuda.setVisible(false);
@@ -171,6 +174,9 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
         botonLimpiar.setVisible(false);
     }
 
+    /**
+     *
+     */
     @Override
     public void doComponentesOrganizacion() {
         contenedorFormulario.add(inventario, equipoTipoCombo, equipoMarcaCombo, modelo,
@@ -183,6 +189,9 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
     public void doCompentesEventos() {
     }
 
+    /**
+     *
+     */
     public void doCasaValores() {
         ArrayList<String> lista = new ArrayList<>();
         for (DatoGenericoBean dato : datoGenericoBeansArrayList) {

@@ -49,6 +49,7 @@ import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.GridUi;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
+import es.sacyl.gsa.inform.ui.usuarios.FrmBuscaUsuario;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -74,7 +75,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPODEFECTO, null, null);
     private final Button ayudaUbicacion = new ObjetosComunes().getBotonMini();
     private final Button ayudaIp = new ObjetosComunes().getBotonMini();
-    private final Button ayudaInventario = new ObjetosComunes().getBotonMini();
+    private final Button ayudaUsuario = new ObjetosComunes().getBotonMini();
+    private final Button ayudaInventario = new ObjetosComunes().getBotonMini(VaadinIcon.PLUS.create());
+    //private final Button nuevoInventario = new ObjetosComunes().getBotonMini(VaadinIcon.PLUS.create());
     private final Button aplicacionButton = new ObjetosComunes().getBoton("App", null, VaadinIcon.FILE_TABLE.create());
     private final Button datosGenericosButton = new ObjetosComunes().getBoton("Dat", null, VaadinIcon.TABLE.create());
 
@@ -106,7 +109,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final TextField comentario = new ObjetosComunes().getTextField("Comentario");
 
     private UsuarioBean usuarioHabitual = null;
-    private EquipoBean equipoBean = null;
+    private EquipoBean equipoBean = new EquipoBean();
     private final Binder<EquipoBean> equipoBinder = new Binder<>();
     private final PaginatedGrid<EquipoBean> equipoGrid = new GridUi().getEquipoGridPaginado();
     private ArrayList<EquipoBean> equipoArrayList = new ArrayList<>();
@@ -127,7 +130,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     public FrmEquipos() {
         super();
-        this.equipoBean = new EquipoBean();
+        equipoBinder.readBean(equipoBean);
         doComponentesOrganizacion();
         doGrid();
         doComponenesAtributos();
@@ -224,6 +227,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         if (equipoBinder.writeBeanIfValid(equipoBean)) {
             equipoBean.setUsuario(usuarioHabitual);
             equipoBean.setValoresAut();
+            equipoBean.setUsuario(usuarioHabitual);
             if (controlIp() == true) {
                 if (new EquipoDao().doGrabaDatos(equipoBean) == true) {
                     (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
@@ -232,8 +236,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 } else {
                     (new Notification(FrmMensajes.AVISODATOERRORBBDD, 1000, Notification.Position.MIDDLE)).open();
                 }
+            } else {
+                (new Notification("Error validano ip", 1000, Notification.Position.MIDDLE)).open();
             }
-
         } else {
             BinderValidationStatus<EquipoBean> validate = equipoBinder.validate();
             String errorText = validate.getFieldValidationStatuses()
@@ -364,8 +369,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         equipoBinder.forField(inventario)
                 .withNullRepresentation("")
-                .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(EquipoBean::getInventario, EquipoBean::setInventario);
 
         equipoBinder.forField(equipoMarcaCombo)
@@ -477,8 +481,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         contenedorFormulario.add(ubicacionCombo, 5);
         contenedorFormulario.add(ayudaUbicacion);
-        contenedorFormulario.add(dni);
-        contenedorFormulario.add(nombreusuario, 5);
+        contenedorFormulario.add(dni, ayudaUsuario);
+        contenedorFormulario.add(nombreusuario, 4);
 
         contenedorFormulario.add(comentario, 6);
 
@@ -515,9 +519,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
             if (equipoTipoCombo.getValue().equals(EquipoBean.TIPOCPU) || equipoTipoCombo.getValue().equals(EquipoBean.TIPOTELEFONO)) {
                 dni.setVisible(true);
                 nombreusuario.setVisible(true);
+                ayudaUsuario.setVisible(true);
             } else {
                 dni.setVisible(false);
                 nombreusuario.setVisible(false);
+                ayudaUsuario.setVisible(false);
             }
         });
 
@@ -601,10 +607,36 @@ public final class FrmEquipos extends FrmMasterPantalla {
             }
         }
         );
+
+        /**
+         * Para generar el siguiente numero de inventario
+         */
         ayudaInventario.addClickListener(evet -> {
             inventario.setValue(new EquipoDao().getSiguienteInventario());
         });
 
+        /**
+         * click en ayuda de buscar usuario
+         */
+        ayudaUsuario.addClickListener(event -> {
+            FrmBuscaUsuario frmBuscaUsuario = new FrmBuscaUsuario();
+            frmBuscaUsuario.addDialogCloseActionListener(event1 -> {
+                if (frmBuscaUsuario.getUsuarioBean() != null) {
+                    usuarioHabitual = frmBuscaUsuario.getUsuarioBean();
+                    dni.setValue(usuarioHabitual.getDni());
+                    nombreusuario.setValue(usuarioHabitual.getApellidosNombre());
+                }
+            });
+            frmBuscaUsuario.addDetachListener(event1 -> {
+                if (frmBuscaUsuario.getUsuarioBean() != null) {
+                    usuarioHabitual = frmBuscaUsuario.getUsuarioBean();
+                    dni.setValue(usuarioHabitual.getDni());
+                    nombreusuario.setValue(usuarioHabitual.getApellidosNombre());
+                }
+            });
+
+            frmBuscaUsuario.open();
+        });
         /**
          * Ventana para añadir aplicaciones el equipo tiene que ser cpu
          */
@@ -772,6 +804,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     public void doActualizaDatosBotones(EquipoBean equipoBean) {
 
         // actualiza lista de ips
+        // actualiza datos usuarios
         if (this.equipoBean != null) {
             this.equipoBean = equipoBean;
             equipoBinder.readBean(equipoBean);
@@ -781,6 +814,16 @@ public final class FrmEquipos extends FrmMasterPantalla {
             doControlBotones(equipoBean);
             doActualizaGridAplicacion();
             doActualizaGridDatosGenericos();
+            if (equipoBean.getUsuario() != null && equipoBean.getUsuario().getDni() != null) {
+                dni.setValue(equipoBean.getUsuario().getDni());
+            } else {
+                dni.clear();
+            }
+            if (equipoBean.getUsuario() != null && equipoBean.getUsuario().getApellidosNombre() != null) {
+                nombreusuario.setValue(equipoBean.getUsuario().getApellidosNombre());
+            } else {
+                dni.clear();
+            }
             page1.setVisible(true);
             if (equipoBean.getTipo().equals(EquipoBean.TIPOCPU) || equipoBean.getTipo().equals(EquipoBean.TIPOTELEFONO)) {
                 dni.setVisible(true);
@@ -896,7 +939,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
             int puerto = Integer.parseInt(valores.split(",")[1]);
             ipPrinter = valores.split(",")[0];
             if (equipoBean.getInventario() != null) {
-                inventario = equipoBean.getInventario();
+                inventario = equipoBean.getInventario().toString();
             }
             if (equipoBean.getIpsCadena() != null) {
                 ip = equipoBean.getIpsCadena();
@@ -907,10 +950,12 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
             Socket clientSocket = new Socket(ipPrinter, puerto);
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            String[] datos = new String[]{"^XA",
-                "^BY1,2^FO50,40^BCN,50,N,Y,N^FR^FD" + inventario + "^FS",
-                "^FO50,80^ADN,40,20^FD" + ip + "^FS ",
-                "^FO50,120^ADN,40,15^FD" + sn + "^FS ",
+            String[] datos = new String[]{"^XA", "^FO0,0",
+                "^A0N,25,25^BY2,2^FO50,35^BCN,50,Y^FD" + inventario + "^FS",
+                "^FO40,120^A0,30,40^FDIP: " + ip + "^FS ",
+                "^FO30,170^A0,30,25^FDN/S: " + sn + "^FS ",
+                "^FO60,220^A0,15,15^FH^FDGerencia de Asistencia Sanitaria de _B5vila^FS ",
+                "^FO6,50^A0B,15,20^FH^FDINFORM_B5TICA^FS ",
                 /*
                 "^FO50,50^ADN,40,20^FD" + inventario + "^FS",
                 "^FO50,75^ADN,40,20^FD" + ip + "^FS",
