@@ -844,10 +844,12 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
             Socket clientSocket = new Socket(ipPrinter, puerto);
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            String[] datos = new String[]{"^XA",
-                "^BY1,2^FO50,40^BCN,50,N,Y,N^FR^FD" + inventario + "^FS",
-                "^FO50,80^ADN,40,20^FD" + ip + "^FS ",
-                "^FO50,120^ADN,40,15^FD" + sn + "^FS ",
+            String[] datos = new String[]{"^XA", "^FO0,0",
+                "^A0N,25,25^BY2,2^FO50,35^BCN,50,Y^FD" + inventario + "^FS",
+                "^FO40,120^A0,30,40^FDIP: " + ip + "^FS ",
+                "^FO30,170^A0,30,25^FDN/S: " + sn + "^FS ",
+                "^FO60,220^A0,15,15^FH^FDGerencia de Asistencia Sanitaria de _B5vila^FS ",
+                "^FO6,50^A0B,15,20^FH^FDINFORM_B5TICA^FS ",
                 /*
                 "^FO50,50^ADN,40,20^FD" + inventario + "^FS",
                 "^FO50,75^ADN,40,20^FD" + ip + "^FS",
