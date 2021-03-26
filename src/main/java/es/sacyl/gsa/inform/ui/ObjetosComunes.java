@@ -472,7 +472,16 @@ public class ObjetosComunes {
      * @return
      */
     public TextField getTelefono() {
-        TextField campo = getTextField("Teléfono", "dni", 9, "30px", "30px");
+        TextField campo = getTextField("Teléfono", "teléfono", 9, "30px", "30px");
+        return campo;
+    }
+    
+    /**
+     *
+     * @return
+     */
+    public TextField getMovil() {
+        TextField campo = getTextField("Teléfono Móvil", "número de móvil", 9, "30px", "30px");
         return campo;
     }
 

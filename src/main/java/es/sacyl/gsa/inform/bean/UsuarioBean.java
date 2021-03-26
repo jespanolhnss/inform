@@ -1,6 +1,7 @@
 package es.sacyl.gsa.inform.bean;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,18 +13,22 @@ import java.util.Set;
 public class UsuarioBean extends MasterBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    
+    private String dniSolicitante;
+    private String nombreSolicitante;
+    private String apellido1Solicitante;
+    private String apellido2Solcitante;
+    private String movilSolicitante;
+    private String telefonoSolicitante;
+    private LocalDate fechaSolicitud;
     private String dni;
     private String nombre;
     private String apellido1;
     private String apellido2;
     private String codigoFarmatools;
     private String servicioFarmatols;
-
     private String clave;
-
     private String mail;
-
     private String telefono;
 
     private Set<String> funcionalidadStrings = new HashSet<String>();
@@ -46,6 +51,62 @@ public class UsuarioBean extends MasterBean implements Serializable {
     public UsuarioBean(String dni, String nombre) {
         this.dni = dni;
         this.nombre = nombre;
+    }
+    
+    public String getDniSolicitante() {
+        return dniSolicitante;
+    }
+
+    public void setDniSolicitante(String dniSolicitante) {
+        this.dniSolicitante = dniSolicitante;
+    }
+
+    public String getNombreSolicitante() {
+        return nombreSolicitante;
+    }
+
+    public void setNombreSolicitante(String nombreSolicitante) {
+        this.nombreSolicitante = nombreSolicitante;
+    }
+
+    public String getApellido1Solicitante() {
+        return apellido1Solicitante;
+    }
+
+    public void setApellido1Solicitante(String apellido1Solicitante) {
+        this.apellido1Solicitante = apellido1Solicitante;
+    }
+
+    public String getApellido2Solcitante() {
+        return apellido2Solcitante;
+    }
+
+    public void setApellido2Solcitante(String apellido2Solcitante) {
+        this.apellido2Solcitante = apellido2Solcitante;
+    }
+
+    public String getMovilSolicitante() {
+        return movilSolicitante;
+    }
+
+    public void setMovilSolicitante(String movilSolicitante) {
+        this.movilSolicitante = movilSolicitante;
+    }
+
+    public String getTelefonoSolicitante() {
+        return telefonoSolicitante;
+    }
+
+    public void setTelefonoSolicitante(String telefonoSolicitante) {
+        this.telefonoSolicitante = telefonoSolicitante;
+    }
+
+    public LocalDate getFechaSolicitud() {
+        return fechaSolicitud;
+    }
+
+    public void setFechaSolicitud(LocalDate fechaSolicitud) {
+        this.fechaSolicitud = fechaSolicitud;
     }
 
     public String getDni() {

@@ -3,12 +3,14 @@ package es.sacyl.gsa.inform.ui.usuarios;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.ValidationException;
 import es.sacyl.gsa.inform.bean.AplicacionBean;
 import es.sacyl.gsa.inform.bean.AplicacionPerfilBean;
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
@@ -25,6 +27,7 @@ import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterConstantes;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -34,11 +37,19 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     private static final long serialVersionUID = 1L;
 
     /* Campos del formulario */
+    TextField nifSolicitante = new ObjetosComunes().getDni();
+    TextField nombreSolicitante = new ObjetosComunes().getTextField("Nombre", "teclea nombre", 25, "100px", "30px");
+    TextField apellido1Solicitante = new ObjetosComunes().getTextField("Apellido 1", "teclea primer apellido", 25, "100px", "30px");
+    TextField apellido2Solicitante = new ObjetosComunes().getTextField("Apellido 2", "teclea segundo apellido", 25, "100px", "30px");
+    TextField movilSolicitante = new ObjetosComunes().getMovil();
+    TextField telefonoSolicitante = new ObjetosComunes().getTelefono();
+    DatePicker fechaSolicitud = new ObjetosComunes().getDatePicker("Fecha Solicitud", "Fecha solicitud", LocalDate.now());    
     TextField nombreUsuario = new ObjetosComunes().getTextField("Nombre", "teclea nombre", 25, "100px", "30px");
     TextField apellido1Usuario = new ObjetosComunes().getTextField("Apellido 1", "teclea primer apellido", 25, "100px", "30px");
     TextField apellido2Usuario = new ObjetosComunes().getTextField("Apellido 2", "teclea segundo apellido", 25, "100px", "30px");
-    TextField nifUsuario = new ObjetosComunes().getTextField("NIF", "teclea el NIF", 25, "50px", "30px");
-    TextField correoUsuario = new ObjetosComunes().getTextField("Correo Electrónico", "teclea el correo electrónico", 25, "100px", "30px");
+    TextField nifUsuario = new ObjetosComunes().getDni();
+    TextField correoUsuario = new ObjetosComunes().getMail("Correo Electrónico", "Correo del lusuario");
+    TextField telefonoUsuario = new ObjetosComunes().getTelefono();
     ComboBox<CategoriaBean> categoriaUsuario = new CombosUi().getCategoriasUsuarios(null);
     ComboBox<ProvinciaBean> provinciasCombo = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null,
             AutonomiaBean.AUTONOMIADEFECTO);
@@ -58,6 +69,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
 
     public FrmUsuariosPedir() {
         super();
+        setSizeFull();
         doComponentesOrganizacion();
         doGrid();
         doComponenesAtributos();
@@ -66,9 +78,8 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     }
 
     @Override
-    public void doGrabar() {
-        try {
-            usuarioBinder.writeBean(usuarioBean);
+    public void doGrabar() {            
+            usuarioBinder.writeBeanIfValid(usuarioBean); 
             if (new UsuarioDao().doGrabaDatos(usuarioBean) == true) {
                 (new Notification(FrmMasterConstantes.AVISODATOALMACENADO, 4000, Notification.Position.MIDDLE)).open();
                 doActualizaGrid();
@@ -76,10 +87,6 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
             } else {
                 (new Notification(FrmMasterConstantes.AVISODATOERRORBBDD, 4000, Notification.Position.MIDDLE)).open();
             }
-        } catch (ValidationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -124,6 +131,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         usuariosGrid.addColumn(UsuarioBean::getApellido2).setHeader("Apellido 2");
         usuariosGrid.addColumn(UsuarioBean::getDni).setHeader("NIF");
         usuariosGrid.addColumn(UsuarioBean::getMail).setHeader("Correo electrónico");
+        usuariosGrid.addColumn(UsuarioBean::getTelefono).setHeader("Teléfono");
 
         doActualizaGrid();
     }
@@ -136,6 +144,13 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
 
     @Override
     public void doBinderPropiedades() {
+        usuarioBinder.forField(nifSolicitante).bind(UsuarioBean::getDniSolicitante, UsuarioBean::setDniSolicitante);
+        usuarioBinder.forField(nombreSolicitante).bind(UsuarioBean::getNombreSolicitante, UsuarioBean::setNombreSolicitante);
+        usuarioBinder.forField(apellido1Solicitante).bind(UsuarioBean::getApellido1Solicitante, UsuarioBean::setApellido1Solicitante);
+        usuarioBinder.forField(apellido2Solicitante).bind(UsuarioBean::getApellido2Solcitante, UsuarioBean::setApellido2Solcitante);
+        usuarioBinder.forField(movilSolicitante).bind(UsuarioBean::getMovilSolicitante, UsuarioBean::setMovilSolicitante);
+        usuarioBinder.forField(telefonoSolicitante).bind(UsuarioBean::getTelefonoSolicitante, UsuarioBean::setTelefonoSolicitante);
+        usuarioBinder.forField(fechaSolicitud).bind(UsuarioBean::getFechaSolicitud, UsuarioBean::setFechaSolicitud);       
         usuarioBinder.forField(nombreUsuario).asRequired("El nombre es obligatorio").bind(UsuarioBean::getNombre, UsuarioBean::setNombre);
         usuarioBinder.forField(apellido1Usuario).bind(UsuarioBean::getApellido1, UsuarioBean::setApellido1);
         usuarioBinder.forField(apellido2Usuario).bind(UsuarioBean::getApellido2, UsuarioBean::setApellido2);
@@ -146,6 +161,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
                         "Name must contain at least three characters")
                 .bind(UsuarioBean::getDni, UsuarioBean::setDni);
         usuarioBinder.forField(correoUsuario).bind(UsuarioBean::getMail, UsuarioBean::setMail);
+        usuarioBinder.forField(telefonoUsuario).bind(UsuarioBean::getTelefono, UsuarioBean::setTelefono);
     }
 
     @Override
@@ -153,19 +169,16 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         buscador.focus();
         buscador.setLabel("Texto de la búsqueda:");
         aplicacionesAccordion.close();
+        aplicacionesAccordion.setSizeFull();
     }
 
     @Override
     public void doComponentesOrganizacion() {
         construirAccordion();
-        contenedorFormulario.add(nifUsuario);
-        contenedorFormulario.add(nombreUsuario);
-        contenedorFormulario.add(apellido1Usuario);
-        contenedorFormulario.add(apellido2Usuario);
-        contenedorFormulario.add(correoUsuario);
-        contenedorFormulario.add(categoriaUsuario);
         contenedorFormulario.add(aplicacionesAccordion);
+        contenedorFormulario.setSizeFull();
         contenedorBuscadores.add(camposFiltro, buscador);
+        contenedorDerecha.setSizeFull();
         contenedorDerecha.add(usuariosGrid);
     }
 
@@ -207,6 +220,20 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     }
 
     public void construirAccordion() {
+        FormLayout solicitanteLayout = new FormLayout();
+        solicitanteLayout.setResponsiveSteps(
+            new ResponsiveStep("25em", 1), 
+            new ResponsiveStep("32em", 2),
+            new ResponsiveStep("40em", 3));        
+        solicitanteLayout.add(nifSolicitante, nombreSolicitante, apellido1Solicitante, apellido2Solicitante, 
+                movilSolicitante, telefonoSolicitante, fechaSolicitud);
+        aplicacionesAccordion.add("Datos del Solicitante", solicitanteLayout);
+        
+        FormLayout usuarioLayout = new FormLayout();
+        
+        usuarioLayout.add(nifUsuario, nombreUsuario, apellido1Usuario, apellido2Usuario, correoUsuario, telefonoUsuario, categoriaUsuario);
+        aplicacionesAccordion.add("Datos del Usuario", usuarioLayout);
+        
         VerticalLayout tipoCentroLayout = new VerticalLayout();
         tipoCentroLayout.add(tiposCentro);
         aplicacionesAccordion.add("Tipo Centro", tipoCentroLayout);
