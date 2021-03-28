@@ -447,16 +447,16 @@ public class JimenaDao {
         return listaCampos;
     }
 
-    /*
-    Este método retorna un objeto RespuestaSql para insertar  los resultados
-    en la tabla de acciones asociado a la incidencia
+    /**
+     * Este método retorna un objeto RespuestaSql para insertar los resultados
+     * en la tabla de acciones asociado a la incidencia
      */
-    public String doUpdateInformeBorrado(Long id) {
+    public String doUpdateInformeEstado(Long id, int estadoNuevo) {
         String sql = null;
         Connection connection = this.conecta();
         ResultSet resulSet;
         try {
-            sql = "UPDATE  informes SET estado= " + JimenaInformeBean.INFORME_ESTADO_SUSTITUIDO + "  WHERE id = " + id;
+            sql = "UPDATE  informes SET estado= " + estadoNuevo + "  WHERE id = " + id;
             logger.debug(sql);
             Statement statement = connection.createStatement();
             Boolean updated = statement.execute(sql);
@@ -482,11 +482,11 @@ public class JimenaDao {
      * @param id
      * @return Un string con las sentencia sql que ha ejecutado
      */
-    public String doUpdateCampos_iBorrado(Long id) {
+    public String doUpdateCampos_iEstado(Long id, int estadonuevo) {
         String sql = null;
         Connection connection = this.conecta();
         try {
-            sql = "UPDATE  campos_i SET estado= " + JimenaInformeBean.INFORME_ESTADO_SUSTITUIDO + "  WHERE informe = " + id;
+            sql = "UPDATE  campos_i SET estado= " + estadonuevo + "  WHERE informe = " + id;
             logger.debug(sql);
             Statement statement = connection.createStatement();
             Boolean updated = statement.execute(sql);
@@ -507,6 +507,48 @@ public class JimenaDao {
         return sql;
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public String doUpdateInformeDesconsolida(Long id) {
+        String sql = null;
+        Connection connection = this.conecta();
+        ResultSet resulSet;
+        try {
+            sql = "UPDATE  informes SET   estado = 1, tipobin = 0, tipoxml = 0   WHERE id = " + id;
+            logger.debug(sql);
+            Statement statement = connection.createStatement();
+            Boolean updated = statement.execute(sql);
+            statement.close();
+        } catch (SQLException e) {
+            logger.error(sql + Utilidades.getStackTrace(e));
+            sql = null;
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+            sql = null;
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                logger.error(ConexionDao.ERROR_CLOSE_BBDD_SQL, e);
+            }
+        }
+        return sql;
+    }
+
+    /**
+     *
+     * @param rs
+     * @param conCampos_I
+     * @param paciente
+     * @param centro
+     * @param servicio
+     * @param usuario
+     * @param estado
+     * @return
+     */
     public JimenaInformeBean getInformeResulsetJimena(ResultSet rs, boolean conCampos_I, PacienteBean paciente, CentroBean centro,
             GfhBean servicio, UsuarioBean usuario, Integer estado) {
         JimenaInformeBean informe = new JimenaInformeBean();

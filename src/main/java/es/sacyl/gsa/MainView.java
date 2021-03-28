@@ -22,11 +22,14 @@ import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.ctrl.LlamdasExternas;
 import es.sacyl.gsa.inform.ctrl.SesionCtrl;
+import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.exceptiones.LoginException;
 import es.sacyl.gsa.inform.ui.Menu;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Ldap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -64,6 +67,8 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         contenedorFormularios.setSpacing(false);
         contenedorFormularios.setPadding(false);
 
+        doTimerDa0();
+
         System.out.println(System.getProperty("user.dir"));
         System.out.println(System.getProperty("catalina.base"));
         System.out.println(VaadinServlet.getCurrent().getServletInfo());
@@ -72,12 +77,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         System.out.println("addr" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalAddr());
         System.out.println("name" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalName());
         System.out.println("port" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalPort());
-        /*
-        ServletContext servletContext;
-        servletContext = (ServletContext) ServletUtils.getBaseDirectory(VaadinServlet.getCurrent());
-        System.out.println(ServletUtils.getResourcePath(servletContext,
-                ((HttpServletRequest) VaadinRequest.getCurrent()).getPathTranslated()));
-         */
+
         this.setMargin(false);
         this.setSpacing(false);
         this.setAlignItems(Alignment.CENTER);
@@ -198,4 +198,19 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         this.contenedorFormularios = contenedorFormularios;
     }
 
+    /**
+     * Cada dos minuto lanza una conexión para que el fw no cierre las
+     * conesiones a la bbdd
+     *
+     */
+    public static void doTimerDa0() {
+        Timer timerObj = new Timer();
+        TimerTask timerTaskObj = new TimerTask() {
+            @Override
+            public void run() {
+                new ConexionDao().isTestConexion();
+            }
+        };
+        timerObj.schedule(timerTaskObj, 0, 120000);
+    }
 }

@@ -12,12 +12,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.JimenaInformeBean;
+import es.sacyl.gsa.inform.bean.LopdDocumentoBean;
 import es.sacyl.gsa.inform.bean.LopdIncidenciaBean;
 import es.sacyl.gsa.inform.bean.LopdNotaBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.GfhDao;
 import es.sacyl.gsa.inform.dao.JimenaDao;
+import es.sacyl.gsa.inform.dao.LopdDocumentoDao;
 import es.sacyl.gsa.inform.dao.LopdNotaDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
@@ -136,10 +138,10 @@ public final class FrmInterconsultasBorrar extends Dialog {
 
     public void doProcesoDeBorrado(JimenaInformeBean informe) {
         // inserta el pdf antes de borrar en la tabla lopd_documentos
-        //    doInsertaPdf(informe);
+        doInsertaPdf(informe);
         // borrado lógico de informe y campos
-        String respuestaInforme = new JimenaDao().doUpdateInformeBorrado(informe.getId());
-        String respuestaCampos = new JimenaDao().doUpdateCampos_iBorrado(informe.getId());
+        String respuestaInforme = new JimenaDao().doUpdateInformeEstado(informe.getId(), JimenaInformeBean.INFORME_ESTADO_SUSTITUIDO);
+        String respuestaCampos = new JimenaDao().doUpdateCampos_iEstado(informe.getId(), JimenaInformeBean.INFORME_ESTADO_SUSTITUIDO);
         // inserta una nota en la incidencia con la sentencia sql que se ha  ejecutado.
         doInsertaNota(respuestaInforme + "\n" + respuestaCampos);
 
@@ -149,8 +151,7 @@ public final class FrmInterconsultasBorrar extends Dialog {
         //   doCancela();
     }
 
-    /*
- public void doInsertaPdf(JimenaInformeBean informe) {
+    public void doInsertaPdf(JimenaInformeBean informe) {
         // sólo inserta si tiene pdf asociado en jimena
         if (informe.getTipobin() == 1) {
             LopdDocumentoBean documento = new LopdDocumentoBean();
@@ -166,7 +167,7 @@ public final class FrmInterconsultasBorrar extends Dialog {
             lopdDocumentoDAO.grabaDatos(documento);
         }
     }
-     */
+
     public void doInsertaNota(String texto) {
         LopdNotaBean nota = new LopdNotaBean();
         nota.setIdIncidenciaLong(lopdIncidenciaBean.getId());

@@ -387,13 +387,14 @@ public final class FrmLopdIncidenciaGestionar extends FrmMasterPantalla implemen
          * Campos del formulario Fila 1
          */
         contenedorFormulario.add(dni);
-        contenedorFormulario.add(apellidosNombre, 2);
+        contenedorFormulario.add(apellidosNombre, 3);
         contenedorFormulario.add(mail, 2);
-        contenedorFormulario.add(telefono);
+
         /**
          * Fila 2
          */
-        contenedorFormulario.add(id, 2);
+        contenedorFormulario.add(telefono);
+        contenedorFormulario.add(id);
         contenedorFormulario.add(comboTiposIncidencia, 4);
         /**
          * Fila 3
