@@ -132,7 +132,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         usuariosGrid.addColumn(UsuarioBean::getDni).setHeader("NIF");
         usuariosGrid.addColumn(UsuarioBean::getMail).setHeader("Correo electrónico");
         usuariosGrid.addColumn(UsuarioBean::getTelefono).setHeader("Teléfono");
-
+        
         doActualizaGrid();
     }
 
@@ -168,8 +168,8 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     public void doComponenesAtributos() {
         buscador.focus();
         buscador.setLabel("Texto de la búsqueda:");
-        aplicacionesAccordion.close();
         aplicacionesAccordion.setSizeFull();
+        aplicacionesAccordion.close();
     }
 
     @Override
@@ -192,8 +192,8 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         nifUsuario.addBlurListener(event -> {
             if (!nifUsuario.getValue().isEmpty() && nifUsuario.getValue() != null) {
                 usuarioBean = new UsuarioDao().getUsuarioPersigo(nifUsuario.getValue());
-                usuarioBinder.readBean(usuarioBean);
-            }
+                usuarioBinder.readBean(usuarioBean);               
+            } 
         });
 
         tiposCentro.addValueChangeListener(event -> {
