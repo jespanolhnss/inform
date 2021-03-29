@@ -58,6 +58,7 @@ public final class FrmJimenaBorraInf extends Dialog {
     private final PaginatedGrid<JimenaInformeBean> jimenaInformeGrid = new PaginatedGrid<>();
 
     private final Button borrarInfomeBoton = new ObjetosComunes().getBoton("Borrar informe", null, VaadinIcon.CHECK.create());
+    private final Button desconsolidarInformeBoton = new ObjetosComunes().getBoton("Desconsolida informe", null, VaadinIcon.CHECK.create());
     private final Button cancelarBoton = new ObjetosComunes().getBoton("Cancela", null, VaadinIcon.CLOSE_CIRCLE.create());
     private JimenaInformeBean informe = null;
 
@@ -89,7 +90,11 @@ public final class FrmJimenaBorraInf extends Dialog {
         jimenaInformeGrid.addSelectionListener(e -> doSeleccionaInforme());
 
         borrarInfomeBoton.addClickListener(e -> doBorrar());
+
+        desconsolidarInformeBoton.addClickListener(e -> doDesonsolida());
+
         borrarInfomeBoton.setEnabled(Boolean.FALSE);
+        desconsolidarInformeBoton.setEnabled(false);
         cancelarBoton.addClickListener(e -> doCancela());
     }
 
@@ -104,7 +109,7 @@ public final class FrmJimenaBorraInf extends Dialog {
         this.contenedorBotones.setMargin(false);
 
         //  borrarInfomeBoton.setEnabled(false);
-        contenedorBotones.add(fechaSeleccion, servicioCombo, borrarInfomeBoton, cancelarBoton);
+        contenedorBotones.add(fechaSeleccion, servicioCombo, borrarInfomeBoton, desconsolidarInformeBoton, cancelarBoton);
 
         contenedorPrincipal.add(contenedorIzquierda, contenedorDerecha);
 
@@ -142,12 +147,42 @@ public final class FrmJimenaBorraInf extends Dialog {
     public void doProcesoDeBorrado(JimenaInformeBean informe) {
         // inserta el pdf antes de borrar en la tabla lopd_documentos
         doInsertaPdf(informe);
-        // borrado lógico de informe y campos
-        String respuestaInforme = new JimenaDao().doUpdateInformeBorrado(informe.getId());
-        String respuestaCampos = new JimenaDao().doUpdateCampos_iBorrado(informe.getId());
+        // borrado lógico de informe estado = 5
+        String respuestaInforme = new JimenaDao().doUpdateInformeEstado(informe.getId(), JimenaInformeBean.INFORME_ESTADO_SUSTITUIDO);
+        // borrado lógico de campos_i estado = 5
+        String respuestaCampos = new JimenaDao().doUpdateCampos_iEstado(informe.getId(), JimenaInformeBean.INFORME_ESTADO_SUSTITUIDO);
         // inserta una nota en la incidencia con la sentencia sql que se ha  ejecutado.
         doInsertaNota(respuestaInforme + "\n" + respuestaCampos);
+        Notification.show(FrmMensajes.AVISODATOBORRADO);
+        setBorradoConfirmado(Boolean.TRUE);
+        doCancela();
+    }
 
+    /**
+     *
+     */
+    public void doDesonsolida() {
+        if (informe != null) {
+            final ConfirmDialog dialog = new ConfirmDialog(
+                    FrmMensajes.AVISOCONFIRMACIONACCION,
+                    " Confirmas que quieres DESCONSOLIDAR  el informe " + informe.getFechaHoraServcioDescrip(),
+                    FrmMensajes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
+                        doProcesoDeDesconsolidar(informe);
+
+                    });
+            dialog.open();
+
+        }
+    }
+
+    public void doProcesoDeDesconsolidar(JimenaInformeBean informe) {
+        // inserta el pdf antes de borrar en la tabla lopd_documentos
+        doInsertaPdf(informe);
+        // actualiza el informe a estao 1
+        // no cambia campos_i por que se perdería la traza de los updates si ponemos todos
+        // los valores a 1
+        String respuestaInforme = new JimenaDao().doUpdateInformeDesconsolida(informe.getId());
+        doInsertaNota(respuestaInforme + "\n" + respuestaInforme);
         Notification.show(FrmMensajes.AVISODATOBORRADO);
         setBorradoConfirmado(Boolean.TRUE);
         doCancela();
@@ -213,6 +248,7 @@ public final class FrmJimenaBorraInf extends Dialog {
                 if (url != null) {
                     contenedorDerecha.add(new EmbeddedPdfDocument(informe.getUrlFile(), "600px"));
                     borrarInfomeBoton.setEnabled(true);
+                    desconsolidarInformeBoton.setEnabled(true);
                 } else {
                 }
             } else {
@@ -225,6 +261,7 @@ public final class FrmJimenaBorraInf extends Dialog {
                     contenedorDerecha.setMaxHeight("200px");
                     contenedorDerecha.add(component);
                     borrarInfomeBoton.setEnabled(true);
+                    desconsolidarInformeBoton.setEnabled(true);
                 } else {
                 }
             }
@@ -241,5 +278,6 @@ public final class FrmJimenaBorraInf extends Dialog {
         jimenaInformeGrid.setItems(listaInformes);
         contenedorDerecha.removeAll();
         borrarInfomeBoton.setEnabled(Boolean.FALSE);
+        desconsolidarInformeBoton.setEnabled(false);
     }
 }

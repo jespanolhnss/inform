@@ -435,7 +435,8 @@ public class CombosUi {
         if (valor != null) {
             combo.setValue(valor);
         }
-        combo.setWidth("100px");
+        combo.setWidth("250px");
+        combo.setMaxWidth("250px");
         return combo;
     }
 

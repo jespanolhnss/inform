@@ -63,8 +63,12 @@ public class MandaMail {
             properties.put("mail.smtp.auth", new ParametroDao().getPorCodigo(ParametroBean.MAIL_AUTH).getValor());
 
             session = Session.getDefaultInstance(properties);
-
-            String[] destinatarios = destinatario.split(",");
+            String[] destinatarios = new String[1];
+            if (destinatario.indexOf(",") != -1) {
+                destinatarios = destinatario.split(",");
+            } else {
+                destinatarios[0] = destinatario;
+            }
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress((String) properties.get("mail.smtp.mail.sender")));
             for (String destino : destinatarios) {
@@ -95,10 +99,10 @@ public class MandaMail {
         }
     }
 
-    public void mandaMailAdjunto(String destinatario, String asunto, String contenido, String pathFile, String nameFile){
-        
+    public void mandaMailAdjunto(String destinatario, String asunto, String contenido, String pathFile, String nameFile) {
+
         try {
-          properties.put("mail.smtp.host", new ParametroDao().getPorCodigo(ParametroBean.MAIL_HOST).getValor());
+            properties.put("mail.smtp.host", new ParametroDao().getPorCodigo(ParametroBean.MAIL_HOST).getValor());
             properties.put("mail.smtp.port", new ParametroDao().getPorCodigo(ParametroBean.MAIL_PORT).getValor());
             properties.put("mail.smtp.mail.sender", new ParametroDao().getPorCodigo(ParametroBean.MAIL_SENDER).getValor());
             properties.put("mail.smtp.user", new ParametroDao().getPorCodigo(ParametroBean.MAIL_USER).getValor());
@@ -106,24 +110,22 @@ public class MandaMail {
 
             session = Session.getDefaultInstance(properties);
 
-        
-            
-         // Se compone la parte del texto
+            // Se compone la parte del texto
             BodyPart texto = new MimeBodyPart();
             texto.setText(contenido);
 
             // Se compone el adjunto con la imagen
             BodyPart adjunto = new MimeBodyPart();
             adjunto.setDataHandler(
-                new DataHandler(new FileDataSource(pathFile)));
+                    new DataHandler(new FileDataSource(pathFile)));
             adjunto.setFileName(nameFile);
 
             // Una MultiParte para agrupar texto e imagen.
             MimeMultipart multiParte = new MimeMultipart();
             multiParte.addBodyPart(texto);
             multiParte.addBodyPart(adjunto);
-            
-   String[] destinatarios = destinatario.split(",");
+
+            String[] destinatarios = destinatario.split(",");
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress((String) properties.get("mail.smtp.mail.sender")));
             for (String destino : destinatarios) {
@@ -134,8 +136,8 @@ public class MandaMail {
             message.setSubject(asunto);
             message.setText(contenido);
             message.setContent(multiParte);
-            
-              Transport t = session.getTransport("smtp");
+
+            Transport t = session.getTransport("smtp");
             // t.connect((String) properties.get("mail.smtp.host ") + (String)
             // properties.get("mail.smtp.user"),
             // (String) MyUI.objParametros.get(Parametros.KEY_MAILPASSW));
@@ -146,7 +148,7 @@ public class MandaMail {
             t.close();
             logger.debug("mensaje enviado" + destinatarios.toString() + "\n Asunto: " + asunto + "\n Contenido:"
                     + contenido);
-             } catch (AddressException e) {
+        } catch (AddressException e) {
             logger.error(Utilidades.getStackTrace(e));
         } catch (MessagingException e) {
             logger.error(Utilidades.getStackTrace(e));

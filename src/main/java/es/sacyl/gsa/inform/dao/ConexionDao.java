@@ -5,12 +5,11 @@ package es.sacyl.gsa.inform.dao;
  * @author 06551256M
  */
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
-import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -120,7 +119,7 @@ public class ConexionDao implements Serializable {
      * sesion
      */
     public ConexionDao() {
-        usuarioBean = ((UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME));
+
     }
 
     /**
@@ -204,4 +203,29 @@ public class ConexionDao implements Serializable {
         }
     }
 
+    /**
+     * Método para verificar que la coenxión con la BBDD está activa
+     *
+     * @return
+     */
+    public Boolean isTestConexion() {
+        Connection connection = null;
+        Boolean resultado = false;
+        try {
+            connection = getConexionBBDD();
+            sql = " SELECT * FROM dual ";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                resultado = statement.executeUpdate() > 0;
+                statement.close();
+            }
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql, Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return resultado;
+    }
 }
