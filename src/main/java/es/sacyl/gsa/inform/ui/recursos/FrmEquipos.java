@@ -224,6 +224,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
      */
     @Override
     public void doGrabar() {
+
         if (equipoBinder.writeBeanIfValid(equipoBean)) {
             equipoBean.setUsuario(usuarioHabitual);
             equipoBean.setValoresAut();
@@ -726,14 +727,23 @@ public final class FrmEquipos extends FrmMasterPantalla {
         ip.addBlurListener(event -> {
             if (!ip.getValue().contains(",")) {
                 /*
-                Si solo escribe una ip, es valida y no hay equipo seleccionado
+                Si solo escribe una ip,la ip  es valida y no hay equipo seleccionado
                 recupera el equipo de la bbdd
                  */
                 if (IpCtrl.isValid(ip.getValue())) {
-                    if (equipoBean == null || equipoBean.getId().equals(new Long(0))) {
-                        // recupera los datos del equipos
-                        equipoBean = new EquipoDao().getPorIP(ip.getValue());
-                        doActualizaDatosBotones(equipoBean);
+                    if (equipoBean.getId().equals(new Long(0))) {
+                        // recupera los datos del equipo si esta registrando uno nuevo id=0
+                        EquipoBean equipoBeanRecuperado = new EquipoDao().getPorIP(ip.getValue());
+                        if (equipoBeanRecuperado != null) {
+                            equipoBean = equipoBeanRecuperado;
+                            doActualizaDatosBotones(equipoBean);
+                        } else {
+                            if (!IpCtrl.isLibre(ip.getValue())) {
+                                Notification.show(" Ip ocupada");
+                                ip.clear();
+                                ip.focus();
+                            }
+                        }
                     } else {
                         // revisa que este libre
                         if (!IpCtrl.isLibre(ip.getValue(), equipoBean)) {

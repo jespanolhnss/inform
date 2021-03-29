@@ -16,6 +16,10 @@ public class MensajeBean extends MasterBean implements Serializable {
     private String contenido;
     private String ficherosAdjuntos;
 
+    public final static String TIPOMAIL = "Mail";
+    public final static String TIPOTELEGRAM = "Telegram";
+    public final static String TIPOPUSH = "Push";
+
     public String getTipo() {
         return tipo;
     }

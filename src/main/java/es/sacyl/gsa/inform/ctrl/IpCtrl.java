@@ -55,8 +55,17 @@ public class IpCtrl {
     public static Boolean isLibre(String ip, EquipoBean equipoBean) {
         Boolean libre = false;
         IpBean ipBean = new IpDao().getPorCodigo(ip);
-        if (ipBean.getEquipo() == null || ipBean.getEquipo().getId().equals(equipoBean.getId())) {
-            libre = true;
+        if (equipoBean == null) {
+            if (ipBean != null && ipBean.getEquipo() == null) {
+                libre = true;
+            }
+        } else {
+            if (ipBean != null && ipBean.getEquipo() == null) {
+                libre = true;
+
+            } else if (ipBean != null && ipBean.getEquipo().getId().equals(equipoBean.getId())) {
+                libre = true;
+            }
         }
         return libre;
     }

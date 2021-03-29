@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,14 +27,6 @@ public class MensajeDao extends ConexionDao implements Serializable, ConexionInt
         sql = " SELECT * from mensajes WHERE 1=1";
     }
 
-    /*
-    private String tipo;
-    private String destinatarios;
-    private String asuntos;
-    private String contenido;
-    private String ficherosAdjuntos;
-
-     */
     @Override
     public MensajeBean getRegistroResulset(ResultSet rs) {
 
@@ -104,7 +95,6 @@ public class MensajeDao extends ConexionDao implements Serializable, ConexionInt
         Connection connection = null;
         Boolean insertadoBoolean = false;
         connection = super.getConexionBBDD();
-
         sql = " INSERT INTO  mensajes  (id,tipo,destinatarios,asuntos,contenido,ficherosadjuntos) "
                 + " VALUES (?,?,?,?,?,?)  ";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -126,11 +116,12 @@ public class MensajeDao extends ConexionDao implements Serializable, ConexionInt
             } else {
                 statement.setNull(6, Types.CHAR);
             }
-
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
         } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(AutonomiaDao.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error(Utilidades.getStackTrace(ex));
+        } finally {
+            this.doCierraConexion(connection);
         }
         return insertadoBoolean;
     }
@@ -165,6 +156,8 @@ public class MensajeDao extends ConexionDao implements Serializable, ConexionInt
             statement.close();
         } catch (SQLException ex) {
             LOGGER.error(Utilidades.getStackTrace(ex));
+        } finally {
+            this.doCierraConexion(connection);
         }
         return insertadoBoolean;
     }
@@ -173,7 +166,6 @@ public class MensajeDao extends ConexionDao implements Serializable, ConexionInt
     public boolean doBorraDatos(MensajeBean mensajeBean) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
-
         connection = super.getConexionBBDD();
         sql = " DELETE  * FROM mensajes WHERE id=?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -182,8 +174,9 @@ public class MensajeDao extends ConexionDao implements Serializable, ConexionInt
             statement.close();
         } catch (SQLException ex) {
             LOGGER.error(Utilidades.getStackTrace(ex));
+        } finally {
+            this.doCierraConexion(connection);
         }
-
         return insertadoBoolean;
     }
 
@@ -193,7 +186,6 @@ public class MensajeDao extends ConexionDao implements Serializable, ConexionInt
         ArrayList<MensajeBean> lista = new ArrayList<>();
         try {
             connection = super.getConexionBBDD();
-
             sql = sql.concat(" ORDER BY id  ");
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sql);

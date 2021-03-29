@@ -426,7 +426,13 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 statement.setString(9, equipoBean.getComentario());
             }
             statement.setLong(10, Utilidades.getFechaLong(equipoBean.getFechacambio()));
-            statement.setLong(11, equipoBean.getUsucambio().getId());
+
+            if (equipoBean.getUsucambio() != null) {
+                statement.setLong(11, equipoBean.getUsucambio().getId());
+            } else {
+                statement.setNull(11, Types.INTEGER);
+            }
+
             if (equipoBean.getMacadress() == null) {
                 statement.setNull(12, Types.VARCHAR);
             } else {

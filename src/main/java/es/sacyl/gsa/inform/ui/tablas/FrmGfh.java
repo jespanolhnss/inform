@@ -30,7 +30,7 @@ public final class FrmGfh extends FrmMasterPantalla {
     private final TextField id = new ObjetosComunes().getTextField("Id");
     private final TextField idjimena = new ObjetosComunes().getTextField("IdJimena");
     private final TextField codigo = new ObjetosComunes().getTextField("Código", "codigo", 10, "150px", "50px");
-    private final TextField descripcion = new ObjetosComunes().getTextField("Nombre", "nombre", 10, "300px", "50px");
+    private final TextField descripcion = new ObjetosComunes().getTextField("Nombre", "nombre", 50, "300px", "50px");
     private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
     private final RadioButtonGroup<String> asistencialRadio = new ObjetosComunes().getSNRadio("Asistencial");
 

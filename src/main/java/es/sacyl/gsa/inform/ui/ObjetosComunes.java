@@ -400,8 +400,8 @@ public class ObjetosComunes {
         if (date != null) {
             dateTimePicker.setValue(date);
         }
-        dateTimePicker.setMinWidth("190px");
-        dateTimePicker.setMaxWidth("220px");
+        dateTimePicker.setMinWidth("240px");
+        dateTimePicker.setMaxWidth("240px");
         return dateTimePicker;
     }
 
@@ -471,7 +471,7 @@ public class ObjetosComunes {
         TextField campo = getTextField("Teléfono", "teléfono", 9, "30px", "30px");
         return campo;
     }
-    
+
     /**
      *
      * @return
