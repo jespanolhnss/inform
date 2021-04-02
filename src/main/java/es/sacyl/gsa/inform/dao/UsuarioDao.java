@@ -303,7 +303,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         Long id = null;
         try {
             connection = super.getConexionBBDD();
-            sql = " INSERT INTO usuarios (id,dni,apellido1,apellido2,nombre, mail,telefono,usucambio,fechacambio,estado) "
+            sql = " INSERT INTO usuarios (id,dni,apellido1,apellido2,nombre,mail,telefono,usucambio,fechacambio,estado) "
                     + " VALUES (?,?,?,?,?,?,?,?,?,?)  ";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setLong(1, usuarioBean.getId());
