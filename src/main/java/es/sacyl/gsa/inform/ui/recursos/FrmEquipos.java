@@ -334,8 +334,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
     @Override
     public void doActualizaGrid() {
         equipoArrayList = new EquipoDao().getLista(buscador.getValue(), equipoTipoComboBuscador.getValue(),
-                centroComboBuscador.getValue(), null, null);
+                centroComboBuscador.getValue(), null, null, null);
         equipoGrid.setItems(equipoArrayList);
+
     }
 
     public void doActualizaGridAplicacion() {

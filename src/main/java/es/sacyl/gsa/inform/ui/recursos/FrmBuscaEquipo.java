@@ -47,7 +47,7 @@ public class FrmBuscaEquipo extends Dialog {
 
     public FrmBuscaEquipo() {
         this.add(filabuscadores);
-        filabuscadores.add(provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador);
+        filabuscadores.add(provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador, botonCancelar);
         this.add(equipoGrid);
         doActualizaGrid();
         autonomiaComboBuscador.addValueChangeListener(event -> {
@@ -72,6 +72,10 @@ public class FrmBuscaEquipo extends Dialog {
             this.close();
         });
 
+        botonCancelar.addClickListener(evebt -> {
+            equipoBean = null;
+            this.close();
+        });
     }
 
     public EquipoBean getEquipoBean() {
@@ -89,7 +93,7 @@ public class FrmBuscaEquipo extends Dialog {
 
     public void doActualizaGrid() {
         ArrayList<EquipoBean> equipoArrayList = new EquipoDao().getLista(null, equipoTipoComboBuscador.getValue(),
-                centroComboBuscador.getValue(), null, null);
+                centroComboBuscador.getValue(), null, null, null);
         equipoGrid.setItems(equipoArrayList);
     }
 

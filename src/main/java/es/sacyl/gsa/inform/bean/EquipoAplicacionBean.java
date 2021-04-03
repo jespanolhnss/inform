@@ -12,22 +12,17 @@ import java.time.LocalDate;
  *
  * @author 06551256M
  */
-public class EquipoAplicacionBean implements Serializable {
+public class EquipoAplicacionBean extends MasterBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long id;
     private EquipoBean equipo;
     private AplicacionBean aplicacion;
     private LocalDate fecha;
     private String comentario;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public EquipoAplicacionBean() {
+        super();
     }
 
     public EquipoBean getEquipo() {

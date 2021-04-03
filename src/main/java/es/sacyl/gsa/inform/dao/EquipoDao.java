@@ -1,10 +1,12 @@
 package es.sacyl.gsa.inform.dao;
 
+import es.sacyl.gsa.inform.bean.AplicacionBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
+import es.sacyl.gsa.inform.ctrl.IpCtrl;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -107,11 +109,11 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      */
     @Override
     public EquipoBean getRegistroResulset(ResultSet rs) {
-        return getRegistroResulset(rs, null, null, null, null);
+        return getRegistroResulset(rs, null, null, null, null, null);
     }
 
-    public EquipoBean getRegistroResulset(ResultSet rs, Boolean conAplicaciones, Boolean conIps) {
-        return getRegistroResulset(rs, null, null, conAplicaciones, conIps);
+    public EquipoBean getRegistroResulset(ResultSet rs, Boolean conAplicaciones, Boolean conIps, AplicacionBean aplicacionBean) {
+        return getRegistroResulset(rs, null, null, conAplicaciones, conIps, aplicacionBean);
     }
 
     /**
@@ -121,7 +123,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      * @param servicio
      * @return
      */
-    public static EquipoBean getRegistroResulset(ResultSet rs, CentroBean centro, GfhBean servicio, Boolean conAplicaciones, Boolean conIps) {
+    public static EquipoBean getRegistroResulset(ResultSet rs, CentroBean centro, GfhBean servicio, Boolean conAplicaciones, Boolean conIps, AplicacionBean aplicacionBean) {
         EquipoBean equipoBean = new EquipoBean();
         try {
             equipoBean.setId(rs.getLong("equipoid"));
@@ -164,7 +166,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
 
             // actualiza app instaladas
             if (conAplicaciones == true) {
-                equipoBean.setAplicacinesArrayList(new EquipoAplicacionDao().getLista(null, equipoBean, null));
+                equipoBean.setAplicacinesArrayList(new EquipoAplicacionDao().getLista(null, equipoBean, aplicacionBean));
             }
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
@@ -181,7 +183,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
-                    equipoBean = getRegistroResulset(resulSet, null, null, true, true);
+                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null);
                 }
                 statement.close();
             }
@@ -225,7 +227,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
-                    equipoBean = getRegistroResulset(resulSet, null, null, true, true);
+                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null);
                 }
                 statement.close();
             }
@@ -249,7 +251,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
-                    equipoBean = getRegistroResulset(resulSet, null, null, true, true);
+                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null);
                 }
                 statement.close();
             }
@@ -497,7 +499,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      */
     @Override
     public ArrayList<EquipoBean> getLista(String texto) {
-        return getLista(texto, null, null, null, null);
+        return getLista(texto, null, null, null, null, null);
     }
 
     /**
@@ -508,7 +510,9 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      * @param servicio
      * @return
      */
-    public ArrayList<EquipoBean> getLista(String texto, String tipo, CentroBean centro, GfhBean servicio, Integer estado) {
+    public ArrayList<EquipoBean> getLista(String texto, String tipo, CentroBean centro, GfhBean servicio, Integer estado,
+            AplicacionBean aplicacionBean
+    ) {
         Connection connection = null;
         ArrayList<EquipoBean> lista = new ArrayList<>();
         try {
@@ -523,9 +527,14 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             if (servicio != null) {
                 sql = sql.concat(" AND e.servicio='" + servicio.getId() + "'");
             }
-
             if (texto != null && !texto.isEmpty()) {
-                //   sql = sql.concat(" AND  ( UPPER(nombre) like'%" + texto.toUpperCase() + "%'  OR   UPPER(codigo) like'%" + texto.toUpperCase() + "%' )");
+                if (IpCtrl.isValid(texto)) {
+                    sql = sql.concat("  AND e.id IN (select  equipo from ips where not equipo  is null AND  ip = '" + texto + "')");
+                } else if (texto.contains("10.")) {
+                    sql = sql.concat(" AND  e.id IN (select  equipo from ips where not equipo  is null AND  ip LIKE  '" + texto + "%')");
+                } else {
+                    sql = sql.concat(" AND e.nombredominio like '%" + texto + "%'");
+                }
             }
             if (estado != null) {
                 sql = sql.concat(" AND e.estado=" + estado);
@@ -535,7 +544,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {
-                lista.add(getRegistroResulset(resulSet, centro, servicio, true, true));
+                lista.add(getRegistroResulset(resulSet, centro, servicio, true, true, aplicacionBean));
             }
             statement.close();
             LOGGER.debug(sql);

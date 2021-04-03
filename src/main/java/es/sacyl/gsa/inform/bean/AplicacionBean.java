@@ -101,4 +101,31 @@ public class AplicacionBean extends MasterBean implements Serializable {
         this.listaEquipoBeans = listaEquipoBeans;
     }
 
+    public String toHtml() {
+        String cadena = "<b>";
+        cadena = cadena.concat("  ");
+
+        if (nombre != null) {
+            cadena = cadena.concat(nombre);
+        } else {
+            cadena = cadena.concat(" ");
+        }
+        cadena = cadena.concat("<hr> ");
+        cadena = cadena.concat("Proveddor:   ");
+        if (proveedor != null) {
+            cadena = cadena.concat(proveedor.getNombre());
+        } else {
+            cadena = cadena.concat(" ");
+        }
+        cadena = cadena.concat("<hr> ");
+        cadena = cadena.concat("Comentario:   ");
+        if (descripcion != null) {
+            cadena = cadena.concat(descripcion);
+        } else {
+            cadena = cadena.concat(" ");
+        }
+        cadena = cadena.concat("</b>");
+
+        return cadena;
+    }
 }

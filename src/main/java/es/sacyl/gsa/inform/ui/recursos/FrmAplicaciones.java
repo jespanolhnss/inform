@@ -58,6 +58,7 @@ import org.vaadin.klaudeta.PaginatedGrid;
 public final class FrmAplicaciones extends FrmMasterPantalla {
 
     private final Button botonPerfiles = new ObjetosComunes().getBoton("Perfiles", null, VaadinIcon.FILE_TABLE.create());
+    private final Button equiposButton = new ObjetosComunes().getBoton("Equi", null, VaadinIcon.FILE_TABLE.create());
 
     private final ComboBox<ProveedorBean> proveedorComboBuscador = new CombosUi().getProveedorCombo(null, null);
     private final ComboBox<GfhBean> gfhcomboBuscador = new CombosUi().getServicioCombo(null, null);
@@ -158,7 +159,10 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
         aplicacionBean = new AplicacionBean();
         aplicacionesBinder.readBean(aplicacionBean);
         doActualizaGrid();
-        doActualizaGridPerfiles();
+        equipoGrid.setItems(new ArrayList<>());
+        equipoTab.setLabel("Equipos(0)");
+        aplicacionesPerfiGrid.setItems(new ArrayList<>());
+        perfilesTab.setLabel("Perfieles(0)");
         doControlBotones(null);
     }
 
@@ -300,6 +304,9 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 99))
                 .bind(AplicacionBean::getGestionUsuarios, AplicacionBean::setGestionUsuarios);
 
+        aplicacionesBinder.forField(fechaInstalacion)
+                .bind(AplicacionBean::getFechaInstalacion, AplicacionBean::setFechaInstalacion);
+
         aplicacionesBinder.forField(descripcion)
                 .withNullRepresentation("")
                 .asRequired()
@@ -319,6 +326,7 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
 
     @Override
     public void doComponenesAtributos() {
+        titulo.setText("Aplicaciones");
         buscador.setLabel("Dato a buscar");
         page1.setWidthFull();
         page2.setWidthFull();
@@ -333,7 +341,7 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
     @Override
     public void doComponentesOrganizacion() {
         this.titulo.setText("Aplicaciones");
-        contenedorBotones.add(botonPerfiles);
+        contenedorBotones.add(botonPerfiles, equiposButton);
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
                 new FormLayout.ResponsiveStep("50px", 2),
@@ -407,6 +415,20 @@ public final class FrmAplicaciones extends FrmMasterPantalla {
             AplicacionPerfilBean aplicacionPerfilBean = new AplicacionPerfilBean();
             aplicacionPerfilBean.setAplicacion(aplicacionBean);
             doVentanaPerfil(aplicacionPerfilBean);
+        });
+
+        equiposButton.addClickListener(event -> {
+            FrmAplicaciónEquipo frmAplicaciónEquipo = new FrmAplicaciónEquipo(aplicacionBean);
+            frmAplicaciónEquipo.addDialogCloseActionListener(even3t -> {
+                aplicacionBean.setListaEquipoBeans(new EquipoAplicacionDao().getLista(null, null, aplicacionBean));
+                doActualizaGridEquipos();
+            });
+            frmAplicaciónEquipo.addDetachListener(even3t -> {
+                aplicacionBean.setListaEquipoBeans(new EquipoAplicacionDao().getLista(null, null, aplicacionBean));
+                doActualizaGridEquipos();
+            });
+
+            frmAplicaciónEquipo.open();
         });
 
         tabs.addSelectedChangeListener(event -> {
