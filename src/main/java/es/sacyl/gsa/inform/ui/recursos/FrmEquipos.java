@@ -9,6 +9,7 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -60,6 +61,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.klaudeta.PaginatedGrid;
 
 /**
@@ -68,22 +70,26 @@ import org.vaadin.klaudeta.PaginatedGrid;
  */
 public final class FrmEquipos extends FrmMasterPantalla {
 
-    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(FrmEquipos.class);
+    private static final Logger LOGGER = LogManager.getLogger(FrmEquipos.class);
+    private final HorizontalLayout contenedorBuscadores1 = new HorizontalLayout();
+
     private final ComboBox<AutonomiaBean> autonomiaComboBuscador = new CombosUi().getAutonomiaCombo(AutonomiaBean.AUTONOMIADEFECTO, null);
     private final ComboBox<ProvinciaBean> provinciaComboBuscador = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null, AutonomiaBean.AUTONOMIADEFECTO);
     private final ComboBox<CentroTipoBean> centroTipoComboBuscador = new CombosUi().getCentroTipoCombo(null);
     private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPODEFECTO, null, null);
+    private final ComboBox<String> equipoTipoComboBuscador = new CombosUi().getEquipoTipoCombo(null, 50);
+    private final ComboBox<String> equipoMarcaComboBuscador = new CombosUi().getGrupoRamaComboValor(ComboBean.TIPOEQUIPOMARCA, equipoTipoComboBuscador.getValue(), null, "Marca");
+
     private final Button ayudaUbicacion = new ObjetosComunes().getBotonMini();
     private final Button ayudaIp = new ObjetosComunes().getBotonMini();
     private final Button ayudaUsuario = new ObjetosComunes().getBotonMini();
+    private final Button ayudaModelo = new ObjetosComunes().getBotonMini();
     private final Button ayudaInventario = new ObjetosComunes().getBotonMini(VaadinIcon.PLUS.create());
     //private final Button nuevoInventario = new ObjetosComunes().getBotonMini(VaadinIcon.PLUS.create());
     private final Button aplicacionButton = new ObjetosComunes().getBoton("App", null, VaadinIcon.FILE_TABLE.create());
     private final Button datosGenericosButton = new ObjetosComunes().getBoton("Dat", null, VaadinIcon.TABLE.create());
 
     private final Button etiquetaButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.BARCODE.create());
-
-    private final ComboBox<String> equipoTipoComboBuscador = new CombosUi().getEquipoTipoCombo(null, 50);
 
     private final TextField id = new ObjetosComunes().getTextField("Id");
     private final ComboBox<String> equipoTipoCombo = new CombosUi().getEquipoTipoCombo(null, 50);
@@ -133,6 +139,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         equipoBinder.readBean(equipoBean);
         doComponentesOrganizacion();
         doGrid();
+        doGripEquipoAplicacion();
         doComponenesAtributos();
         doBinderPropiedades();
         doCompentesEventos();
@@ -172,19 +179,19 @@ public final class FrmEquipos extends FrmMasterPantalla {
      */
     public Boolean controlIp() {
         Boolean control = true;
+        //  busca equipos con esa ip y los limpia
+        new IpDao().doLiberaIpsEquipo(equipoBean);
+
         if (ip.getValue().isEmpty()) {
-            //  busca equipos con esa ip y los limpia
-            new IpDao().doLiberaIpsEquipo(equipoBean);
             return true;
         }
         if (!ip.getValue().contains(",")) {
-            new IpDao().doLiberaIpsEquipo(equipoBean);
+            //
             // si la ip no esta en blanco comprueba que este libre y la ocupa
             control = doGestionaUnaIp(ip.getValue());
         } else {
             // ha escrito varias ips, separadas por comas
             if (IpCtrl.listaIpsValidas(ip.getValue()) && IpCtrl.listaIpsLibres(ip.getValue(), equipoBean)) {
-                new IpDao().doLiberaIpsEquipo(equipoBean);
                 String[] listaips = ip.getValue().split(",");
                 for (String unaIp : listaips) {
                     control = doGestionaUnaIp(unaIp);
@@ -229,16 +236,14 @@ public final class FrmEquipos extends FrmMasterPantalla {
             equipoBean.setUsuario(usuarioHabitual);
             equipoBean.setValoresAut();
             equipoBean.setUsuario(usuarioHabitual);
-            if (controlIp() == true) {
-                if (new EquipoDao().doGrabaDatos(equipoBean) == true) {
-                    (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
-                    doActualizaGrid();
-                    // doLimpiar();
-                } else {
-                    (new Notification(FrmMensajes.AVISODATOERRORBBDD, 1000, Notification.Position.MIDDLE)).open();
-                }
+            //  if (controlIp() == true) {
+            if (new EquipoDao().doGrabaDatos(equipoBean) == true && this.controlIp() == true) {
+                (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
+
+                doActualizaGrid();
+                // doLimpiar();
             } else {
-                (new Notification("Error validano ip", 1000, Notification.Position.MIDDLE)).open();
+                (new Notification(FrmMensajes.AVISODATOERRORBBDD, 1000, Notification.Position.MIDDLE)).open();
             }
         } else {
             BinderValidationStatus<EquipoBean> validate = equipoBinder.validate();
@@ -302,7 +307,34 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     @Override
     public void doGrid() {
+        if (equipoTipoComboBuscador.getValue().equals(ComboBean.TIPOEQUIPOIMPRESORA)) {
+            equipoGrid.removeAllColumns();
+            equipoGrid.addColumn(EquipoBean::getIpsCadena).setAutoWidth(true).setHeader(new Html("<b>Ip</b>"));
+            equipoGrid.addColumn(EquipoBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Est</b>")).setWidth("20px");
+            equipoGrid.addColumn(EquipoBean::getNumeroSerie).setAutoWidth(true).setHeader(new Html("<b>SN</b>")).setWidth("70px");
+            equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
+            equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
+
+        } else if (equipoTipoComboBuscador.getValue().equals(ComboBean.TIPOEQUIPOPC)) {
+            equipoGrid.removeAllColumns();
+            equipoGrid.addColumn(EquipoBean::getIpsCadena).setAutoWidth(true).setHeader(new Html("<b>Ip</b>"));
+            equipoGrid.addColumn(EquipoBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Est</b>")).setWidth("20px");
+            equipoGrid.addColumn(EquipoBean::getInventario).setAutoWidth(true).setHeader(new Html("<b>Invent</b>")).setWidth("70px");
+            equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
+            equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
+
+        } else {
+            equipoGrid.removeAllColumns();
+            equipoGrid.addColumn(EquipoBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Est</b>")).setWidth("20px");
+            equipoGrid.addColumn(EquipoBean::getInventario).setAutoWidth(true).setHeader(new Html("<b>Invent</b>")).setWidth("70px");
+            equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
+            equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
+        }
         doActualizaGrid();
+
+    }
+
+    public void doGripEquipoAplicacion() {
         // grid eqipo aplicación
         equipoAplicacionGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         equipoAplicacionGrid.setHeightByRows(true);
@@ -333,8 +365,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     @Override
     public void doActualizaGrid() {
-        equipoArrayList = new EquipoDao().getLista(buscador.getValue(), equipoTipoComboBuscador.getValue(),
-                centroComboBuscador.getValue(), null, null, null);
+        equipoArrayList = new EquipoDao().getLista(buscador.getValue(), equipoTipoComboBuscador.getValue(), equipoMarcaComboBuscador.getValue(),
+                centroComboBuscador.getValue(),
+                null, null, null);
         equipoGrid.setItems(equipoArrayList);
 
     }
@@ -462,15 +495,17 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorIzquierda.add(tabs, page1, page2, page3);
 
         contenedorDerecha.removeAll();
-        contenedorBuscadores.add(equipoTipoComboBuscador, autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador);
-        contenedorDerecha.add(this.contenedorBuscadores, equipoGrid);
+        contenedorBuscadores.add(autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador);
+        contenedorBuscadores1.add(equipoTipoComboBuscador, equipoMarcaComboBuscador, botonImprimir);
+
+        contenedorDerecha.add(this.contenedorBuscadores, this.contenedorBuscadores1, equipoGrid);
 
         contenedorFormulario.add(id, 2);
         contenedorFormulario.add(equipoTipoCombo, 2);
         contenedorFormulario.add(equipoMarcaCombo, 2);
 
         contenedorFormulario.add(inventario, ayudaInventario);
-        contenedorFormulario.add(modelo, 2);
+        contenedorFormulario.add(modelo, ayudaModelo);
         contenedorFormulario.add(numeroSerie, 2);
 
         contenedorFormulario.add(ip, 2);
@@ -508,7 +543,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
          *
          */
         equipoTipoComboBuscador.addValueChangeListener(evetn -> {
-            doActualizaGrid();
+            doGrid();
+
         });
 
         /**
@@ -529,6 +565,10 @@ public final class FrmEquipos extends FrmMasterPantalla {
             }
         });
 
+        equipoTipoComboBuscador.addValueChangeListener(event -> {
+            equipoMarcaComboBuscador.setItems(new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPOMARCA, event.getValue(), 100));
+            doActualizaGrid();
+        });
         /**
          * Si cambia la provinca en el combo buscador actualiza el combo de
          * centros
@@ -573,6 +613,16 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         });
 
+        ayudaModelo.addClickListener(event -> {
+            FrmBuscaModelo frmBuscaModelo = new FrmBuscaModelo(equipoMarcaCombo.getValue());
+            frmBuscaModelo.addDialogCloseActionListener(eventAyuda -> {
+                modelo.setValue(frmBuscaModelo.getModelo());
+            });
+            frmBuscaModelo.addDetachListener(eventAyuda -> {
+                modelo.setValue(frmBuscaModelo.getModelo());
+            });
+            frmBuscaModelo.open();
+        });
         /**
          * Ventana de ayuda para elegir ubicación
          */
@@ -726,46 +776,53 @@ public final class FrmEquipos extends FrmMasterPantalla {
          *
          */
         ip.addBlurListener(event -> {
-            if (!ip.getValue().contains(",")) {
-                /*
+            if (!ip.getValue().isEmpty()) {
+                if (IpCtrl.isExiste(ip.getValue()) == true) {
+                    if (!ip.getValue().contains(",")) {
+                        /*
                 Si solo escribe una ip,la ip  es valida y no hay equipo seleccionado
                 recupera el equipo de la bbdd
-                 */
-                if (IpCtrl.isValid(ip.getValue())) {
-                    if (equipoBean.getId().equals(new Long(0))) {
-                        // recupera los datos del equipo si esta registrando uno nuevo id=0
-                        EquipoBean equipoBeanRecuperado = new EquipoDao().getPorIP(ip.getValue());
-                        if (equipoBeanRecuperado != null) {
-                            equipoBean = equipoBeanRecuperado;
-                            doActualizaDatosBotones(equipoBean);
-                        } else {
-                            if (!IpCtrl.isLibre(ip.getValue())) {
-                                Notification.show(" Ip ocupada");
-                                ip.clear();
-                                ip.focus();
+                         */
+                        if (IpCtrl.isValid(ip.getValue())) {
+                            if (equipoBean.getId().equals(new Long(0))) {
+                                // recupera los datos del equipo si esta registrando uno nuevo id=0
+                                EquipoBean equipoBeanRecuperado = new EquipoDao().getPorIP(ip.getValue());
+                                if (equipoBeanRecuperado != null) {
+                                    equipoBean = equipoBeanRecuperado;
+                                    doActualizaDatosBotones(equipoBean);
+                                } else {
+                                    if (!IpCtrl.isLibre(ip.getValue())) {
+                                        Notification.show(" Ip ocupada");
+                                        ip.clear();
+                                        ip.focus();
+                                    }
+                                }
+                            } else {
+                                // revisa que este libre
+                                if (!IpCtrl.isLibre(ip.getValue(), equipoBean)) {
+                                    Notification.show(" Ip ocupada");
+                                    ip.clear();
+                                    ip.focus();
+                                }
                             }
+                        } else {
+                            Notification.show(" Ip no válida");
+                            ip.focus();
                         }
                     } else {
-                        // revisa que este libre
-                        if (!IpCtrl.isLibre(ip.getValue(), equipoBean)) {
-                            Notification.show(" Ip ocupada");
-                            ip.clear();
+                        // Si escribe varias ips, valida que sean válidas
+                        if (!IpCtrl.listaIpsValidas(ip.getValue())) {
+                            Notification.show("Alguna  Ip no es válida");
+                            ip.focus();
+                        }
+                        // Valida que sean válidas o del equipo actual
+                        if (!IpCtrl.listaIpsLibres(ip.getValue(), equipoBean)) {
+                            Notification.show("Alguna  Ip no es de este equipo o no esta libre");
                             ip.focus();
                         }
                     }
                 } else {
-                    Notification.show(" Ip no válida");
-                    ip.focus();
-                }
-            } else {
-                // Si escribe varias ips, valida que sean válidas
-                if (!IpCtrl.listaIpsValidas(ip.getValue())) {
-                    Notification.show("Alguna  Ip no es válida");
-                    ip.focus();
-                }
-                // Valida que sean válidas o del equipo actual
-                if (!IpCtrl.listaIpsLibres(ip.getValue(), equipoBean)) {
-                    Notification.show("Alguna  Ip no es de este equipo o no esta libre");
+                    Notification.show("Ip no existe " + ip.getValue());
                     ip.focus();
                 }
             }

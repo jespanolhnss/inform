@@ -15,10 +15,12 @@ import es.sacyl.gsa.inform.bean.AplicacionBean;
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
+import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.EquipoAplicacionBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.dao.CentroDao;
+import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.EquipoAplicacionDao;
 import es.sacyl.gsa.inform.dao.EquipoDao;
@@ -44,6 +46,8 @@ public final class FrmAplicaciónEquipo extends FrmMasterVentana {
     private final ComboBox<AutonomiaBean> autonomiaComboBuscador = new CombosUi().getAutonomiaCombo(AutonomiaBean.AUTONOMIADEFECTO, null);
     private final ComboBox<ProvinciaBean> provinciaComboBuscador = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null, AutonomiaBean.AUTONOMIADEFECTO);
     private final ComboBox<CentroTipoBean> centroTipoComboBuscador = new CombosUi().getCentroTipoCombo(null);
+    private final ComboBox<String> equipoMarcaComboBuscador = new CombosUi().getGrupoRamaComboValor(ComboBean.TIPOEQUIPOMARCA, equipoTipoComboBuscador.getValue(), null, "Marca");
+
     private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPOCENTROSALUD, null, null);
     private final PaginatedGrid<EquipoBean> equipoGrid = new GridUi().getEquipoGridPaginado();
 
@@ -128,7 +132,7 @@ public final class FrmAplicaciónEquipo extends FrmMasterVentana {
     @Override
     public void doActualizaGrid() {
         ArrayList<EquipoBean> equipoArrayList = new EquipoDao().getLista(buscador.getValue(), equipoTipoComboBuscador.getValue(),
-                centroComboBuscador.getValue(), null, null, aplicacionBean);
+                equipoMarcaComboBuscador.getValue(), centroComboBuscador.getValue(), null, null, aplicacionBean);
         equipoGrid.setItems(equipoArrayList);
     }
 
@@ -158,7 +162,7 @@ public final class FrmAplicaciónEquipo extends FrmMasterVentana {
     @Override
     public void doComponentesOrganizacion() {
 
-        contenedorFiltros.add(provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador, buscador);
+        contenedorFiltros.add(provinciaComboBuscador, centroTipoComboBuscador, equipoMarcaComboBuscador, centroComboBuscador, buscador);
         contenedorDerecha.add(equipoGrid);
 
         contenedorFormulario.add(id, fecha, comentario, equipoDetalle);
@@ -171,6 +175,10 @@ public final class FrmAplicaciónEquipo extends FrmMasterVentana {
             doActualizaComboProvinicas(provinciaComboBuscador, autonomiaBean);
         });
         equipoTipoComboBuscador.addValueChangeListener(evetn -> {
+            doActualizaGrid();
+        });
+        equipoTipoComboBuscador.addValueChangeListener(event -> {
+            equipoMarcaComboBuscador.setItems(new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPOMARCA, event.getValue(), 100));
             doActualizaGrid();
         });
         provinciaComboBuscador.addValueChangeListener(event -> {

@@ -60,7 +60,7 @@ public class GridUi {
         equipoGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         equipoGrid.setHeightByRows(true);
         equipoGrid.setPageSize(14);
-        equipoGrid.addColumn(EquipoBean::getTipo).setAutoWidth(true).setHeader(new Html("<b>Tipo</b>")).setWidth("70px");
+        //      equipoGrid.addColumn(EquipoBean::getTipo).setAutoWidth(true).setHeader(new Html("<b>Tipo</b>")).setWidth("70px");
         equipoGrid.addColumn(EquipoBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Est</b>")).setWidth("20px");
         equipoGrid.addColumn(EquipoBean::getInventario).setAutoWidth(true).setHeader(new Html("<b>Invent</b>")).setWidth("70px");
         equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));

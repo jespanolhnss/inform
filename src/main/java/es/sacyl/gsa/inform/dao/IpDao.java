@@ -288,15 +288,31 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
         return insertado;
     }
 
+    /**
+     *
+     * @param equipoBean
+     * @return Para el equipo dado libera todas sus ips
+     */
     public boolean doLiberaIpsEquipo(EquipoBean equipoBean) {
         Connection connection = null;
-        boolean insertado = false;
-        for (IpBean ipBean : equipoBean.getListaIps()) {
-            ipBean.setEquipo(null);
-            ipBean.setValoresAut();
-            this.doActualizaEquipo(ipBean);
+        Boolean insertadoBoolean = false;
+        try {
+            connection = super.getConexionBBDD();
+            sql = " UPDATE  ips SET equipo=NULL  WHERE equipo ='" + equipoBean.getId() + "'";
+            Statement statement = connection.createStatement();
+            insertadoBoolean = statement.execute(sql);
+            insertadoBoolean = true;
+            statement.close();
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
         }
-        return insertado;
+        return insertadoBoolean;
+
     }
 
     @Override
@@ -305,7 +321,7 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE  ip SET estado=" + ConexionDao.BBDD_ACTIVONO + "WHERE id='" + ipBean.getId() + "'";
+            sql = " UPDATE  ips SET estado=" + ConexionDao.BBDD_ACTIVONO + "WHERE id='" + ipBean.getId() + "'";
             Statement statement = connection.createStatement();
             insertadoBoolean = statement.execute(sql);
             insertadoBoolean = true;

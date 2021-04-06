@@ -344,7 +344,11 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             }
             statement.setInt(11, ConexionDao.BBDD_ACTIVOSI);
             statement.setLong(12, Utilidades.getFechaLong(equipoBean.getFechacambio()));
-            statement.setLong(13, equipoBean.getUsucambio().getId());
+            if (equipoBean.getUsuario() != null) {
+                statement.setLong(13, equipoBean.getUsucambio().getId());
+            } else {
+                statement.setNull(13, Types.INTEGER);
+            }
             if (equipoBean.getMacadress() == null) {
                 statement.setNull(14, Types.VARCHAR);
             } else {
@@ -499,7 +503,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      */
     @Override
     public ArrayList<EquipoBean> getLista(String texto) {
-        return getLista(texto, null, null, null, null, null);
+        return getLista(texto, null, null, null, null, null, null);
     }
 
     /**
@@ -510,7 +514,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      * @param servicio
      * @return
      */
-    public ArrayList<EquipoBean> getLista(String texto, String tipo, CentroBean centro, GfhBean servicio, Integer estado,
+    public ArrayList<EquipoBean> getLista(String texto, String tipo, String marca, CentroBean centro, GfhBean servicio, Integer estado,
             AplicacionBean aplicacionBean
     ) {
         Connection connection = null;
@@ -518,8 +522,11 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         try {
             connection = super.getConexionBBDD();
 
-            if (tipo != null) {
+            if (tipo != null && !tipo.isEmpty()) {
                 sql = sql.concat(" AND e.tipo='" + tipo + "'");
+            }
+            if (marca != null && marca.isEmpty()) {
+                sql = sql.concat(" AND e.marca='" + marca + "'");
             }
             if (centro != null) {
                 sql = sql.concat(" AND e.centro='" + centro.getId() + "'");

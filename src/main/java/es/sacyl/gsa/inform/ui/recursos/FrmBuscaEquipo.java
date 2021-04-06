@@ -13,9 +13,11 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
+import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.dao.CentroDao;
+import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.EquipoDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
@@ -32,6 +34,7 @@ import org.vaadin.klaudeta.PaginatedGrid;
 public class FrmBuscaEquipo extends Dialog {
 
     private final ComboBox<String> equipoTipoComboBuscador = new CombosUi().getEquipoTipoCombo(null, 50);
+    private final ComboBox<String> equipoMarcaComboBuscador = new CombosUi().getGrupoRamaComboValor(ComboBean.TIPOEQUIPOMARCA, equipoTipoComboBuscador.getValue(), null, "Marca");
 
     private final ComboBox<AutonomiaBean> autonomiaComboBuscador = new CombosUi().getAutonomiaCombo(AutonomiaBean.AUTONOMIADEFECTO, null);
     private final ComboBox<ProvinciaBean> provinciaComboBuscador = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null, AutonomiaBean.AUTONOMIADEFECTO);
@@ -47,7 +50,7 @@ public class FrmBuscaEquipo extends Dialog {
 
     public FrmBuscaEquipo() {
         this.add(filabuscadores);
-        filabuscadores.add(provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador, botonCancelar);
+        filabuscadores.add(provinciaComboBuscador, centroTipoComboBuscador, equipoMarcaComboBuscador, centroComboBuscador, botonCancelar);
         this.add(equipoGrid);
         doActualizaGrid();
         autonomiaComboBuscador.addValueChangeListener(event -> {
@@ -55,6 +58,10 @@ public class FrmBuscaEquipo extends Dialog {
             doActualizaComboProvinicas(provinciaComboBuscador, autonomiaBean);
         });
         equipoTipoComboBuscador.addValueChangeListener(evetn -> {
+            doActualizaGrid();
+        });
+        equipoTipoComboBuscador.addValueChangeListener(event -> {
+            equipoMarcaComboBuscador.setItems(new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPOMARCA, event.getValue(), 100));
             doActualizaGrid();
         });
         provinciaComboBuscador.addValueChangeListener(event -> {
@@ -93,7 +100,7 @@ public class FrmBuscaEquipo extends Dialog {
 
     public void doActualizaGrid() {
         ArrayList<EquipoBean> equipoArrayList = new EquipoDao().getLista(null, equipoTipoComboBuscador.getValue(),
-                centroComboBuscador.getValue(), null, null, null);
+                equipoMarcaComboBuscador.getValue(), centroComboBuscador.getValue(), null, null, null);
         equipoGrid.setItems(equipoArrayList);
     }
 

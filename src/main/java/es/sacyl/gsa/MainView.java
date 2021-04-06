@@ -22,7 +22,6 @@ import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.ctrl.LlamdasExternas;
 import es.sacyl.gsa.inform.ctrl.SesionCtrl;
-import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.exceptiones.LoginException;
 import es.sacyl.gsa.inform.ui.Menu;
@@ -208,7 +207,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         TimerTask timerTaskObj = new TimerTask() {
             @Override
             public void run() {
-                new ConexionDao().isTestConexion();
+                //   new ConexionDao().isTestConexion();
             }
         };
         timerObj.schedule(timerTaskObj, 0, 120000);
