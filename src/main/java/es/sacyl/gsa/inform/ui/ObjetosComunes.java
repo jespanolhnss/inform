@@ -241,6 +241,10 @@ public class ObjetosComunes {
         return boton;
     }
 
+    public Button getExcelBoton() {
+        return getBoton("Excel", ButtonVariant.LUMO_LARGE, VaadinIcon.GRID_BEVEL.create());
+    }
+
     /**
      *
      * @return

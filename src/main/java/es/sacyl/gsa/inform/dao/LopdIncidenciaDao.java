@@ -151,7 +151,11 @@ public class LopdIncidenciaDao extends ConexionDao {
 
             statement.setLong(2, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
 
-            statement.setLong(3, incidencia.getUsuCambio().getId());
+            if (incidencia.getUsuCambio() != null && incidencia.getUsuCambio().getId() != null) {
+                statement.setLong(3, incidencia.getUsuCambio().getId());
+            } else {
+                statement.setLong(3, UsuarioBean.USUARIO_SISTEMA.getId());
+            }
 
             statement.setBoolean(4, incidencia.getResuelta());
             if (incidencia.getFechaSolucion() != null) {

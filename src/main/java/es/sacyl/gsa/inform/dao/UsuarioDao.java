@@ -316,8 +316,8 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             if (usuarioBean.getUsucambio() != null) {
                 statement.setLong(8, usuarioBean.getUsucambio().getId());
             } else {
-                // si no hay usuario de cambio pone el mismo
-                statement.setLong(8, new Long(1));
+                // si no hay usuario de cambio pone el del sistema
+                statement.setLong(8, UsuarioBean.USUARIO_SISTEMA.getId());
             }
             statement.setLong(9, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
             statement.setInt(10, usuarioBean.getEstado());

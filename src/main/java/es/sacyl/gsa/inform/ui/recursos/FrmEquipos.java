@@ -79,6 +79,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPODEFECTO, null, null);
     private final ComboBox<String> equipoTipoComboBuscador = new CombosUi().getEquipoTipoCombo(null, 50);
     private final ComboBox<String> equipoMarcaComboBuscador = new CombosUi().getGrupoRamaComboValor(ComboBean.TIPOEQUIPOMARCA, equipoTipoComboBuscador.getValue(), null, "Marca");
+    private final Button excelButton = new ObjetosComunes().getExcelBoton();
+    private final Button etiquetaListaButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.BARCODE.create());
 
     private final Button ayudaUbicacion = new ObjetosComunes().getBotonMini();
     private final Button ayudaIp = new ObjetosComunes().getBotonMini();
@@ -171,6 +173,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 page1.setVisible(false);
             }
         }
+        botonImprimir.setEnabled(true);
     }
 
     /**
@@ -454,7 +457,13 @@ public final class FrmEquipos extends FrmMasterPantalla {
     public void doComponenesAtributos() {
         autonomiaComboBuscador.setVisible(Boolean.FALSE);
         ubicacionCombo.setLabel("Ubicación");
-        buscador.setLabel("Valores a buscar");
+        //      buscador.setLabel("Valores a buscar");
+        provinciaComboBuscador.setLabel("");
+        centroTipoComboBuscador.setLabel("");
+        centroComboBuscador.setLabel("");
+        equipoTipoComboBuscador.setLabel("");
+        equipoMarcaComboBuscador.setLabel("");
+        botonImprimir.setEnabled(true);
 
         nombredominio.setMinWidth("170px");
         //  nombredominio.setWidth("170px");
@@ -496,7 +505,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         contenedorDerecha.removeAll();
         contenedorBuscadores.add(autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador);
-        contenedorBuscadores1.add(equipoTipoComboBuscador, equipoMarcaComboBuscador, botonImprimir);
+        contenedorBuscadores1.add(equipoTipoComboBuscador, equipoMarcaComboBuscador, botonImprimir, excelButton, etiquetaListaButton);
 
         contenedorDerecha.add(this.contenedorBuscadores, this.contenedorBuscadores1, equipoGrid);
 
@@ -740,6 +749,10 @@ public final class FrmEquipos extends FrmMasterPantalla {
         etiquetaButton.addClickListener(event
                 -> {
             imprimeEtiqueta(equipoBean);
+        });
+        etiquetaButton.addClickListener(event
+                -> {
+            doImprimeEtiquetas();
         });
 
         /**
@@ -999,6 +1012,17 @@ public final class FrmEquipos extends FrmMasterPantalla {
         }
     }
      */
+    public void doImprimeEtiquetas() {
+
+        equipoArrayList = new EquipoDao().getLista(buscador.getValue(), equipoTipoComboBuscador.getValue(), equipoMarcaComboBuscador.getValue(),
+                centroComboBuscador.getValue(),
+                null, null, null);
+        for (EquipoBean equi : equipoArrayList) {
+            imprimeEtiqueta(equipoBean);
+        }
+
+    }
+
     public void imprimeEtiqueta(EquipoBean equipoBean) {
         String inventario = "", ip = "", sn = "";
         String valores = new ParametroDao().getPorCodigo(ParametroBean.PRINT_ETIQUETAS).getValor();
