@@ -4,11 +4,10 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class ViajeBean implements Serializable {
+public class ViajeBean extends MasterBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long id;
     private LocalDateTime salida;
     private LocalDateTime llegada;
 
@@ -19,15 +18,7 @@ public class ViajeBean implements Serializable {
     private ArrayList<UsuarioBean> listaTecnicos = new ArrayList<>();
 
     public ViajeBean() {
-        id = new Long(0);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        super();
     }
 
     public LocalDateTime getSalida() {

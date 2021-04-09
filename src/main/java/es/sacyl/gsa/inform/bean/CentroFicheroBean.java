@@ -5,26 +5,22 @@ import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.Blob;
-import java.time.LocalDate;
 import java.util.ArrayList;
 
 /**
  *
  * @author juannietopajares
  */
-public class CentroFicheroBean implements Serializable {
+public class CentroFicheroBean extends MasterBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long id;
     private CentroBean centro;
     private String descripcion;
     private Blob ficheroBlobs;
     private String nombreFichero;
     private String nombreFicheroMiniatura;
-    private Integer estado;
-    private UsuarioBean usuarioCambio;
-    private LocalDate fechaCambio;
+
     private byte[] imageBytes;
 
     private InputStream streamInputStream;
@@ -45,15 +41,7 @@ public class CentroFicheroBean implements Serializable {
     };
 
     public CentroFicheroBean() {
-        this.id = new Long(0);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        super();
     }
 
     public CentroBean getCentro() {
@@ -92,32 +80,8 @@ public class CentroFicheroBean implements Serializable {
         this.ficheroBlobs = ficheroBlobs;
     }
 
-    public Integer getEstado() {
-        return estado;
-    }
-
-    public void setEstado(Integer estado) {
-        this.estado = estado;
-    }
-
-    public UsuarioBean getUsuarioCambio() {
-        return usuarioCambio;
-    }
-
-    public void setUsuarioCambio(UsuarioBean usuarioCambio) {
-        this.usuarioCambio = usuarioCambio;
-    }
-
-    public LocalDate getFechaCambio() {
-        return fechaCambio;
-    }
-
     public String getFechaCambioFormato() {
-        return Utilidades.getFechadd_mm_yyyy(fechaCambio);
-    }
-
-    public void setFechaCambio(LocalDate fechaCambio) {
-        this.fechaCambio = fechaCambio;
+        return Utilidades.getFechadd_mm_yyyy(fechacambio);
     }
 
     public String getNombreFichero() {

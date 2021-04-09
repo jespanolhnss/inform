@@ -88,6 +88,11 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + ",usu.fechacambio as usuariofechacambio,usu.mail as usuariomail"
                 + ",usu.telefono as usuariotelefon,usu.idgfh as usuarioidgfh"
                 + ",usu.idcategoria as usuarioidcategoria"
+                + ",usu.idcategoria as usuarioidcategoria,usu.movil as usuariomovil"
+                + ",usu.mailprivado as usuariomailprivado,usu.telegram as usuariotegegram"
+                + ",usu.solicita as usuariosolicita"
+                + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
+                + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
                 + ",usue.id as usueid,usue.dni as usuedni,usue.apellido1 as usueapellido1"
                 + ",usue.apellido2 as usueapellido2,usue.nombre as usuenombre"
                 + ",usue.estado as usueestado,usue.usucambio as usueusucambio"
@@ -98,6 +103,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + " LEFT JOIN  gfh  ON gfh.id=e.servicio"
                 + " LEFT JOIN ubicaciones u ON u.id=e.ubicacion"
                 + " LEFT JOIN usuarios usu ON usu.id=e.usucambio"
+                + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
                 + " LEFT JOIN usuarios usue ON usue.id=e.usuario"
                 + " WHERE  1=1 ";
     }
@@ -138,8 +144,8 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 equipoBean.setCentro(centro);
             }
 
-            //          equipoBean.setUbicacion(new UbicacionDao().getPorId(rs.getLong("equipoubicacion")));
-            equipoBean.setUbicacion(new UbicacionDao().getRegistroResulset(rs, equipoBean.getCentro()));
+            equipoBean.setUbicacion(new UbicacionDao().getPorId(rs.getLong("equipoubicacion")));
+            //  equipoBean.setUbicacion(new UbicacionDao().getRegistroResulset(rs, equipoBean.getCentro()));
             if (servicio == null) {
                 //     equipoBean.setServicio(new GfhDao().getPorId(rs.getLong("equiposervicio")));
                 equipoBean.setServicio(new GfhDao().getRegistroResulset(rs));

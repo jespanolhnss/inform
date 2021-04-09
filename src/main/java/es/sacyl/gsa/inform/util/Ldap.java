@@ -36,7 +36,7 @@ public class Ldap {
 
     }
 
-    public static UsuarioBean loginActiveDirectory(String user, String password) throws LoginException {
+    public UsuarioBean loginActiveDirectory(String user, String password) throws LoginException {
 
         UsuarioBean usuario = new UsuarioBean();
 

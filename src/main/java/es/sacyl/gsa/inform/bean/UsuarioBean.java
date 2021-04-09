@@ -32,6 +32,9 @@ public class UsuarioBean extends MasterBean implements Serializable {
     private String telefono;
     private CategoriaBean categoria;
     private String solicita;
+    private String movilUsuario;
+    private String correoPrivadoUsuario;
+    private String telegram;
     private Set<String> funcionalidadStrings = new HashSet<String>();
 
     private ArrayList<FuncionalidadBean> fucionalidadesArrayList = new ArrayList<FuncionalidadBean>();
@@ -286,6 +289,30 @@ public class UsuarioBean extends MasterBean implements Serializable {
 
     public void setSolicita(String solicita) {
         this.solicita = solicita;
+    }
+
+    public String getMovilUsuario() {
+        return movilUsuario;
+    }
+
+    public void setMovilUsuario(String movilUsuario) {
+        this.movilUsuario = movilUsuario;
+    }
+
+    public String getCorreoPrivadoUsuario() {
+        return correoPrivadoUsuario;
+    }
+
+    public void setCorreoPrivadoUsuario(String correoPrivadoUsuario) {
+        this.correoPrivadoUsuario = correoPrivadoUsuario;
+    }
+
+    public String getTelegram() {
+        return telegram;
+    }
+
+    public void setTelegram(String telegram) {
+        this.telegram = telegram;
     }
 
 }

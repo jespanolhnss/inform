@@ -134,6 +134,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         tecnicosButton.setEnabled(true);
         try {
             viajesBinder.writeBean(viajeBean);
+            viajeBean.setValoresAut();
             if (new ViajesDao().doGrabaDatos(viajeBean) == true) {
                 (new Notification(FrmMasterConstantes.AVISODATOALMACENADO, 3000, Notification.Position.MIDDLE)).open();
                 // leo el binder para que pinte del id
@@ -426,7 +427,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
 
         tecnicosButton.addClickListener(event
                 -> {
-            FrmViajesTecnicosRegistrar nuevo = new FrmViajesTecnicosRegistrar("640px", viajeBean);
+            FrmViajesTecnicosRegistrar nuevo = new FrmViajesTecnicosRegistrar(viajeBean);
             nuevo.addDialogCloseActionListener(e -> {
                 doActualizaGridTecnicos(viajeBean);
                 nuevo.close();

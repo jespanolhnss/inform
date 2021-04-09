@@ -7,6 +7,7 @@ import es.sacyl.gsa.inform.bean.ViajeCentroBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -103,6 +104,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
     public boolean doGrabaDatos(ViajeBean viajeBean) {
         boolean actualizado = false;
         if (viajeBean != null && viajeBean.getId() != null && getPorId(viajeBean.getId(), Boolean.FALSE) == null) {
+            viajeBean.setId(getSiguienteId("viajes"));
             actualizado = this.doInsertaDatos(viajeBean);
         } else {
             actualizado = this.doActualizaDatos(viajeBean);
@@ -114,21 +116,26 @@ public class ViajesDao extends ConexionDao implements Serializable {
         Connection connection = null;
         Boolean insertadoBoolean = false;
         try {
+
             connection = super.getConexionBBDD();
-            viajeBean.setId(this.getSiguienteId("viajes"));
-            sql = " INSERT INTO  viajes  (id,fecha,horasalida,horallegada,matricula,estado,usucambio,fechacambio) " + " VALUES "
-                    + "(" + viajeBean.getId() + ",'" + Utilidades.getFechaLong(viajeBean.getSalida()) + "','"
-                    + Utilidades.getHoraInt(viajeBean.getSalida())
-                    + "','" + Utilidades.getHoraInt(viajeBean.getLlegada()) + "','" + viajeBean.getMatricula() + "'"
-                    + ", '" + ConexionDao.BBDD_ACTIVOSI + "','"
-                    + usuarioBean.getId() + "','" + Utilidades.getFechaActualLong() + "')";
-            try (Statement statement = connection.createStatement()) {
-                insertadoBoolean = statement.execute(sql);
-                //    doInsertaCentros(viajeBean);
-                //   doInsertaTecnicos(viajeBean);
-                insertadoBoolean = true;
-                statement.close();
+            sql = " INSERT INTO viajes (id,fecha,horasalida,horallegada,matricula,estado,usucambio,fechacambio ) "
+                    + " VALUES (?,?,?,?,?,?,?,?)  ";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setLong(1, viajeBean.getId());
+            statement.setLong(2, Utilidades.getFechaLong(viajeBean.getSalida()));
+            statement.setInt(3, Utilidades.getHoraInt(viajeBean.getSalida()));
+            statement.setInt(4, Utilidades.getHoraInt(viajeBean.getLlegada()));
+            statement.setString(5, viajeBean.getMatricula());
+            statement.setInt(6, viajeBean.getEstado());
+            if (viajeBean.getUsucambio() != null) {
+                statement.setLong(7, viajeBean.getUsucambio().getId());
+            } else {
+                statement.setLong(7, UsuarioBean.USUARIO_SISTEMA.getId());
             }
+            statement.setLong(8, Utilidades.getFechaLong(viajeBean.getFechacambio()));
+
+            insertadoBoolean = statement.executeUpdate() > 0;
+            statement.close();
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
@@ -145,28 +152,26 @@ public class ViajesDao extends ConexionDao implements Serializable {
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE   viajes  SET fecha='" + Utilidades.getFechaLong(viajeBean.getSalida()) + "'"
-                    + ",horasalida='" + Utilidades.getHoraInt(viajeBean.getSalida()) + "', horallegada="
-                    + Utilidades.getHoraInt(viajeBean.getLlegada())
-                    + ",matricula='" + viajeBean.getMatricula() + "'"
-                    + ",estado='" + ConexionDao.BBDD_ACTIVOSI + "'"
-                    + ",usucambio='" + usuarioBean.getId() + "'"
-                    + ",fechacambio=" + Utilidades.getFechaActualLong()
-                    + " WHERE id='" + viajeBean.getId() + "'";
+            sql = " UPDATE  viajes  SET fecha=?,horasalida=?,horallegada=?,matricula=?,estado=?,usucambio=?,fechacambio=?  WHERE id=?  ";
+            PreparedStatement statement = connection.prepareStatement(sql);
 
-            try (Statement statement = connection.createStatement()) {
-                insertadoBoolean = statement.execute(sql);
-                //   doBorraCentros(viajeBean.getId());
-                //  doInsertaCentros(viajeBean);
-                //  doBorraTecnicos(viajeBean.getId());
-                //  doInsertaCentros(viajeBean);
-                insertadoBoolean = true;
-                statement.close();
+            statement.setLong(1, Utilidades.getFechaLong(viajeBean.getSalida()));
+            statement.setInt(2, Utilidades.getHoraInt(viajeBean.getSalida()));
+            statement.setInt(3, Utilidades.getHoraInt(viajeBean.getLlegada()));
+            statement.setString(4, viajeBean.getMatricula());
+            statement.setInt(5, viajeBean.getEstado());
+            if (viajeBean.getUsucambio() != null) {
+                statement.setLong(6, viajeBean.getUsucambio().getId());
+            } else {
+                statement.setLong(6, UsuarioBean.USUARIO_SISTEMA.getId());
             }
+            statement.setLong(7, Utilidades.getFechaLong(viajeBean.getFechacambio()));
+            statement.setLong(8, viajeBean.getId());
+            insertadoBoolean = statement.executeUpdate() > 0;
+            statement.close();
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
-
         } catch (Exception e) {
             LOGGER.error(e);
         } finally {
@@ -180,13 +185,18 @@ public class ViajesDao extends ConexionDao implements Serializable {
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE viajes SET  " + ",estado='" + ConexionDao.BBDD_ACTIVOSI + "'"
-                    + ",usucambio='" + usuarioBean.getId() + "'"
-                    + ",fechacambio=" + Utilidades.getFechaActualLong()
-                    + " WHERE id='" + viajeBean.getId() + "'";
-            Statement statement = connection.createStatement();
-            insertadoBoolean = statement.execute(sql);
-            insertadoBoolean = true;
+            viajeBean.setEstado(ConexionDao.BBDD_ACTIVONO);
+            sql = " UPDATE  viajes  SET estado=?,usucambio=?,fechacambio=?  WHERE id=?  ";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, viajeBean.getEstado());
+            if (viajeBean.getUsucambio() != null) {
+                statement.setLong(2, viajeBean.getUsucambio().getId());
+            } else {
+                statement.setLong(2, UsuarioBean.USUARIO_SISTEMA.getId());
+            }
+            statement.setLong(3, Utilidades.getFechaLong(viajeBean.getFechacambio()));
+            statement.setLong(4, viajeBean.getId());
+            insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
             LOGGER.debug(sql);
         } catch (SQLException e) {

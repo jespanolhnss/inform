@@ -34,11 +34,14 @@ public final class FrmUsuarios extends FrmMasterPantalla {
     private final TextField apellido1Usuario = new ObjetosComunes().getTextField("Apellido 1", "teclea primer apellido", 25, "100px", "30px");
     private final TextField apellido2Usuario = new ObjetosComunes().getTextField("Apellido 2", "teclea segundo apellido", 25, "100px", "30px");
     private final TextField nifUsuario = new ObjetosComunes().getDni();
-    private final TextField correoUsuario = new ObjetosComunes().getMail("Correo Electrónico", "Correo del lusuario");
+    private final TextField correoUsuario = new ObjetosComunes().getMail("Correo Electrónico", "Correo del usuario");
     private final TextField telefonoUsuario = new ObjetosComunes().getTelefono();
     private final ComboBox<CategoriaBean> categoriaUsuario = new CombosUi().getCategoriaCombo(null, null);
     private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
     private final RadioButtonGroup<String> solicitaRadio = new ObjetosComunes().getEstadoRadio();
+    private final TextField movilUsuario = new ObjetosComunes().getTelefono();
+    private final TextField correoPrivadoUsuario = new ObjetosComunes().getMail("Correo particular", "Correo del particular");
+    private final TextField telegram = new ObjetosComunes().getTextField("Telegram");
 
     private UsuarioBean usuarioBean = new UsuarioBean();
     private Binder<UsuarioBean> usuarioBinder = new Binder<>();
@@ -197,6 +200,23 @@ public final class FrmUsuarios extends FrmMasterPantalla {
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 25))
                 .bind(UsuarioBean::getSolicita, UsuarioBean::setSolicita);
 
+        usuarioBinder.forField(movilUsuario)
+                .withNullRepresentation("")
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 20))
+                .bind(UsuarioBean::getMovilUsuario, UsuarioBean::setMovilUsuario);
+
+        usuarioBinder.forField(correoPrivadoUsuario)
+                .withNullRepresentation("")
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 100))
+                .bind(UsuarioBean::getCorreoPrivadoUsuario, UsuarioBean::setCorreoPrivadoUsuario);
+
+        usuarioBinder.forField(telegram)
+                .withNullRepresentation("")
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 20))
+                .bind(UsuarioBean::getTelegram, UsuarioBean::setTelegram);
     }
 
     @Override
@@ -208,7 +228,7 @@ public final class FrmUsuarios extends FrmMasterPantalla {
     @Override
     public void doComponentesOrganizacion() {
         this.contenedorFormulario.add(nombreUsuario, apellido1Usuario, apellido2Usuario, nifUsuario, correoUsuario,
-                telefonoUsuario, categoriaUsuario, estadoRadio, solicitaRadio);
+                telefonoUsuario, categoriaUsuario, estadoRadio, solicitaRadio, movilUsuario, correoPrivadoUsuario, telegram);
 
         this.contenedorBuscadores.add(buscador);
         this.contenedorDerecha.removeAll();
@@ -222,6 +242,9 @@ public final class FrmUsuarios extends FrmMasterPantalla {
     @Override
     public void doCompentesEventos() {
 
+        buscador.addBlurListener(event -> {
+            doActualizaGrid();
+        });
         usuarioGrid.addItemClickListener(event -> {
             usuarioBean = event.getItem();
             usuarioBinder.readBean(event.getItem());

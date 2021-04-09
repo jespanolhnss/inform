@@ -136,7 +136,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         //UsuarioBean usuario = new UsuarioDao().getUsuarioDni(user, Boolean.FALSE);
         UsuarioBean usuario = null;
         try {
-            usuario = Ldap.loginActiveDirectory(user, pass);
+            usuario = new Ldap().loginActiveDirectory(user, pass);
         } catch (LoginException ex) {
             Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -206,9 +206,11 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
     public static void doTimerDa0() {
         Timer timerObj = new Timer();
         TimerTask timerTaskObj = new TimerTask() {
+            ConexionDao conexionDao = new ConexionDao();
+
             @Override
             public void run() {
-                new ConexionDao().isTestConexion();
+                conexionDao.isTestConexion();
             }
         };
         timerObj.schedule(timerTaskObj, 0, 120000);

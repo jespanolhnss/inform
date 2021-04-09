@@ -69,9 +69,9 @@ public class CentroFicheroDao extends ConexionDao implements Serializable, Conex
             statement.setString(3, centroFicheroBean.getDescripcion());
             statement.setBinaryStream(4, in, (int) file.length());
             statement.setString(5, centroFicheroBean.getNombreFichero());
-            statement.setInt(6, CentroDao.BBDD_ACTIVOSI);
-            if (usuarioBean != null && usuarioBean.getId() != null) {
-                statement.setLong(7, this.usuarioBean.getId());
+            statement.setInt(6, centroFicheroBean.getEstado());
+            if (centroFicheroBean.getUsucambio() != null && centroFicheroBean.getUsucambio().getId() != null) {
+                statement.setLong(7, centroFicheroBean.getUsucambio().getId());
             } else {
                 statement.setNull(7, Types.INTEGER);
             }
@@ -114,9 +114,9 @@ public class CentroFicheroDao extends ConexionDao implements Serializable, Conex
                 centroFicheroBean.setNombreFichero(resulSet.getString("nombre"));
 
                 centroFicheroBean.setCentro(centroTBean);
-                centroFicheroBean.setFechaCambio(Utilidades.getFechaLocalDate(resulSet.getLong("fechaCambio")));
+                centroFicheroBean.setFechacambio(Utilidades.getFechaLocalDate(resulSet.getLong("fechaCambio")));
                 centroFicheroBean.setEstado(resulSet.getInt("estado"));
-                centroFicheroBean.setUsuarioCambio(new UsuarioDao().getPorId(resulSet.getLong("usucambio")));
+                centroFicheroBean.setUsucambio(new UsuarioDao().getPorId(resulSet.getLong("usucambio")));
                 Blob blob = resulSet.getBlob("fichero");
                 byte[] bytes = blob.getBytes(1l, (int) blob.length());
                 centroFicheroBean.setImageBytes(bytes);

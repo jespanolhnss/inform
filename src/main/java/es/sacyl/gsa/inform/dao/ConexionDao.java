@@ -5,7 +5,6 @@ package es.sacyl.gsa.inform.dao;
  * @author 06551256M
  */
 import com.vaadin.flow.component.notification.Notification;
-import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -112,8 +111,7 @@ public class ConexionDao implements Serializable {
     public DateTimeFormatter formatterdd_mm_yyyy = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     public DateTimeFormatter formatterdd_mm_yyyy_hh_mm = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-    protected UsuarioBean usuarioBean;
-
+    //protected UsuarioBean usuarioBean;
     /**
      * asigna valor al atributo usuario con el valor almacenado en la variable
      * sesion

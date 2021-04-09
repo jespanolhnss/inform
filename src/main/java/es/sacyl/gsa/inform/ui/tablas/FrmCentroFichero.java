@@ -27,7 +27,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -225,7 +224,7 @@ public final class FrmCentroFichero extends FrmMasterVentana {
         centroFicheroBean.setDescripcion(descripcion.getValue());
         centroFicheroBean.setNombreFichero(filename.toLowerCase());
         centroFicheroBean.setNombreFicheroMiniatura(centroFicheroBean.getNombreFicheroNoExtension() + Constantes.MINIATURAEXTENSION);
-        centroFicheroBean.setFechaCambio(LocalDate.now());
+        centroFicheroBean.setValoresAut();
 
         new CentroFicheroDao().doGrabaDatos(centroFicheroBean);
         // new CentroTDao().doInsertaFichero(centroTBean, stream, filename, descripcion.getValue());

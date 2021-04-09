@@ -457,6 +457,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     public void doComponenesAtributos() {
         autonomiaComboBuscador.setVisible(Boolean.FALSE);
         ubicacionCombo.setLabel("Ubicación");
+        ubicacionCombo.setMaxWidth("450px");
         //      buscador.setLabel("Valores a buscar");
         provinciaComboBuscador.setLabel("");
         centroTipoComboBuscador.setLabel("");
@@ -466,7 +467,6 @@ public final class FrmEquipos extends FrmMasterPantalla {
         botonImprimir.setEnabled(true);
 
         nombredominio.setMinWidth("170px");
-        //  nombredominio.setWidth("170px");
         wwwimage.setVisible(false);
 
         page1.setWidthFull();
