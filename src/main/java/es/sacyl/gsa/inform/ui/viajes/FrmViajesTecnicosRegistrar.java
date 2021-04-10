@@ -101,14 +101,16 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
 
         usuGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         usuGrid.setHeightByRows(true);
-        usuGrid.setPageSize(15);
-        usuGrid.addColumn(UsuarioBean::getApellidosNombre).setAutoWidth(true).setHeader(new Html("<b>Usuario</b>"));
+
+        usuGrid.addColumn(UsuarioBean::getApellidosNombre).setWidth("300px").setHeader(new Html("<b>Usuario</b>"));
         usuGrid.setWidth("500px");
         ArrayList<UsuarioBean> lista = new UsuarioDao().getInformaticos();
         usuGrid.setItems(lista);
         if (lista.size() > 0) {
             usuGrid.setHeightByRows(true);
             usuGrid.setPageSize(lista.size());
+        } else {
+            usuGrid.setPageSize(5);
         }
         usuGrid.setSelectionMode(Grid.SelectionMode.MULTI);
 

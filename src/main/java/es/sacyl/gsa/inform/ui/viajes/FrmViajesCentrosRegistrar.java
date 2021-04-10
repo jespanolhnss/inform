@@ -68,6 +68,7 @@ public final class FrmViajesCentrosRegistrar extends FrmMasterVentana {
 
     public FrmViajesCentrosRegistrar(String ancho, ViajeCentroBean viajeCentrosBean) {
         super(ancho);
+        //  this.viajeBean=viajeCentrosBean.get
         this.viajeCentrosBean = viajeCentrosBean;
         viajeCentrosBinder.setBean(viajeCentrosBean);
         botonGrabar.setVisible(false);
@@ -182,12 +183,22 @@ public final class FrmViajesCentrosRegistrar extends FrmMasterVentana {
                 .asRequired()
                 .bind(ViajeCentroBean::getPreparacion, ViajeCentroBean::setPreparacion);
         viajeCentrosBinder.forField(actuacionTextArea)
-                .asRequired().bind(ViajeCentroBean::getActuacion, ViajeCentroBean::setActuacion);
+                .bind(ViajeCentroBean::getActuacion, ViajeCentroBean::setActuacion);
     }
 
     @Override
     public void doComponenesAtributos() {
         this.setModal(true);
+        if (viajeCentrosBean != null && viajeCentrosBean.getIdViaje() != null) {
+            this.titulo.setText("Centros del viaje " + viajeCentrosBean.getIdViaje().toString());
+        } else if (viajeBean != null && viajeBean.getId() != null) {
+            this.titulo.setText("Centros del viaje " + viajeBean.getId().toString());
+        } else {
+            this.titulo.setText("Centros del viaje ");
+        }
+
+        this.tipoCentroCombo.setValue(CentroTipoBean.CENTROTIPOCENTROSALUD);
+
         contenedorDerecha.setVisible(false);
         preparacionTextArea.setHeight("150px");
         preparacionTextArea.setPlaceholder("Datos de la preparación del viaje");

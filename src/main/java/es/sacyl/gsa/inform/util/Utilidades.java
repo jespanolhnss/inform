@@ -228,7 +228,7 @@ public class Utilidades {
             hh = fecha.getHour();
             mm = fecha.getMinute();
             ss = fecha.getSecond();
-            unaHecha = new Integer(hh * 10000 + mm * 100 + ss);
+            unaHecha = new Integer(hh * 100 + mm);
         }
         return unaHecha;
     }
@@ -249,7 +249,8 @@ public class Utilidades {
             y = Integer.parseInt(fechaString.substring(0, 4));
             m = Integer.parseInt(fechaString.substring(4, 6));
             d = Integer.parseInt(fechaString.substring(6, 8));
-            if (horaString.length() == 4) {
+
+            if (horaString.length() >= 4) {
                 h = Integer.parseInt(horaString.substring(0, 2));
                 mi = Integer.parseInt(horaString.substring(2, 4));
             } else if (horaString.length() == 3) {

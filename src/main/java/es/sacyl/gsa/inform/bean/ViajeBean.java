@@ -2,6 +2,7 @@ package es.sacyl.gsa.inform.bean;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class ViajeBean extends MasterBean implements Serializable {
@@ -23,6 +24,11 @@ public class ViajeBean extends MasterBean implements Serializable {
 
     public LocalDateTime getSalida() {
         return salida;
+    }
+
+    public String getSalidaString() {
+        DateTimeFormatter formatterdd_mm_yyyy_hh_mm = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm");
+        return formatterdd_mm_yyyy_hh_mm.format(salida);
     }
 
     public void setSalida(LocalDateTime salida) {

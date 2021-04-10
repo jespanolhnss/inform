@@ -140,7 +140,7 @@ public class Ldap {
 
             logger.error("Error de autentificacion", e);
 
-            // new NotificacionInfo("ldap.loginActiveDirectory : Error de autentificacion",
+            new Notification("ldap.loginActiveDirectory : Error de autentificacion");
             // true);
             throw new LoginException("Error de autentificacion", e);
 
