@@ -26,8 +26,8 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
 
     public GfhDao() {
         super();
-        sql = " SELECT gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+        sql = " SELECT gfh.id as gfhid,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena as gfhidjimena, gfh.estado as gfhestado"
                 + " FROM gfh gfh WHERE 1=1 ";
     }
 
@@ -44,7 +44,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
             gfh.setIdjimena(rs.getLong("gfhidjimena"));
             gfh.setCodigo(rs.getString("gfhcodigo"));
             gfh.setDescripcion(rs.getString("gfhdescripcion"));
-            gfh.setAsistencial(rs.getInt("gfhasisencial"));
+            gfh.setAsistencial(rs.getInt("gfhasistencial"));
             gfh.setEstado(rs.getInt("gfhestado"));
         } catch (SQLException e) {
             logger.error(Utilidades.getStackTrace(e));
@@ -234,6 +234,37 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
         }
         return lista;
     }
+    
+    public ArrayList<GfhBean> getListaPorCodigo(String texto, Integer estado) {
+        Connection connection = null;
+        ArrayList<GfhBean> lista = new ArrayList<GfhBean>();
+        try {
+            connection = super.getConexionBBDD();
+            if (estado != null) {
+                sql = sql.concat(" AND estado=" + estado);
+            }
+            if (texto != null && !texto.isEmpty()) {
+                sql = sql.concat(" AND codigo LIKE '%" + texto + "%'");
+            }
+            sql = sql.concat(" ORDER BY descripcion	");
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(sql);
+            while (resulSet.next()) {
+                GfhBean gfh = getRegistroResulset(resulSet);
+                lista.add(gfh);
+            }
+            statement.close();
+            logger.debug(sql);
+        } catch (SQLException e) {
+            logger.error(sql);
+            logger.error(ConexionDao.ERROR_BBDD_SQL, e);
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
 
     @Override
     public GfhBean getPorId(Long id) {
@@ -298,8 +329,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
         GfhBean gfh = null;
         try {
             connection = super.getConexionBBDD();
-            sql = "SELECT  *  FROM gfh WHERE estado=" + ConexionDao.BBDD_ACTIVOSI + " AND codigo='" + codigo
-                    + "'";
+            sql = sql.concat(" AND estado=" + ConexionDao.BBDD_ACTIVOSI + " AND codigo = '" + codigo + "'");
             logger.debug(sql);
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);

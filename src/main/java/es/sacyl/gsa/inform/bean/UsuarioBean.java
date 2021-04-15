@@ -30,6 +30,10 @@ public class UsuarioBean extends MasterBean implements Serializable {
     private String clave;
     private String mail;
     private String telefono;
+    private CategoriaBean categoria;
+    private GfhBean gfh;
+    private String tipo;
+    private String comentario;
 
     private Set<String> funcionalidadStrings = new HashSet<String>();
 
@@ -188,7 +192,81 @@ public class UsuarioBean extends MasterBean implements Serializable {
     public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
+    
+    public Long getIdCategoria() {
+        Long idCategoria = new Long(0)
+                ;
+        if (categoria != null) {
+            idCategoria = categoria.id;
+        }
+        
+        return idCategoria;
+    }
+    
+    public String getNombreCategoria() {
+        String nombreCategoria = "";
+        
+        if (categoria != null) {
+            nombreCategoria = categoria.getNombre();
+        }
+        return nombreCategoria;
+    }
+    
+    public CategoriaBean getCategoria() {
+        return categoria;
+    }
 
+    public void setCategoria(CategoriaBean categoria) {
+        this.categoria = categoria;
+    }
+    
+    public void setIdCategoria(Long categoria) {
+        this.categoria.id = categoria;
+    }
+    
+    public GfhBean getGfh() {
+        return gfh;
+    }
+    
+    public Long getIdGfh() {
+        Long idGfh = new Long(0);
+        
+        if (gfh != null) {
+            idGfh = gfh.getId();
+        }
+        
+        return idGfh;
+    }
+    
+    public String getNombreGfh() {
+        String nombreGfh = "";
+        
+        if (gfh != null) {
+            nombreGfh = gfh.getDescripcion();
+        }
+        return nombreGfh;
+    }
+    
+    public void setGfh(GfhBean gfh) {
+        this.gfh = gfh;
+    }
+    
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+    
+    public String getComentario() {
+        return comentario;
+    }
+    
+    public void setComentario(String comentario) {
+        this.comentario = comentario;
+    }
+    
     public UsuarioBean getUsucambio() {
         return usucambio;
     }

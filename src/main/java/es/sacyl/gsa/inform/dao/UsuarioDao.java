@@ -5,6 +5,8 @@ import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.bean.FuncionalidadBean;
 import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
+import es.sacyl.gsa.inform.bean.UsuarioPeticionAppBean;
+import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
@@ -13,7 +15,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -68,6 +69,8 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             usuario.setNombre(resulSet.getString("usuarionombre"));
             usuario.setMail(resulSet.getString("usuariomail"));
             usuario.setTelefono(resulSet.getString("usuariotelefon"));
+            usuario.setCategoria(new CategoriaDao().getPorId(resulSet.getLong("usuarioidcategoria")));
+            usuario.setGfh(new GfhDao().getPorId(resulSet.getLong("usuarioidgfh")));
             usuario.setEstado(resulSet.getInt("usuarioestado"));
         } catch (SQLException e) {
             logger.error(Utilidades.getStackTrace(e));
@@ -93,6 +96,8 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             usuario.setNombre(resulSet.getString("usuenombre"));
             usuario.setMail(resulSet.getString("usuemail"));
             usuario.setTelefono(resulSet.getString("usuetelefon"));
+            usuario.setCategoria(new CategoriaDao().getPorId(resulSet.getLong("usuarioidcategoria")));
+            usuario.setGfh(new GfhDao().getPorId(resulSet.getLong("usuarioidgfh")));
             usuario.setEstado(resulSet.getInt("usueestado"));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
@@ -231,7 +236,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         try {
             connection = super.getConexionBBDD();
             sql = " UPDATE  usuarios  SET dni=?,apellido1=?,apellido2=?,nombre=?"
-                    + ", mail=?,telefono=?,usucambio=?,fechacambio=?,estado=? "
+                    + ", mail=?,telefono=?,idcategoria=?,idgfh=?,usucambio=?,fechacambio=?,estado=? "
                     + " WHERE id=?  ";
             PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -241,14 +246,17 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             statement.setString(4, usuarioBean.getNombre());
             statement.setString(5, usuarioBean.getMail());
             statement.setString(6, usuarioBean.getTelefono());
+            statement.setLong(7, usuarioBean.getIdCategoria());
+            statement.setLong(8, usuarioBean.getIdGfh());
             if (usuarioBean.getUsucambio() == null) {
-                statement.setLong(7, usuarioBean.getUsucambio().getId());
+                statement.setLong(9, usuarioBean.getUsucambio().getId());
             } else {
-                statement.setNull(7, Types.INTEGER);
+                // si no hay usuario de cambio pone el mismo
+                statement.setLong(9, new Long(1));
             }
-            statement.setLong(8, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
-            statement.setInt(9, usuarioBean.getEstado());
-            statement.setLong(10, usuarioBean.getId());
+            statement.setLong(10, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
+            statement.setInt(11, usuarioBean.getEstado());
+            statement.setLong(12, usuarioBean.getId());
             insertado = statement.executeUpdate() > 0;
             statement.close();
             logger.debug(sql);
@@ -303,8 +311,8 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         Long id = null;
         try {
             connection = super.getConexionBBDD();
-            sql = " INSERT INTO usuarios (id,dni,apellido1,apellido2,nombre,mail,telefono,usucambio,fechacambio,estado) "
-                    + " VALUES (?,?,?,?,?,?,?,?,?,?)  ";
+            sql = " INSERT INTO usuarios (id,dni,apellido1,apellido2,nombre,mail,telefono,idcategoria,idgfh,usucambio,fechacambio,estado)"
+                    + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)  ";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setLong(1, usuarioBean.getId());
             statement.setString(2, usuarioBean.getDni());
@@ -313,15 +321,18 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             statement.setString(5, usuarioBean.getNombre());
             statement.setString(6, usuarioBean.getMail());
             statement.setString(7, usuarioBean.getTelefono());
+            statement.setLong(8, usuarioBean.getIdCategoria());
+            statement.setLong(9, usuarioBean.getIdGfh());
             if (usuarioBean.getUsucambio() != null) {
-                statement.setLong(8, usuarioBean.getUsucambio().getId());
+                statement.setLong(10, usuarioBean.getUsucambio().getId());
             } else {
                 // si no hay usuario de cambio pone el mismo
-                statement.setLong(8, new Long(1));
+                statement.setLong(10, new Long(1));
             }
-            statement.setLong(9, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
-            statement.setInt(10, usuarioBean.getEstado());
+            statement.setLong(11, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
+            statement.setInt(12, usuarioBean.getEstado());
             insertado = statement.executeUpdate() > 0;
+            insertado = true;
             statement.close();
             logger.debug(sql);
         } catch (SQLException e) {
@@ -343,14 +354,13 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         try {
             UsuarioBean usuarioa = (UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME);
             connection = super.getConexionBBDD();
-
-            sql = " UPDATE usuarios SET   usucambio='" + usuarioa.getDni() + "',  fechacambio="
-                    + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ",estado=" + ConexionDao.BBDD_ACTIVONO + " WHERE id="
-                    + usuarioa.getId();
-            Statement statement = connection.createStatement();
-            insertadoBoolean = statement.execute(sql);
-            insertadoBoolean = true;
-            statement.close();
+            sql = " UPDATE usuarios SET   usucambio='" + usuarioa.getId() + "',  fechacambio="
+                    + Integer.parseInt(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))) + ",estado=" + ConexionDao.BBDD_ACTIVONO + " WHERE id="
+                    + ob.getId();
+            try (Statement statement = connection.createStatement()) {
+                insertadoBoolean = statement.execute(sql);
+                insertadoBoolean = true;
+            }
             logger.debug(sql);
         } catch (SQLException e) {
             logger.error(sql + Utilidades.getStackTrace(e));
@@ -533,4 +543,81 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         }
         return usuario;
     }
+
+    public boolean doGrabaPeticion(UsuarioBean usuario, UsuarioPeticionBean peticion) {
+        Connection connection = null;
+        boolean insertado = false;
+        peticion.setId(getSiguienteId("usuariospeticiones"));
+        peticion.setIdusuario(usuario.getId());
+        
+        try {
+            connection = super.getConexionBBDD();
+            String insertar;
+            insertar = "insert into usuariospeticiones " + 
+                    "(id,idpeticionario,idusuario,estado,fechasolicitud,centro,comentario) " +
+                    "values (?,?,?,?,?,?,?)";
+            PreparedStatement statement = connection.prepareStatement(insertar);
+            statement.setLong(1, peticion.getId());
+            statement.setLong(2, peticion.getIdpeticionario());
+            statement.setLong(3, peticion.getIdusuario());
+            statement.setInt(4, ConexionDao.BBDD_ACTIVONO);
+            statement.setInt(5, Integer.parseInt(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
+            statement.setString(6, peticion.getCentros());
+            statement.setString(7, peticion.getComentario());
+            insertado = statement.executeUpdate() > 0;
+            statement.close();
+            logger.debug(insertar);           
+        } catch (SQLException e) {
+            logger.error(Utilidades.getStackTrace(e));
+            logger.error(ConexionDao.ERROR_BBDD_SQL, e);
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return insertado;
+        
+    }
+
+    public boolean doGrabaPeticionApp(UsuarioPeticionBean peticionBean, ArrayList<UsuarioPeticionAppBean> arrayListAplicaciones) {
+        Connection connection = null;
+        boolean insertado = false;
+        
+        for (UsuarioPeticionAppBean peticionAppBean : arrayListAplicaciones) {        
+            peticionAppBean.setId(getSiguienteId("usuariospeticionesapp"));
+            peticionAppBean.setIdPeticion(peticionBean.getId());
+            
+            try {
+                connection = super.getConexionBBDD();
+                String insertar; 
+                insertar = "insert into usuariospeticionesapp " + 
+                        "(id,idpeticion,idaplicacion,idperfil,tipo,comentario) " +
+                        "values (?,?,?,?,?,?)";
+                PreparedStatement statement = connection.prepareStatement(insertar);
+                statement.setLong(1, peticionAppBean.getId());
+                statement.setLong(2, peticionAppBean.getIdPeticion());
+                statement.setLong(3, peticionAppBean.getIdAplicacion());
+                statement.setLong(4, peticionAppBean.getIdPerfil());
+                statement.setString(5, peticionAppBean.getTipo());
+                statement.setString(6, peticionAppBean.getComentario());
+                insertado = statement.executeUpdate() > 0;
+                insertado = true;
+                statement.close();
+                logger.debug(insertar);  
+            } catch (SQLException e) {
+                logger.error(Utilidades.getStackTrace(e));
+                logger.error(ConexionDao.ERROR_BBDD_SQL, e);
+            } catch (Exception e) {
+                logger.error(Utilidades.getStackTrace(e));
+            } finally {
+                this.doCierraConexion(connection);
+            }            
+        }       
+        
+            return insertado;     
+        
+        }   
+        
+              
+    
 }

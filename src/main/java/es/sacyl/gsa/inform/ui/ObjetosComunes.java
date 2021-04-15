@@ -7,6 +7,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.details.Details;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
@@ -14,6 +15,7 @@ import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import es.sacyl.gsa.inform.bean.AplicacionBean;
 import es.sacyl.gsa.inform.bean.AplicacionPerfilBean;
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
@@ -152,15 +154,19 @@ public class ObjetosComunes {
      * @param id
      * @return
      */
-    public CheckboxGroup<AplicacionPerfilBean> getAplicacionesPerfilesPorIdCheckboxGroup(Long id) {
+    public RadioButtonGroup<AplicacionPerfilBean> getAplicacionesPerfilesPorIdRadioButtonGroup(Long id) {
         AplicacionBean aplicacion = new AplicacionBean();
         aplicacion.setId(id);
-        CheckboxGroup<AplicacionPerfilBean> checkboxGroup;
-        checkboxGroup = new CheckboxGroup<>();
-        checkboxGroup.setItems(new AplicacionPerfilDao().getLista(null, aplicacion));
-        checkboxGroup.setItemLabelGenerator(AplicacionPerfilBean::getNombre);
-
-        return checkboxGroup;
+        RadioButtonGroup<AplicacionPerfilBean> radioButtonGroup;
+        radioButtonGroup = new RadioButtonGroup<>();
+        radioButtonGroup.setItems(new AplicacionPerfilDao().getLista(null, aplicacion));      
+        radioButtonGroup.setRenderer(new ComponentRenderer<>(aplicacionPerfilBean -> {
+            Div title = new Div();
+            title.setText(aplicacionPerfilBean.getNombre());
+            return title;
+        }));
+       
+        return radioButtonGroup;
     }
 
     /**
@@ -183,12 +189,13 @@ public class ObjetosComunes {
      */
     public CheckboxGroup<CentroBean> getCentrosCheckboxGroup() {
         CheckboxGroup<CentroBean> centros = new CheckboxGroup<>();
-        ArrayList<CentroBean> centrosArrayList = new CentroDao().getLista(null, AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, null, null, ConexionDao.BBDD_ACTIVOSI);
+        ArrayList<CentroBean> centrosArrayList = new CentroDao().getLista(null, AutonomiaBean.AUTONOMIADEFECTO, 
+                ProvinciaBean.PROVINCIA_DEFECTO, null, null, null, null, ConexionDao.BBDD_ACTIVOSI);        
         centros.setItems(centrosArrayList);
         centros.setItemLabelGenerator(CentroBean::getNomcorto);
         return centros;
     }
-
+    
     /**
      *
      * @param valor el valor que esté seleccionado del combo

@@ -611,11 +611,32 @@ public class CombosUi {
     public ComboBox<CategoriaBean> getCategoriasUsuarios(CategoriaBean valor) {
         ComboBox<CategoriaBean> combo;
         combo = new ComboBox<>("Categorias");
-        combo.setItems(new CategoriaDao().getLista(null));
-        combo.setItemLabelGenerator(CategoriaBean::getNombre);
         if (valor != null) {
-            combo.setValue(valor);
+            combo.setItems(new CategoriaDao().getLista(valor.getNombre()));
+        } else {
+            combo.setItems(new CategoriaDao().getLista(null));
         }
+        combo.setItemLabelGenerator(CategoriaBean::getNombre);
+        combo.setMinWidth("150px");
+        combo.setClearButtonVisible(true);
+        return combo;
+    }
+    
+    /**
+     * Devuelve un listado con los gfhs por código
+     *
+     * @param valor
+     * @return
+     */
+    public ComboBox<GfhBean> getGfhPorCodigoUsuarios(GfhBean valor) {
+        ComboBox<GfhBean> combo;
+        combo = new ComboBox<>("Gfhs");
+        if (valor != null) {
+            combo.setItems(new GfhDao().getListaPorCodigo(valor.getCodigo(), ConexionDao.BBDD_ACTIVOSI));
+        } else {
+            combo.setItems(new GfhDao().getListaPorCodigo(null, ConexionDao.BBDD_ACTIVOSI));
+        }
+        combo.setItemLabelGenerator(GfhBean::getDescripcion);
         combo.setMinWidth("150px");
         combo.setClearButtonVisible(true);
         return combo;
