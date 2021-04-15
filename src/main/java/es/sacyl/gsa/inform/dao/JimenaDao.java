@@ -249,7 +249,7 @@ public class JimenaDao {
                 servicioBd.setCodigo(resulSet.getString("codigoservicio"));
                 servicioBd.setDescripcion(resulSet.getString("descservcicio"));
                 servicioBd.setIdjimena(resulSet.getLong("idservicio"));
-                UsuarioBean usuarioBd = new UsuarioDao().getUsuairoResulSetJimena(resulSet, null);
+                UsuarioBean usuarioBd = new UsuarioDao().getUsuarioResulSetJimena(resulSet, null);
                 JimenaInformeBean informe = getInformeResulsetJimena(resulSet, false, paciente, null, servicioBd, usuarioBd, estado);
                 informe.setNumeroOrden(resulSet.getInt("numeroorden"));
                 listaInformeBeans.add(informe);

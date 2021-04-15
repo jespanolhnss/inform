@@ -1,12 +1,8 @@
 package es.sacyl.gsa.inform.dao;
 
 import com.vaadin.flow.server.VaadinSession;
-import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.bean.FuncionalidadBean;
-import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
-import es.sacyl.gsa.inform.bean.UsuarioPeticionAppBean;
-import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
@@ -17,7 +13,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Iterator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -248,12 +243,9 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         try {
             connection = super.getConexionBBDD();
             sql = " UPDATE  usuarios  SET dni=?,apellido1=?,apellido2=?,nombre=?"
-<<<<<<< HEAD
                     + ", mail=?,telefono=?,idcategoria=?,idgfh=?,usucambio=?,fechacambio=?,estado=? "
-=======
                     + ", mail=?,telefono=?,usucambio=?,fechacambio=?,estado=? ,movil=?,mailprivado=?,telegram=?"
                     + ", solicita =?, idcategoria=?"
->>>>>>> 8b9a5f7906000c7e95091622141998434c99725e
                     + " WHERE id=?  ";
             PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -268,15 +260,13 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             if (usuarioBean.getUsucambio() == null) {
                 statement.setLong(9, usuarioBean.getUsucambio().getId());
             } else {
-<<<<<<< HEAD
                 // si no hay usuario de cambio pone el mismo
                 statement.setLong(9, new Long(1));
             }
             statement.setLong(10, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
             statement.setInt(11, usuarioBean.getEstado());
             statement.setLong(12, usuarioBean.getId());
-=======
-                statement.setLong(7, UsuarioBean.USUARIO_SISTEMA.getId());
+            statement.setLong(7, UsuarioBean.USUARIO_SISTEMA.getId());
             }
             statement.setLong(8, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
             statement.setInt(9, usuarioBean.getEstado());
@@ -304,7 +294,6 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             }
 
             statement.setLong(15, usuarioBean.getId());
->>>>>>> 8b9a5f7906000c7e95091622141998434c99725e
             insertado = statement.executeUpdate() > 0;
             statement.close();
             logger.debug(sql);

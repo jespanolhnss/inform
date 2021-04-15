@@ -31,17 +31,13 @@ public class UsuarioBean extends MasterBean implements Serializable {
     private String mail;
     private String telefono;
     private CategoriaBean categoria;
-<<<<<<< HEAD
     private GfhBean gfh;
     private String tipo;
     private String comentario;
-
-=======
     private String solicita;
     private String movilUsuario;
     private String correoPrivadoUsuario;
     private String telegram;
->>>>>>> 8b9a5f7906000c7e95091622141998434c99725e
     private Set<String> funcionalidadStrings = new HashSet<String>();
 
     private ArrayList<FuncionalidadBean> fucionalidadesArrayList = new ArrayList<FuncionalidadBean>();
@@ -354,14 +350,6 @@ public class UsuarioBean extends MasterBean implements Serializable {
 
     public static void setUSUARIO_ADMINISTRADOR(int USUARIO_ADMINISTRADOR) {
         UsuarioBean.USUARIO_ADMINISTRADOR = USUARIO_ADMINISTRADOR;
-    }
-
-    public CategoriaBean getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(CategoriaBean categoria) {
-        this.categoria = categoria;
     }
 
     public String getSolicita() {
