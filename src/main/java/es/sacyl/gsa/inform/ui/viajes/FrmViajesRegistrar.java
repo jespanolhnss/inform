@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.sacyl.gsa.inform.ui.viajes;
 
 import com.vaadin.flow.component.Component;
@@ -134,6 +129,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         tecnicosButton.setEnabled(true);
         try {
             viajesBinder.writeBean(viajeBean);
+            viajeBean.setValoresAut();
             if (new ViajesDao().doGrabaDatos(viajeBean) == true) {
                 (new Notification(FrmMasterConstantes.AVISODATOALMACENADO, 3000, Notification.Position.MIDDLE)).open();
                 // leo el binder para que pinte del id
@@ -178,8 +174,10 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
 
     @Override
     public void doLimpiar() {
-        viajesBinder.readBean(null);
 
+        viajesBinder.readBean(null);
+        salida.setValue(LocalDateTime.now());
+        llegada.setValue(Utilidades.getFechaHoraLas15horas());
         viajeCentroGrid.setItems(new ArrayList<ViajeCentroBean>());
         doActualizaGridCentros(viajeBean);
 
@@ -197,8 +195,8 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
     public void doGrid() {
         // grid viaje
         viajesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        viajesGrid.addColumn(ViajeBean::getSalida).setHeader("Salida");
-        viajesGrid.addColumn(ViajeBean::getLlegada).setHeader("Llegada");
+        viajesGrid.addColumn(ViajeBean::getSalidaString).setHeader("Salida");
+        //       viajesGrid.addColumn(ViajeBean::getLlegada).setHeader("Llegada");
         viajesGrid.addColumn(ViajeBean::getMatricula).setHeader("Matrícula");
         viajesGrid.setWidthFull();
 
@@ -296,7 +294,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
 
         viajesBinder.forField(matricula)
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 8))
+                        FrmMensajes.AVISODATOABLIGATORIO, 0, 8))
                 .bind(ViajeBean::getMatricula, ViajeBean::setMatricula);
     }
 
@@ -426,7 +424,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
 
         tecnicosButton.addClickListener(event
                 -> {
-            FrmViajesTecnicosRegistrar nuevo = new FrmViajesTecnicosRegistrar("640px", viajeBean);
+            FrmViajesTecnicosRegistrar nuevo = new FrmViajesTecnicosRegistrar(viajeBean);
             nuevo.addDialogCloseActionListener(e -> {
                 doActualizaGridTecnicos(viajeBean);
                 nuevo.close();

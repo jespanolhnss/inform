@@ -414,7 +414,10 @@ public class CombosUi {
         } else {
             combo.setValue(LopdSujetoBean.SUJETO_PACIENTE);
         }
-        combo.setWidth("200px");
+        combo.setWidth("175px");
+        combo.setMinWidth("175px");
+        combo.setMaxWidth("175px");
+
         combo.setClearButtonVisible(true);
         return combo;
     }
@@ -435,8 +438,8 @@ public class CombosUi {
         if (valor != null) {
             combo.setValue(valor);
         }
-        combo.setWidth("250px");
-        combo.setMaxWidth("250px");
+        combo.setWidth("315px");
+        combo.setMaxWidth("315px");
         return combo;
     }
 

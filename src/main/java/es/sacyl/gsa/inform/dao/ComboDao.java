@@ -395,7 +395,7 @@ public class ComboDao extends ConexionDao implements Serializable, ConexionInter
         try {
             connection = super.getConexionBBDD();
             sql = " SELECT UNIQUE valor FROM combos_informatica WHERE grupo='" + grupo + "'"
-                    + " AND rama='" + rama + "'  ";
+                    + " AND rama='" + rama + "'  GROUP BY valor ";
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 while (resulSet.next()) {

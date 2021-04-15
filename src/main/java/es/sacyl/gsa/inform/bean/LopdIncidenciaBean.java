@@ -206,6 +206,26 @@ public class LopdIncidenciaBean extends MasterBean implements Serializable {
         }
     }
 
+    public String getPerdidaDatosString() {
+        if (perdidaDatos == null) {
+            return "";
+        } else {
+            if (perdidaDatos == false) {
+                return "N";
+            } else {
+                return "S";
+            }
+        }
+    }
+
+    public void setPerdidaDatos(String valor) {
+        if (valor != null && valor.equals("S")) {
+            this.perdidaDatos = true;
+        } else {
+            this.perdidaDatos = false;
+        }
+    }
+
     public String getDescripcionError() {
         return descripcionError;
     }

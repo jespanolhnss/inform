@@ -1,7 +1,6 @@
 package es.sacyl.gsa.inform.ui.lopd;
 
 import com.vaadin.flow.component.Html;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -10,6 +9,7 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -28,6 +28,7 @@ import es.sacyl.gsa.inform.bean.PacienteBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.ctrl.MensajesCtrl;
 import es.sacyl.gsa.inform.ctrl.SesionCtrl;
+import es.sacyl.gsa.inform.dao.JimenaDao;
 import es.sacyl.gsa.inform.dao.LopdIncidenciaDao;
 import es.sacyl.gsa.inform.dao.LopdTipoDao;
 import es.sacyl.gsa.inform.dao.PacienteDao;
@@ -52,7 +53,7 @@ import java.util.stream.Collectors;
 public final class FrmLopdIncidenciaNueva extends FrmMasterPantalla {
 
     private TextField dni = new ObjetosComunes().getDni();
-    private TextField apellidosNombre = new ObjetosComunes().getTextField("Solicitante", "", 50, "200px", "50px");
+    private TextField apellidosNombre = new ObjetosComunes().getTextField("Solicitante", "", 50, "300px", "3000px");
     private TextField mail = new ObjetosComunes().getMail();
     private TextField telefono = new ObjetosComunes().getTelefono();
 
@@ -60,7 +61,8 @@ public final class FrmLopdIncidenciaNueva extends FrmMasterPantalla {
     private ComboBox<LopdTipoBean> comboTiposIncidencia = new CombosUi().getLopdTipoCombo(null, null, null);
 
     private final TextField id = new TextField("Id");
-    private final Checkbox perdidaDatos = new Checkbox("Pérdida datos");
+//    private final Checkbox perdidaDatos = new Checkbox("Pérdida datos");
+    private final RadioButtonGroup<String> perdidaDatos = new ObjetosComunes().getSNRadio("Pérdida de datos");
 
     private final TextField numerohc = new ObjetosComunes().getNumeroHc();
     private final TextField pacienteApellidos = new ObjetosComunes().getTextField("Paciente", null, 50, "200px", "90px");
@@ -260,8 +262,8 @@ public final class FrmLopdIncidenciaNueva extends FrmMasterPantalla {
                 .bind(LopdIncidenciaBean::getDescriDocu, LopdIncidenciaBean::setDescriDocu);
 
         lopdIncidenciaBinder.forField(perdidaDatos)
-                .withNullRepresentation(false)
-                .bind(LopdIncidenciaBean::getPerdidaDatos, LopdIncidenciaBean::setPerdidaDatos);
+                .withNullRepresentation("")
+                .bind(LopdIncidenciaBean::getPerdidaDatosString, LopdIncidenciaBean::setPerdidaDatos);
 
         lopdIncidenciaBinder.forField(comboServicio)
                 .asRequired()
@@ -292,6 +294,17 @@ public final class FrmLopdIncidenciaNueva extends FrmMasterPantalla {
          */
         doActualizaComboTiposIncidencia(LopdSujetoBean.SUJETO_PACIENTE);
         buscador.setLabel("Valor a busar");
+
+        apellidosNombre.setMaxWidth("350px");
+        apellidosNombre.setMinWidth("350px");
+        apellidosNombre.setWidth("350px");
+
+        pacienteApellidos.setMaxWidth("450px");
+        pacienteApellidos.setMinWidth("450px");
+        pacienteApellidos.setWidth("450px");
+
+        perdidaDatos.setValue("N");
+
     }
 
     /**
@@ -322,19 +335,22 @@ public final class FrmLopdIncidenciaNueva extends FrmMasterPantalla {
          * Campos del formulario Fila 1
          */
         contenedorFormulario.add(dni);
-        contenedorFormulario.add(apellidosNombre, 2);
+        contenedorFormulario.add(apellidosNombre, 3);
         contenedorFormulario.add(mail, 2);
-        contenedorFormulario.add(telefono);
+
         /**
          * Fila 2
          */
-        contenedorFormulario.add(comboSujeto, 2);
+        contenedorFormulario.add(telefono);
+        contenedorFormulario.add(comboSujeto);
         contenedorFormulario.add(comboTiposIncidencia, 4);
+
         /**
          * Fila 3
          */
-        contenedorFormulario.add(fechaHoraDocumento, 3);
-        contenedorFormulario.add(comboServicio, 3);
+        contenedorFormulario.add(fechaHoraDocumento);
+        contenedorFormulario.add(comboServicio);
+
         /**
          * Fila 4
          */
@@ -370,9 +386,15 @@ public final class FrmLopdIncidenciaNueva extends FrmMasterPantalla {
             usuRegistraBinder.readBean(usuRegistraBean);
             doActualizaGrid();
         } else {
-            if (!dni.getValue().isEmpty()) {
-                Notification.show(FrmMensajes.USUARIONOEXISTE + dni.getValue());
-                dni.focus();
+            // si no encuentra el usuario en la tabla hnss lo busca en jimena
+            usuRegistraBean = new JimenaDao().getUsuarioBean(dni.getValue().trim());
+            usuRegistraBean.setId(new Long(0));
+            new UsuarioDao().doGrabaDatos(usuRegistraBean);
+            if (usuRegistraBean == null) {
+                if (!dni.getValue().isEmpty()) {
+                    Notification.show(FrmMensajes.USUARIONOEXISTE + dni.getValue());
+                    dni.focus();
+                }
             }
         }
     }

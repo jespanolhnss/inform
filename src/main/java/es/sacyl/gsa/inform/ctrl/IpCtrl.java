@@ -52,11 +52,30 @@ public class IpCtrl {
         return libre;
     }
 
+    public static Boolean isExiste(String ip) {
+        Boolean existe = false;
+
+        if (new IpDao().getPorCodigo(ip) == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public static Boolean isLibre(String ip, EquipoBean equipoBean) {
         Boolean libre = false;
         IpBean ipBean = new IpDao().getPorCodigo(ip);
-        if (ipBean.getEquipo() == null || ipBean.getEquipo().getId().equals(equipoBean.getId())) {
-            libre = true;
+        if (equipoBean == null) {
+            if (ipBean != null && ipBean.getEquipo() == null) {
+                libre = true;
+            }
+        } else {
+            if (ipBean != null && ipBean.getEquipo() == null) {
+                libre = true;
+                // si la ip la ocupa el mismo equipo resultado libre
+            } else if (ipBean != null && ipBean.getEquipo().getId().equals(equipoBean.getId())) {
+                libre = true;
+            }
         }
         return libre;
     }

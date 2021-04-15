@@ -14,6 +14,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.page.Page;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -82,7 +83,8 @@ public final class FrmLopdIncidenciaGestionar extends FrmMasterPantalla implemen
 
     private final TextField id = new TextField("Id");
     private final DateTimePicker fechaHora = new ObjetosComunes().getDateTimePicker("Fecha Hora", null, null);
-    private final Checkbox perdidaDatos = new Checkbox("Pérdida datos");
+    //  private final Checkbox perdidaDatos = new Checkbox("Pérdida datos");
+    private final RadioButtonGroup<String> perdidaDatos = new ObjetosComunes().getSNRadio("Pérdida de datos");
 
     private final TextField numerohc = new ObjetosComunes().getNumeroHc();
     private final TextField pacienteApellidos = new ObjetosComunes().getTextField("Paciente", "", 50, "100px", "150px");
@@ -320,8 +322,8 @@ public final class FrmLopdIncidenciaGestionar extends FrmMasterPantalla implemen
                 .bind(LopdIncidenciaBean::getFechaHora, null);
 
         lopdIncidenciaBinder.forField(perdidaDatos)
-                .withNullRepresentation(false)
-                .bind(LopdIncidenciaBean::getPerdidaDatos, null);
+                .withNullRepresentation("")
+                .bind(LopdIncidenciaBean::getPerdidaDatosString, LopdIncidenciaBean::setPerdidaDatos);
 
         lopdIncidenciaBinder.forField(fechaHoraDocumento)
                 .bind(LopdIncidenciaBean::getFechaHoraDocumento, null);
@@ -330,7 +332,7 @@ public final class FrmLopdIncidenciaGestionar extends FrmMasterPantalla implemen
                 .bind(LopdIncidenciaBean::getServicio, null);
 
         lopdIncidenciaBinder.forField(this.perdidaDatos)
-                .bind(LopdIncidenciaBean::getPerdidaDatos, null);
+                .bind(LopdIncidenciaBean::getPerdidaDatosString, null);
 
         lopdIncidenciaBinder.forField(this.descripcionError)
                 .bind(LopdIncidenciaBean::getDescripcionError, null);
@@ -361,6 +363,15 @@ public final class FrmLopdIncidenciaGestionar extends FrmMasterPantalla implemen
         tecnicodni.setReadOnly(true);
         tecnicodni.setReadOnly(true);
 
+        apellidosNombre.setMaxWidth("350px");
+        apellidosNombre.setMinWidth("350px");
+        apellidosNombre.setWidth("350px");
+
+        pacienteApellidos.setMaxWidth("450px");
+        pacienteApellidos.setMinWidth("450px");
+        pacienteApellidos.setWidth("450px");
+
+        perdidaDatos.setValue("N");
     }
 
     @Override

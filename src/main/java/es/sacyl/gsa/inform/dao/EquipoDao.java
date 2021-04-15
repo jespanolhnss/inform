@@ -1,10 +1,12 @@
 package es.sacyl.gsa.inform.dao;
 
+import es.sacyl.gsa.inform.bean.AplicacionBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
+import es.sacyl.gsa.inform.ctrl.IpCtrl;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -86,6 +88,11 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + ",usu.fechacambio as usuariofechacambio,usu.mail as usuariomail"
                 + ",usu.telefono as usuariotelefon,usu.idgfh as usuarioidgfh"
                 + ",usu.idcategoria as usuarioidcategoria"
+                + ",usu.idcategoria as usuarioidcategoria,usu.movil as usuariomovil"
+                + ",usu.mailprivado as usuariomailprivado,usu.telegram as usuariotegegram"
+                + ",usu.solicita as usuariosolicita"
+                + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
+                + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
                 + ",usue.id as usueid,usue.dni as usuedni,usue.apellido1 as usueapellido1"
                 + ",usue.apellido2 as usueapellido2,usue.nombre as usuenombre"
                 + ",usue.estado as usueestado,usue.usucambio as usueusucambio"
@@ -96,6 +103,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + " LEFT JOIN  gfh  ON gfh.id=e.servicio"
                 + " LEFT JOIN ubicaciones u ON u.id=e.ubicacion"
                 + " LEFT JOIN usuarios usu ON usu.id=e.usucambio"
+                + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
                 + " LEFT JOIN usuarios usue ON usue.id=e.usuario"
                 + " WHERE  1=1 ";
     }
@@ -107,11 +115,11 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      */
     @Override
     public EquipoBean getRegistroResulset(ResultSet rs) {
-        return getRegistroResulset(rs, null, null, null, null);
+        return getRegistroResulset(rs, null, null, null, null, null);
     }
 
-    public EquipoBean getRegistroResulset(ResultSet rs, Boolean conAplicaciones, Boolean conIps) {
-        return getRegistroResulset(rs, null, null, conAplicaciones, conIps);
+    public EquipoBean getRegistroResulset(ResultSet rs, Boolean conAplicaciones, Boolean conIps, AplicacionBean aplicacionBean) {
+        return getRegistroResulset(rs, null, null, conAplicaciones, conIps, aplicacionBean);
     }
 
     /**
@@ -121,7 +129,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      * @param servicio
      * @return
      */
-    public static EquipoBean getRegistroResulset(ResultSet rs, CentroBean centro, GfhBean servicio, Boolean conAplicaciones, Boolean conIps) {
+    public static EquipoBean getRegistroResulset(ResultSet rs, CentroBean centro, GfhBean servicio, Boolean conAplicaciones, Boolean conIps, AplicacionBean aplicacionBean) {
         EquipoBean equipoBean = new EquipoBean();
         try {
             equipoBean.setId(rs.getLong("equipoid"));
@@ -136,8 +144,8 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 equipoBean.setCentro(centro);
             }
 
-            //          equipoBean.setUbicacion(new UbicacionDao().getPorId(rs.getLong("equipoubicacion")));
-            equipoBean.setUbicacion(new UbicacionDao().getRegistroResulset(rs, equipoBean.getCentro()));
+            equipoBean.setUbicacion(new UbicacionDao().getPorId(rs.getLong("equipoubicacion")));
+            //  equipoBean.setUbicacion(new UbicacionDao().getRegistroResulset(rs, equipoBean.getCentro()));
             if (servicio == null) {
                 //     equipoBean.setServicio(new GfhDao().getPorId(rs.getLong("equiposervicio")));
                 equipoBean.setServicio(new GfhDao().getRegistroResulset(rs));
@@ -164,7 +172,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
 
             // actualiza app instaladas
             if (conAplicaciones == true) {
-                equipoBean.setAplicacinesArrayList(new EquipoAplicacionDao().getLista(null, equipoBean, null));
+                equipoBean.setAplicacinesArrayList(new EquipoAplicacionDao().getLista(null, equipoBean, aplicacionBean));
             }
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
@@ -181,7 +189,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
-                    equipoBean = getRegistroResulset(resulSet, null, null, true, true);
+                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null);
                 }
                 statement.close();
             }
@@ -225,7 +233,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
-                    equipoBean = getRegistroResulset(resulSet, null, null, true, true);
+                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null);
                 }
                 statement.close();
             }
@@ -249,7 +257,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
-                    equipoBean = getRegistroResulset(resulSet, null, null, true, true);
+                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null);
                 }
                 statement.close();
             }
@@ -342,7 +350,11 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             }
             statement.setInt(11, ConexionDao.BBDD_ACTIVOSI);
             statement.setLong(12, Utilidades.getFechaLong(equipoBean.getFechacambio()));
-            statement.setLong(13, equipoBean.getUsucambio().getId());
+            if (equipoBean.getUsuario() != null) {
+                statement.setLong(13, equipoBean.getUsucambio().getId());
+            } else {
+                statement.setNull(13, Types.INTEGER);
+            }
             if (equipoBean.getMacadress() == null) {
                 statement.setNull(14, Types.VARCHAR);
             } else {
@@ -426,7 +438,13 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 statement.setString(9, equipoBean.getComentario());
             }
             statement.setLong(10, Utilidades.getFechaLong(equipoBean.getFechacambio()));
-            statement.setLong(11, equipoBean.getUsucambio().getId());
+
+            if (equipoBean.getUsucambio() != null) {
+                statement.setLong(11, equipoBean.getUsucambio().getId());
+            } else {
+                statement.setNull(11, Types.INTEGER);
+            }
+
             if (equipoBean.getMacadress() == null) {
                 statement.setNull(12, Types.VARCHAR);
             } else {
@@ -491,7 +509,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      */
     @Override
     public ArrayList<EquipoBean> getLista(String texto) {
-        return getLista(texto, null, null, null, null);
+        return getLista(texto, null, null, null, null, null, null);
     }
 
     /**
@@ -502,14 +520,19 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      * @param servicio
      * @return
      */
-    public ArrayList<EquipoBean> getLista(String texto, String tipo, CentroBean centro, GfhBean servicio, Integer estado) {
+    public ArrayList<EquipoBean> getLista(String texto, String tipo, String marca, CentroBean centro, GfhBean servicio, Integer estado,
+            AplicacionBean aplicacionBean
+    ) {
         Connection connection = null;
         ArrayList<EquipoBean> lista = new ArrayList<>();
         try {
             connection = super.getConexionBBDD();
 
-            if (tipo != null) {
+            if (tipo != null && !tipo.isEmpty()) {
                 sql = sql.concat(" AND e.tipo='" + tipo + "'");
+            }
+            if (marca != null && marca.isEmpty()) {
+                sql = sql.concat(" AND e.marca='" + marca + "'");
             }
             if (centro != null) {
                 sql = sql.concat(" AND e.centro='" + centro.getId() + "'");
@@ -517,9 +540,14 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             if (servicio != null) {
                 sql = sql.concat(" AND e.servicio='" + servicio.getId() + "'");
             }
-
             if (texto != null && !texto.isEmpty()) {
-                //   sql = sql.concat(" AND  ( UPPER(nombre) like'%" + texto.toUpperCase() + "%'  OR   UPPER(codigo) like'%" + texto.toUpperCase() + "%' )");
+                if (IpCtrl.isValid(texto)) {
+                    sql = sql.concat("  AND e.id IN (select  equipo from ips where not equipo  is null AND  ip = '" + texto + "')");
+                } else if (texto.contains("10.")) {
+                    sql = sql.concat(" AND  e.id IN (select  equipo from ips where not equipo  is null AND  ip LIKE  '" + texto + "%')");
+                } else {
+                    sql = sql.concat(" AND e.nombredominio like '%" + texto + "%'");
+                }
             }
             if (estado != null) {
                 sql = sql.concat(" AND e.estado=" + estado);
@@ -529,7 +557,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {
-                lista.add(getRegistroResulset(resulSet, centro, servicio, true, true));
+                lista.add(getRegistroResulset(resulSet, centro, servicio, true, true, aplicacionBean));
             }
             statement.close();
             LOGGER.debug(sql);

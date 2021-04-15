@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.sacyl.gsa.inform.dao;
 
 import es.sacyl.gsa.inform.bean.CentroBean;
@@ -49,7 +44,7 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
                 + " ,a.codigo as autonomiacodigo, a.nombre as autonomianombre,a.estado as autonomiaestado "
                 + " ,g.codauto gerenciacodauto ,g.codigo   gerenciacodigo ,g.nombre  gerencianombre, g.tipovia   gerenciatipovia"
                 + " , g.callesec   gerenciacallesec,g.numcalsec  gerencianumcalsec "
-                + "  ,g.otrdomger  gerenciaotrdomger, g.cpger  gerenciacpger, g.localger   gerencialocalger, g.estado gerenciaestado  "
+                + " ,g.otrdomger  gerenciaotrdomger, g.cpger  gerenciacpger, g.localger   gerencialocalger, g.estado gerenciaestado  "
                 + " ,z.codauto  zonacodauto  ,z.codgeren  zonacodgeren,z.codigo  zonacodigo,z.nombre  zonanombre,z.codprov zonacodprov "
                 + " ,ct.id as centrotipoid, ct.descripcion as centrotipodescripcion,ct.estado as centrotipoestado  "
                 + " ,na.id as niveltipotipoid, na.descripcion as niveltipodescripcion,na.estado  as niveltipoestado  "
@@ -65,6 +60,65 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
                 + " JOIN centrostipo ct ON ct.id=c.tipocentro "
                 + " JOIN  NIVELESATENCIONTIPO na  ON na.id =n.tipo"
                 + " WHERE  1=1 ";
+        /**
+         * Arturo se inventa esta select para sacar la descripción completa de
+         * la ubicacion SELECT u.ID, u.CENTRO, u.DESCRIPCION, u.IDPADRE,
+         * u.NIVEL, level, pd.DESCRIPCION parent_name, CONNECT_BY_ROOT u.id AS
+         * root_id, LTRIM(SYS_CONNECT_BY_PATH(u.DESCRIPCION, ' -> '), ' -> ') AS
+         * path, CONNECT_BY_ISLEAF AS leaf FROM UBICACIONES u LEFT JOIN
+         * UBICACIONES pd ON u.IDPADRE = pd.ID START WITH u.IDPADRE IS NULL
+         * CONNECT BY PRIOR u.ID = u.IDPADRE ORDER SIBLINGS BY u.ID;
+         *
+         *
+         * A partir de ella añado todos los join para recuperar en la misma
+         * select los datos de centros
+         */
+        sql = " SELECT * FROM (  SELECT "
+                + " u.id as ubicacionesid , u.centro as ubicacionescentro, u.descripcion as ubicacionesdescripcion"
+                + "  ,u.idpadre ubicacionesidpadre, u.nivel  as ubicacionesnivel  "
+                + " ,padre.id as padreid , padre.centro as padrecentro, padre.descripcion as padredescripcion"
+                + "   ,padre.idpadre padreidpadre, padre.nivel  as padrenivel  ,"
+                + "    level,"
+                + "    pd.DESCRIPCION parent_name,"
+                + "    CONNECT_BY_ROOT u.id AS root_id,"
+                + "    LTRIM(SYS_CONNECT_BY_PATH(u.DESCRIPCION, ' -> '), ' -> ') AS descripcionfull,"
+                + "    CONNECT_BY_ISLEAF AS leaf"
+                + "      , c.ID as centroid,c.CODAUTO as centrocodauto,c.CODGEREN   as centrocodgeren"
+                + "      ,c.CODZONA as centrocodozona "
+                + "      ,c.CODIGO as centrocodigo, c.NOMCEN as centronumcen ,c.TIPOVIA as centrotipovia "
+                + "      ,c.CALLECEN as centrocallecen,c.NUMCALCEN as centronumcalcen,c.OTRDIRCEN as centrootrodircen"
+                + "      ,c.CODLOCAL as centrocodlocal "
+                + "      ,c.CPCENTRO as centrocpcentro,c.TELEPREV as centroteleprev,c.TIPOCENTRO as centrotipocentro"
+                + "      ,c.NIVATENCION as centronivatencion "
+                + "      ,c.estado as centroestado, c.mapgoogle as centromapggole, c.nomcorto as centronomcorto  "
+                + "     ,n.id as nivelid,n.codigo as nivelcodigo,n.descripcion as niveldescripcion,n.tipo as niveltipo"
+                + "     ,n.estado as nivelestado  "
+                + "      ,l.codigo as localidadcodigo,l.nombre localidadnombre,l.nombre localidadprovincia "
+                + "      ,p.codigo as provinciacodigo,p.nombre as provincianombre,p.nombre provinciacodauto"
+                + "      ,a.codigo as autonomiacodigo, a.nombre as autonomianombre,a.estado as autonomiaestado "
+                + "       ,g.codauto gerenciacodauto ,g.codigo   gerenciacodigo ,g.nombre  gerencianombre, g.tipovia   gerenciatipovia"
+                + "      , g.callesec   gerenciacallesec,g.numcalsec  gerencianumcalsec "
+                + "       ,g.otrdomger  gerenciaotrdomger, g.cpger  gerenciacpger, g.localger   gerencialocalger, g.estado gerenciaestado  "
+                + "      ,z.codauto  zonacodauto  ,z.codgeren  zonacodgeren,z.codigo  zonacodigo,z.nombre  zonanombre,z.codprov zonacodprov "
+                + "       ,ct.id as centrotipoid, ct.descripcion as centrotipodescripcion,ct.estado as centrotipoestado  "
+                + "      ,na.id as niveltipotipoid, na.descripcion as niveltipodescripcion,na.estado  as niveltipoestado  "
+                + "FROM "
+                + "    UBICACIONES u"
+                + "    LEFT JOIN CENTROS c  ON c.id=u.centro"
+                + "    LEFT JOIN nivelesatencion n ON n.id = c.NIVATENCION"
+                + "    JOIN LOCALIDAD l ON l.codigo = c.CODLOCAL "
+                + "    JOIN PROVINCIA p ON p.codigo=l.codprov "
+                + "    JOIN CAUTONOM a On a.codigo=p.CODAUTO                  "
+                + "    JOIN GERENCIA g ON g.codauto=a.codigo AND g.codigo=c.codgeren  "
+                + "    JOIN ZONAS z ON z.codauto=c.codauto AND z.codgeren=g.codigo AND z.codigo=c.codzona "
+                + "    JOIN centrostipo ct ON ct.id=c.tipocentro "
+                + "    JOIN  NIVELESATENCIONTIPO na  ON na.id =n.tipo"
+                + "    LEFT JOIN ubicaciones padre ON padre.id=u.idpadre                "
+                + "LEFT JOIN UBICACIONES pd ON u.IDPADRE = pd.ID    "
+                + "START WITH u.IDPADRE IS NULL "
+                + "CONNECT BY PRIOR u.ID = u.IDPADRE "
+                + " ORDER SIBLINGS BY u.ID "
+                + " ) WHERE 1=1 ";
     }
 
     /**
@@ -99,7 +153,8 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
             }
             ubicacionBean.setNivel(rs.getInt("ubicacionesnivel"));
             // tiene que recuperar el padre para obtener el nombre completo en el arbol
-            ubicacionBean.setDescripcionFull(getNombreCompleto(ubicacionBean, ubicacionBean.getCentro()));
+            //   ubicacionBean.setDescripcionFull(getNombreCompleto(ubicacionBean, ubicacionBean.getCentro()));
+            ubicacionBean.setDescripcionFull(rs.getString("descripcionfull"));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         }
@@ -118,7 +173,7 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
         String sqlU = sql;
         try {
             connection = super.getConexionBBDD();
-            sqlU = sqlU.concat(" AND u.id=" + id);
+            sqlU = sqlU.concat(" AND ubicacionesid=" + id);
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sqlU);
                 if (resulSet.next()) {
@@ -305,12 +360,14 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
         try {
             connection = super.getConexionBBDD();
             if (texto != null && !texto.isEmpty()) {
-                sqlU = sqlU.concat(" AND   UPPER(u.descripcion) like'%" + texto.toUpperCase() + "%'  ");
+                sqlU = sqlU.concat(" AND   UPPER(ubicacionesdescripcion) like'%" + texto.toUpperCase() + "%'  ");
             }
             if (centroBean != null && centroBean.getId() != null) {
-                sqlU = sqlU.concat(" AND  u.centro=" + centroBean.getId());
+                sqlU = sqlU.concat(" AND  ubicacionescentro=" + centroBean.getId());
             }
-            sqlU = sqlU.concat(" ORDER BY  u.centro,  u.descripcion  ");
+            sqlU = sqlU.concat(" ORDER BY  ubicacionescentro,  ubicacionesdescripcion ");
+
+            //   ubicacionescentro=3916 AND  ubicacionesidpadre
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sqlU);
             while (resulSet.next()) {
@@ -340,8 +397,8 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
         if (centroBean != null) {
             try {
                 connection = super.getConexionBBDD();
-                sqlU = sqlU.concat(" AND  u.centro=" + centroBean.getId());
-                sqlU = sqlU.concat(" AND  u.idpadre IS null ");
+                sqlU = sqlU.concat(" AND  ubicacionescentro=" + centroBean.getId());
+                sqlU = sqlU.concat(" AND ubicacionesidpadre IS null ");
                 sqlU = sqlU.concat(" ORDER BY  ubicacionescentro,  ubicacionesdescripcion  ");
                 Statement statement = connection.createStatement();
                 ResultSet resulSet = statement.executeQuery(sqlU);
@@ -373,7 +430,7 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
         try {
             connection = super.getConexionBBDD();
 
-            sqlU = sqlU.concat(" AND  u.idpadre = " + ubicacionBean.getId());
+            sqlU = sqlU.concat(" AND  ubicacionesidpadre = " + ubicacionBean.getId());
             sqlU = sqlU.concat(" ORDER BY  ubicacionescentro,  ubicacionesdescripcion  ");
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sqlU);

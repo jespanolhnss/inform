@@ -47,6 +47,12 @@ public class EquipoAplicacionDao extends ConexionDao implements Serializable, Co
                 + " ,l.codigo as localidadcodigo,l.nombre as localidadnombre,l.codprov as localidadcodpro"
                 + " ,p. codigo as provinciacodigo, p.nombre as provincianombre,p.codauto as provinciacodauto  "
                 + " ,a.codigo as autonomiacodigo, a.nombre as autonomianombre,a.estado as autonomiaestado   "
+                + " ,usu.id as usuarioid,usu.dni as usuariodni,usu.apellido1 as usuarioapellido1"
+                + ",usu.apellido2 as usuarioapellido2,usu.nombre as usuarionombre"
+                + ",usu.estado as usuarioestado,usu.usucambio as usuariousucambio"
+                + ",usu.fechacambio as usuariofechacambio,usu.mail as usuariomail"
+                + ",usu.telefono as usuariotelefon,usu.idgfh as usuarioidgfh"
+                + ",usu.idcategoria as usuarioidcategoria"
                 + " FROM equipoaplicacion eqap "
                 + " JOIN aplicaciones ap ON ap.id=eqap.IDAPLICACION"
                 + " LEFT  JOIN gfh  ON gfh.id=ap.gfh"
@@ -54,6 +60,7 @@ public class EquipoAplicacionDao extends ConexionDao implements Serializable, Co
                 + " LEFT  JOIN localidad l ON l.codigo=prvee.localidad"
                 + " LEFT  JOIN provincia p ON p.codigo=l.codprov "
                 + " LEFT  JOIN CAUTONOM a ON a.codigo=p.CODAUTO  "
+                + " LEFT JOIN usuarios usu ON usu.id=ap.usucambio"
                 + " WHERE 1=1 ";
     }
 
@@ -274,6 +281,13 @@ public class EquipoAplicacionDao extends ConexionDao implements Serializable, Co
         return getLista(texto, null, null);
     }
 
+    /**
+     *
+     * @param texto
+     * @param equipoBean
+     * @param aplicacionBean
+     * @return
+     */
     public ArrayList<EquipoAplicacionBean> getLista(String texto, EquipoBean equipoBean, AplicacionBean aplicacionBean) {
         Connection connection = null;
         ArrayList<EquipoAplicacionBean> lista = new ArrayList<>();

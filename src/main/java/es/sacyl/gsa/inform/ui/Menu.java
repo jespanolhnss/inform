@@ -37,6 +37,7 @@ import es.sacyl.gsa.inform.ui.tablas.FrmProvincia;
 import es.sacyl.gsa.inform.ui.tablas.FrmUbicacion;
 import es.sacyl.gsa.inform.ui.tablas.FrmUsuarioCategoria;
 import es.sacyl.gsa.inform.ui.tablas.FrmZona;
+import es.sacyl.gsa.inform.ui.usuarios.FrmUsuarios;
 import es.sacyl.gsa.inform.ui.usuarios.FrmUsuariosPedir;
 import es.sacyl.gsa.inform.ui.viajes.FrmViajesRegistrar;
 import es.sacyl.gsa.inform.util.Constantes;
@@ -72,9 +73,16 @@ public class Menu extends MenuBar {
         MenuItem usuarios = this.addItem("Usuarios");
 
         SubMenu usuariosSubMenu = usuarios.getSubMenu();
-        usuariosSubMenu.addItem("Nuevo", e -> {
+        usuariosSubMenu.addItem("Pedir", e -> {
             this.contenedorFormularios.removeAll();
             this.contenedorFormularios.add(new FrmUsuariosPedir());
+        });
+
+        usuariosSubMenu.addItem("Solicitudes", e -> {
+        });
+        usuariosSubMenu.addItem("Gestionar", e -> {
+            this.contenedorFormularios.removeAll();
+            this.contenedorFormularios.add(new FrmUsuarios());
         });
 
         MenuItem recursos = this.addItem("Recursos");

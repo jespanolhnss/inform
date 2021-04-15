@@ -6,6 +6,7 @@ import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.textfield.TextField;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.IpBean;
 import es.sacyl.gsa.inform.bean.VlanBean;
@@ -13,6 +14,7 @@ import es.sacyl.gsa.inform.dao.IpDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.FrmMasterVentana;
 import es.sacyl.gsa.inform.ui.GridUi;
+import es.sacyl.gsa.inform.ui.ObjetosComunes;
 import java.util.ArrayList;
 import java.util.Set;
 import org.vaadin.klaudeta.PaginatedGrid;
@@ -28,6 +30,7 @@ public final class FrmBuscaIp extends FrmMasterVentana {
 
     private final PaginatedGrid<IpBean> ipGrid = new GridUi().getIpGrid();
     private final ComboBox<VlanBean> vlanCombo = new CombosUi().getVlanCombo(null, null);
+    private final TextField buscador = new ObjetosComunes().getTextField("IP ");
 //    private final RadioButtonGroup<String> ipLibre = new ObjetosComunes().getSNRadio("Ip Libre");
     private ArrayList<IpBean> ipArrayList = new ArrayList<>();
     private EquipoBean equipoBean = null;
@@ -67,7 +70,7 @@ public final class FrmBuscaIp extends FrmMasterVentana {
     public void doActualizaGrid(EquipoBean equipoBean) {
         ArrayList<IpBean> lista = new ArrayList<>();
         lista.addAll(equipoBean.getListaIps());
-        lista.addAll(new IpDao().getLista(null, vlanCombo.getValue(), null, null, IpBean.IPLIBRESI));
+        lista.addAll(new IpDao().getLista(buscador.getValue(), vlanCombo.getValue(), null, null, IpBean.IPLIBRESI));
         ipGrid.setItems(lista);
     }
 
@@ -81,6 +84,10 @@ public final class FrmBuscaIp extends FrmMasterVentana {
                 // primero las ip asignadas al  equipo
                 doActualizaGrid(equipoBean);
             }
+        });
+
+        buscador.addBlurListener(event -> {
+            doActualizaGrid();
         });
     }
 
@@ -174,7 +181,7 @@ public final class FrmBuscaIp extends FrmMasterVentana {
     public void doComponentesOrganizacion() {
         contenedorFormulario.removeAll();
         contenedorIzquierda.add(getDetalleEquipo(equipoBean));
-        contenedorFiltros.add(vlanCombo);
+        contenedorFiltros.add(vlanCombo, buscador);
         contenedorDerecha.add(ipGrid);
 
     }

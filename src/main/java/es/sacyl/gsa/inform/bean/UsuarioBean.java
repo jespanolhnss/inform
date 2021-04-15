@@ -13,7 +13,7 @@ import java.util.Set;
 public class UsuarioBean extends MasterBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     private String dniSolicitante;
     private String nombreSolicitante;
     private String apellido1Solicitante;
@@ -31,10 +31,17 @@ public class UsuarioBean extends MasterBean implements Serializable {
     private String mail;
     private String telefono;
     private CategoriaBean categoria;
+<<<<<<< HEAD
     private GfhBean gfh;
     private String tipo;
     private String comentario;
 
+=======
+    private String solicita;
+    private String movilUsuario;
+    private String correoPrivadoUsuario;
+    private String telegram;
+>>>>>>> 8b9a5f7906000c7e95091622141998434c99725e
     private Set<String> funcionalidadStrings = new HashSet<String>();
 
     private ArrayList<FuncionalidadBean> fucionalidadesArrayList = new ArrayList<FuncionalidadBean>();
@@ -43,20 +50,32 @@ public class UsuarioBean extends MasterBean implements Serializable {
     public static int USUARIO_DEBAJA = 0;
     public static int USUARIO_ACTIVO = 1;
     public static int USUARIO_ADMINISTRADOR = 2;
+    public static UsuarioBean USUARIO_SISTEMA = new UsuarioBean(new Long(1828), "06384936K", "SISTEMA", "SISTEMA", "SISTEMA");
 
     public UsuarioBean() {
-        this.id = new Long(0);
+        super();
     }
 
     public UsuarioBean(String dni) {
+        super();
         this.dni = dni;
     }
 
+    public UsuarioBean(Long id, String dni, String nombre, String apellido1, String apellido2) {
+        super();
+        this.id = id;
+        this.dni = dni;
+        this.nombre = nombre;
+        this.apellido1 = apellido1;
+        this.apellido2 = apellido2;
+    }
+
     public UsuarioBean(String dni, String nombre) {
+        super();
         this.dni = dni;
         this.nombre = nombre;
     }
-    
+
     public String getDniSolicitante() {
         return dniSolicitante;
     }
@@ -335,6 +354,46 @@ public class UsuarioBean extends MasterBean implements Serializable {
 
     public static void setUSUARIO_ADMINISTRADOR(int USUARIO_ADMINISTRADOR) {
         UsuarioBean.USUARIO_ADMINISTRADOR = USUARIO_ADMINISTRADOR;
+    }
+
+    public CategoriaBean getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(CategoriaBean categoria) {
+        this.categoria = categoria;
+    }
+
+    public String getSolicita() {
+        return solicita;
+    }
+
+    public void setSolicita(String solicita) {
+        this.solicita = solicita;
+    }
+
+    public String getMovilUsuario() {
+        return movilUsuario;
+    }
+
+    public void setMovilUsuario(String movilUsuario) {
+        this.movilUsuario = movilUsuario;
+    }
+
+    public String getCorreoPrivadoUsuario() {
+        return correoPrivadoUsuario;
+    }
+
+    public void setCorreoPrivadoUsuario(String correoPrivadoUsuario) {
+        this.correoPrivadoUsuario = correoPrivadoUsuario;
+    }
+
+    public String getTelegram() {
+        return telegram;
+    }
+
+    public void setTelegram(String telegram) {
+        this.telegram = telegram;
     }
 
 }

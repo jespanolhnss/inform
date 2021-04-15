@@ -2,13 +2,13 @@ package es.sacyl.gsa.inform.bean;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class ViajeBean implements Serializable {
+public class ViajeBean extends MasterBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long id;
     private LocalDateTime salida;
     private LocalDateTime llegada;
 
@@ -19,19 +19,16 @@ public class ViajeBean implements Serializable {
     private ArrayList<UsuarioBean> listaTecnicos = new ArrayList<>();
 
     public ViajeBean() {
-        id = new Long(0);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        super();
     }
 
     public LocalDateTime getSalida() {
         return salida;
+    }
+
+    public String getSalidaString() {
+        DateTimeFormatter formatterdd_mm_yyyy_hh_mm = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm");
+        return formatterdd_mm_yyyy_hh_mm.format(salida);
     }
 
     public void setSalida(LocalDateTime salida) {

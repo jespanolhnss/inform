@@ -248,6 +248,10 @@ public class ObjetosComunes {
         return boton;
     }
 
+    public Button getExcelBoton() {
+        return getBoton("Excel", ButtonVariant.LUMO_LARGE, VaadinIcon.GRID_BEVEL.create());
+    }
+
     /**
      *
      * @return
@@ -407,8 +411,8 @@ public class ObjetosComunes {
         if (date != null) {
             dateTimePicker.setValue(date);
         }
-        dateTimePicker.setMinWidth("190px");
-        dateTimePicker.setMaxWidth("220px");
+        dateTimePicker.setMinWidth("240px");
+        dateTimePicker.setMaxWidth("240px");
         return dateTimePicker;
     }
 
@@ -446,9 +450,9 @@ public class ObjetosComunes {
      */
     public TextField getDni() {
         TextField campo = getTextField("DNI", "dni", 9, "95px", "95px");
-        campo.setMaxWidth("110px");
-        campo.setMinWidth("110px");
-        campo.setWidth("110px");
+        campo.setMaxWidth("125px");
+        campo.setMinWidth("125px");
+        campo.setWidth("125px");
         return campo;
     }
 
@@ -478,7 +482,7 @@ public class ObjetosComunes {
         TextField campo = getTextField("Teléfono", "teléfono", 9, "30px", "30px");
         return campo;
     }
-    
+
     /**
      *
      * @return

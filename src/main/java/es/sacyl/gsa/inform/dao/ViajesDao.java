@@ -7,9 +7,11 @@ import es.sacyl.gsa.inform.bean.ViajeCentroBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
@@ -103,6 +105,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
     public boolean doGrabaDatos(ViajeBean viajeBean) {
         boolean actualizado = false;
         if (viajeBean != null && viajeBean.getId() != null && getPorId(viajeBean.getId(), Boolean.FALSE) == null) {
+            viajeBean.setId(getSiguienteId("viajes"));
             actualizado = this.doInsertaDatos(viajeBean);
         } else {
             actualizado = this.doActualizaDatos(viajeBean);
@@ -114,21 +117,31 @@ public class ViajesDao extends ConexionDao implements Serializable {
         Connection connection = null;
         Boolean insertadoBoolean = false;
         try {
+
             connection = super.getConexionBBDD();
-            viajeBean.setId(this.getSiguienteId("viajes"));
-            sql = " INSERT INTO  viajes  (id,fecha,horasalida,horallegada,matricula,estado,usucambio,fechacambio) " + " VALUES "
-                    + "(" + viajeBean.getId() + ",'" + Utilidades.getFechaLong(viajeBean.getSalida()) + "','"
-                    + Utilidades.getHoraInt(viajeBean.getSalida())
-                    + "','" + Utilidades.getHoraInt(viajeBean.getLlegada()) + "','" + viajeBean.getMatricula() + "'"
-                    + ", '" + ConexionDao.BBDD_ACTIVOSI + "','"
-                    + usuarioBean.getId() + "','" + Utilidades.getFechaActualLong() + "')";
-            try (Statement statement = connection.createStatement()) {
-                insertadoBoolean = statement.execute(sql);
-                //    doInsertaCentros(viajeBean);
-                //   doInsertaTecnicos(viajeBean);
-                insertadoBoolean = true;
-                statement.close();
+            sql = " INSERT INTO viajes (id,fecha,horasalida,horallegada,matricula,estado,usucambio,fechacambio ) "
+                    + " VALUES (?,?,?,?,?,?,?,?)  ";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setLong(1, viajeBean.getId());
+            statement.setLong(2, Utilidades.getFechaLong(viajeBean.getSalida()));
+            statement.setInt(3, Utilidades.getHoraInt(viajeBean.getSalida()));
+            statement.setInt(4, Utilidades.getHoraInt(viajeBean.getLlegada()));
+            if (viajeBean.getMatricula() != null) {
+                statement.setString(5, viajeBean.getMatricula());
+            } else {
+                statement.setNull(5, Types.VARBINARY);
             }
+
+            statement.setInt(6, viajeBean.getEstado());
+            if (viajeBean.getUsucambio() != null) {
+                statement.setLong(7, viajeBean.getUsucambio().getId());
+            } else {
+                statement.setLong(7, UsuarioBean.USUARIO_SISTEMA.getId());
+            }
+            statement.setLong(8, Utilidades.getFechaLong(viajeBean.getFechacambio()));
+
+            insertadoBoolean = statement.executeUpdate() > 0;
+            statement.close();
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
@@ -145,28 +158,26 @@ public class ViajesDao extends ConexionDao implements Serializable {
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE   viajes  SET fecha='" + Utilidades.getFechaLong(viajeBean.getSalida()) + "'"
-                    + ",horasalida='" + Utilidades.getHoraInt(viajeBean.getSalida()) + "', horallegada="
-                    + Utilidades.getHoraInt(viajeBean.getLlegada())
-                    + ",matricula='" + viajeBean.getMatricula() + "'"
-                    + ",estado='" + ConexionDao.BBDD_ACTIVOSI + "'"
-                    + ",usucambio='" + usuarioBean.getId() + "'"
-                    + ",fechacambio=" + Utilidades.getFechaActualLong()
-                    + " WHERE id='" + viajeBean.getId() + "'";
+            sql = " UPDATE  viajes  SET fecha=?,horasalida=?,horallegada=?,matricula=?,estado=?,usucambio=?,fechacambio=?  WHERE id=?  ";
+            PreparedStatement statement = connection.prepareStatement(sql);
 
-            try (Statement statement = connection.createStatement()) {
-                insertadoBoolean = statement.execute(sql);
-                //   doBorraCentros(viajeBean.getId());
-                //  doInsertaCentros(viajeBean);
-                //  doBorraTecnicos(viajeBean.getId());
-                //  doInsertaCentros(viajeBean);
-                insertadoBoolean = true;
-                statement.close();
+            statement.setLong(1, Utilidades.getFechaLong(viajeBean.getSalida()));
+            statement.setInt(2, Utilidades.getHoraInt(viajeBean.getSalida()));
+            statement.setInt(3, Utilidades.getHoraInt(viajeBean.getLlegada()));
+            statement.setString(4, viajeBean.getMatricula());
+            statement.setInt(5, viajeBean.getEstado());
+            if (viajeBean.getUsucambio() != null) {
+                statement.setLong(6, viajeBean.getUsucambio().getId());
+            } else {
+                statement.setLong(6, UsuarioBean.USUARIO_SISTEMA.getId());
             }
+            statement.setLong(7, Utilidades.getFechaLong(viajeBean.getFechacambio()));
+            statement.setLong(8, viajeBean.getId());
+            insertadoBoolean = statement.executeUpdate() > 0;
+            statement.close();
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
-
         } catch (Exception e) {
             LOGGER.error(e);
         } finally {
@@ -180,14 +191,28 @@ public class ViajesDao extends ConexionDao implements Serializable {
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE viajes SET  " + ",estado='" + ConexionDao.BBDD_ACTIVOSI + "'"
-                    + ",usucambio='" + usuarioBean.getId() + "'"
-                    + ",fechacambio=" + Utilidades.getFechaActualLong()
-                    + " WHERE id='" + viajeBean.getId() + "'";
-            Statement statement = connection.createStatement();
-            insertadoBoolean = statement.execute(sql);
-            insertadoBoolean = true;
+            viajeBean.setEstado(ConexionDao.BBDD_ACTIVONO);
+
+            sql = " DELETE FROM viajescentros   WHERE idviaje=?  ";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setLong(1, viajeBean.getId());
+            insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
+            LOGGER.debug(sql);
+
+            sql = " DELETE FROM viajestecnicos  WHERE idviaje=?  ";
+            PreparedStatement statement1 = connection.prepareStatement(sql);
+            statement1.setLong(1, viajeBean.getId());
+            insertadoBoolean = statement1.executeUpdate() > 0;
+            statement1.close();
+            LOGGER.debug(sql);
+
+            sql = " DELETE FROM viajes   WHERE id=?  ";
+            PreparedStatement statement2 = connection.prepareStatement(sql);
+            statement2.setLong(1, viajeBean.getId());
+            insertadoBoolean = statement2.executeUpdate() > 0;
+            statement2.close();
+
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
@@ -205,6 +230,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
      * @param hasta Fecha final hasta la que se quieren recuperar los viajes
      * @param centroBean Centro del que se quieren recuerar los viajes
      * @param usuarioBean Ténico del que se quieren recuperar los viajes
+     * @param activo
      * @return
      */
     public ArrayList<ViajeBean> getListaViajes(LocalDate desde, LocalDate hasta, CentroBean centroBean, UsuarioBean usuarioBean, Integer activo) {
@@ -284,7 +310,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
 
     /**
      *
-     * @param id El id del viaje cuyos técnicos se quieren recuperar
+     * @param viajeBean
      * @return Un ArrayList de Usuarios asociados al viaje
      */
     public ArrayList<UsuarioBean> getViajeTecnicos(ViajeBean viajeBean) {
@@ -293,13 +319,14 @@ public class ViajesDao extends ConexionDao implements Serializable {
         try {
             connection = super.getConexionBBDD();
             sql = "   SELECT  * FROM viajestecnicos  WHERE idviaje= " + viajeBean.getId();
-            Statement statement = connection.createStatement();
-            ResultSet resulSet = statement.executeQuery(sql);
-            while (resulSet.next()) {
-                UsuarioBean tecnico = new UsuarioDao().getPorId(resulSet.getLong("idtecnico"));
-                listaTecnicos.add(tecnico);
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sql);
+                while (resulSet.next()) {
+                    UsuarioBean tecnico = new UsuarioDao().getPorId(resulSet.getLong("idtecnico"));
+                    listaTecnicos.add(tecnico);
+                }
+                statement.close();
             }
-            statement.close();
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
@@ -322,10 +349,10 @@ public class ViajesDao extends ConexionDao implements Serializable {
         try {
             connection = super.getConexionBBDD();
             sql = " DELETE FROM  viajesCentros WHERE idviaje='" + id + "'";
-            Statement statement = connection.createStatement();
-            booradoBoolean = statement.execute(sql);
-            booradoBoolean = true;
-            statement.close();
+            try (Statement statement = connection.createStatement()) {
+                booradoBoolean = statement.execute(sql);
+                statement.close();
+            }
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
@@ -348,10 +375,11 @@ public class ViajesDao extends ConexionDao implements Serializable {
         try {
             connection = super.getConexionBBDD();
             sql = " DELETE FROM  viajesCentros WHERE id='" + viajeCentroBean.getId() + "'";
-            Statement statement = connection.createStatement();
-            booradoBoolean = statement.execute(sql);
-            booradoBoolean = true;
-            statement.close();
+            try (Statement statement = connection.createStatement()) {
+                booradoBoolean = statement.execute(sql);
+                booradoBoolean = true;
+                statement.close();
+            }
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
@@ -366,7 +394,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
     /**
      *
      * @param id
-     * @return Boora todos los tecnicos asociados al viaje
+     * @return Borra todos los tecnicos asociados al viaje
      */
     public Boolean doBorraTecnicos(Long id) {
         Connection connection = null;
@@ -374,10 +402,10 @@ public class ViajesDao extends ConexionDao implements Serializable {
         try {
             connection = super.getConexionBBDD();
             sql = " DELETE FROM  viajestecnicos WHERE idviaje='" + id + "'";
-            Statement statement = connection.createStatement();
-            booradoBoolean = statement.execute(sql);
-            booradoBoolean = true;
-            statement.close();
+            try (Statement statement = connection.createStatement()) {
+                booradoBoolean = statement.execute(sql);
+                statement.close();
+            }
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
@@ -391,8 +419,72 @@ public class ViajesDao extends ConexionDao implements Serializable {
 
     /**
      *
-     * @param id
-     * @return Boora un tecnicos asociados al viaje id
+     * @param viajeBean
+     * @param tecnico
+     * @return Comprueba si ya está asignado ese técnico para ese vaije
+     */
+    public Boolean getViajeTecnico(ViajeBean viajeBean, UsuarioBean tecnico) {
+        Connection connection = null;
+        Boolean existe = false;
+        String sqlViaj;
+        sqlViaj = " SELECT id FROM  viajestecnicos WHERE idviaje='" + viajeBean.getId() + "' AND idtecnico='" + tecnico.getId() + "'";
+        try {
+            connection = super.getConexionBBDD();
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sqlViaj);
+                if (resulSet.next()) {
+                    existe = true;
+                }
+                statement.close();
+            }
+            LOGGER.debug(sqlViaj);
+        } catch (SQLException e) {
+            LOGGER.error(sqlViaj + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return existe;
+    }
+
+    /**
+     *
+     * @param viajeBean
+     * @param centro
+     * @return
+     */
+    public Long getViajeCentro(ViajeCentroBean viajeCentroBeanBean) {
+        Connection connection = null;
+        Long existe = new Long(0);
+        String sqlViaj;
+        sqlViaj = " SELECT id FROM  viajescentros WHERE idviaje='" + viajeCentroBeanBean.getIdViaje() + "' "
+                + "AND idcentro='" + viajeCentroBeanBean.getCentroDestino().getId() + "'";
+        try {
+            connection = super.getConexionBBDD();
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sqlViaj);
+                if (resulSet.next()) {
+                    existe = resulSet.getLong("id");
+                }
+                statement.close();
+            }
+            LOGGER.debug(sqlViaj);
+        } catch (SQLException e) {
+            LOGGER.error(sqlViaj + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return existe;
+    }
+
+    /**
+     *
+     * @param viajeBean
+     * @param usuarioBean
+     * @return Borra un tecnicos asociados al viaje id
      */
     public Boolean doBorraUnTecnico(ViajeBean viajeBean, UsuarioBean usuarioBean) {
         Connection connection = null;
@@ -401,10 +493,11 @@ public class ViajesDao extends ConexionDao implements Serializable {
             connection = super.getConexionBBDD();
             sql = " DELETE FROM  viajestecnicos WHERE idviaje='" + viajeBean.getId()
                     + "' AND idtecnico='" + usuarioBean.getId() + "'";
-            Statement statement = connection.createStatement();
-            booradoBoolean = statement.execute(sql);
-            booradoBoolean = true;
-            statement.close();
+            try (Statement statement = connection.createStatement()) {
+                booradoBoolean = statement.execute(sql);
+                //  booradoBoolean = true;
+                statement.close();
+            }
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
@@ -433,27 +526,53 @@ public class ViajesDao extends ConexionDao implements Serializable {
     public Boolean doInsertaUnCentros(ViajeCentroBean viajeCentroBean) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
-        try {
-            connection = super.getConexionBBDD();
-            viajeCentroBean.setId(super.getSiguienteId("viajescentros"));
-            sql = " INSERT into   viajescentros (id,idviaje,idcentro,preparacion,actuacion) values "
-                    + " ('" + viajeCentroBean.getId() + "'"
-                    + ",'" + viajeCentroBean.getIdViaje() + "' "
-                    + ",'" + viajeCentroBean.getCentroDestino().getId() + "' "
-                    + ",'" + (viajeCentroBean.getPreparacion() == null ? "  " : viajeCentroBean.getPreparacion()) + "' "
-                    + ",'" + (viajeCentroBean.getActuacion() == null ? "  " : viajeCentroBean.getActuacion()) + "' "
-                    + " ) ";
-            LOGGER.debug(sql);
-            Statement statement = connection.createStatement();
-            insertadoBoolean = statement.execute(sql);
-            statement.close();
-            insertadoBoolean = true;
-        } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
-        } catch (Exception e) {
-            LOGGER.error(Utilidades.getStackTrace(e));
-        } finally {
-            this.doCierraConexion(connection);
+        Long id = getViajeCentro(viajeCentroBean);
+        if (id.equals(new Long(0))) {
+            try {
+
+                connection = super.getConexionBBDD();
+                sql = " INSERT INTO viajescentros (id,idviaje,idcentro,preparacion,actuacion ) "
+                        + " VALUES (?,?,?,?,?)  ";
+                PreparedStatement statement = connection.prepareStatement(sql);
+
+                viajeCentroBean.setId(super.getSiguienteId("viajescentros"));
+                statement.setLong(1, viajeCentroBean.getId());
+                if (viajeCentroBean.getIdViaje() != null) {
+                    statement.setLong(2, viajeCentroBean.getIdViaje());
+                } else {
+                    statement.setNull(2, Types.INTEGER);
+                }
+                if (viajeCentroBean.getCentroDestino() != null && viajeCentroBean.getCentroDestino().getId() != null) {
+                    statement.setLong(3, viajeCentroBean.getCentroDestino().getId());
+                } else {
+                    statement.setNull(3, Types.INTEGER);
+                }
+                if (viajeCentroBean.getPreparacion() != null) {
+                    statement.setString(4, viajeCentroBean.getPreparacion());
+                } else {
+                    statement.setNull(4, Types.VARCHAR);
+                }
+                if (viajeCentroBean.getActuacion() != null && !viajeCentroBean.getActuacion().isEmpty()) {
+                    statement.setString(5, viajeCentroBean.getActuacion());
+                } else {
+                    // tiene null restriccion la tabla de la bbdd
+                    statement.setString(5, "- ");
+                }
+                insertadoBoolean = statement.executeUpdate() > 0;
+                statement.close();
+                LOGGER.debug(sql);
+
+            } catch (SQLException e) {
+                LOGGER.error(sql + Utilidades.getStackTrace(e));
+            } catch (Exception e) {
+                LOGGER.error(Utilidades.getStackTrace(e));
+            } finally {
+                this.doCierraConexion(connection);
+            }
+        } else {
+            // si ya existe actualizamos campos
+            viajeCentroBean.setId(id);
+            insertadoBoolean = doActualizaUnCentro(viajeCentroBean);
         }
         return insertadoBoolean;
     }
@@ -463,16 +582,23 @@ public class ViajesDao extends ConexionDao implements Serializable {
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " update viajescentros set " + "idviaje='" + viajeCentroBean.getIdViaje() + "'"
-                    + ",idcentro='" + viajeCentroBean.getCentroDestino().getId() + "'"
-                    + ",preparacion='" + (viajeCentroBean.getPreparacion() == null ? " " : viajeCentroBean.getPreparacion()) + "'"
-                    + ",actuacion='" + (viajeCentroBean.getActuacion() == null ? " " : viajeCentroBean.getActuacion()) + "'"
-                    + " WHERE id='" + viajeCentroBean.getId() + "'";
-            LOGGER.debug(sql);
-            Statement statement = connection.createStatement();
-            insertadoBoolean = statement.execute(sql);
+            sql = " UPDATE  viajescentros set  preparacion=?,actuacion=?  "
+                    + " WHERE id=?  ";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            if (viajeCentroBean.getPreparacion() != null) {
+                statement.setString(1, viajeCentroBean.getPreparacion());
+            } else {
+                statement.setNull(1, Types.VARCHAR);
+            }
+            if (viajeCentroBean.getActuacion() != null && !viajeCentroBean.getActuacion().isEmpty()) {
+                statement.setString(2, viajeCentroBean.getActuacion());
+            } else {
+                statement.setString(2, "-");
+            }
+            statement.setLong(3, viajeCentroBean.getId());
+            insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
-            insertadoBoolean = true;
+            LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
         } catch (Exception e) {
@@ -492,26 +618,31 @@ public class ViajesDao extends ConexionDao implements Serializable {
     public Boolean doInsertaUnTecnico(ViajeBean viajeBean, UsuarioBean tecnico) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
-        try {
-            connection = super.getConexionBBDD();
-            Long id = super.getSiguienteId("viajestecnicos");
-            sql = " INSERT into   viajestecnicos (id,idviaje,idtecnico) values "
-                    + " ('" + id + "'"
-                    + ",'" + viajeBean.getId() + "' "
-                    + ",'" + tecnico.getId() + "' "
-                    + " ) ";
-            LOGGER.debug(sql);
-            Statement statement = connection.createStatement();
-            insertadoBoolean = statement.execute(sql);
-            statement.close();
-            insertadoBoolean = true;
-        } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
-        } catch (Exception e) {
-            LOGGER.error(Utilidades.getStackTrace(e));
-        } finally {
-            this.doCierraConexion(connection);
+        if (getViajeTecnico(viajeBean, tecnico) == false) {
+            try {
+                connection = super.getConexionBBDD();
+                Long id = super.getSiguienteId("viajestecnicos");
+                sql = " INSERT into   viajestecnicos (id,idviaje,idtecnico) values "
+                        + " ('" + id + "'"
+                        + ",'" + viajeBean.getId() + "' "
+                        + ",'" + tecnico.getId() + "' "
+                        + " ) ";
+                LOGGER.debug(sql);
+                Statement statement = connection.createStatement();
+                insertadoBoolean = statement.execute(sql);
+                statement.close();
+                insertadoBoolean = true;
+            } catch (SQLException e) {
+                LOGGER.error(sql + Utilidades.getStackTrace(e));
+            } catch (Exception e) {
+                LOGGER.error(Utilidades.getStackTrace(e));
+            } finally {
+                this.doCierraConexion(connection);
+            }
+        } else {
+            // si existe confirma la insercion
         }
+        insertadoBoolean = true;
         return insertadoBoolean;
     }
 }

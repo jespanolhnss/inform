@@ -39,7 +39,7 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         try {
             usuarioCategoriaBean.setId(rs.getLong("usuarioscategoriaid"));
             usuarioCategoriaBean.setCodigopersigo(rs.getString("usuarioscategoriacodigo"));
-            usuarioCategoriaBean.setNombre(rs.getString("usuarioscategoriaanombre").trim());
+            usuarioCategoriaBean.setNombre(rs.getString("usuarioscategoriaanombre"));
             usuarioCategoriaBean.setEstado(rs.getInt("usuarioscategoriaestado"));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));

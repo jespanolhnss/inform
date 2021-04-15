@@ -45,8 +45,13 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 + ",usu.estado as usuarioestado,usu.usucambio as usuariousucambio"
                 + ",usu.fechacambio as usuariofechacambio,usu.mail as usuariomail"
                 + ",usu.telefono as usuariotelefon,usu.idgfh as usuarioidgfh"
-                + ",usu.idcategoria as usuarioidcategoria"
-                + " FROM usuarios usu "
+                + ",usu.idcategoria as usuarioidcategoria,usu.movil as usuariomovil"
+                + ",usu.mailprivado as usuariomailprivado,usu.telegram as usuariotegegram"
+                + ",usu.solicita as usuariosolicita"
+                + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
+                + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
+                + " FROM usuarios usu  "
+                + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
                 + " WHERE 1=1";
 
     }
@@ -72,6 +77,13 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             usuario.setCategoria(new CategoriaDao().getPorId(resulSet.getLong("usuarioidcategoria")));
             usuario.setGfh(new GfhDao().getPorId(resulSet.getLong("usuarioidgfh")));
             usuario.setEstado(resulSet.getInt("usuarioestado"));
+            usuario.setCorreoPrivadoUsuario(resulSet.getString("usuariomailprivado"));
+            usuario.setMovilUsuario(resulSet.getString("usuariomovil"));
+            usuario.setTelegram(resulSet.getString("usuariotegegram"));
+            usuario.setSolicita(resulSet.getString("usuariosolicita"));
+
+            usuario.setCategoria(CategoriaDao.getRegistroResulset(resulSet));
+
         } catch (SQLException e) {
             logger.error(Utilidades.getStackTrace(e));
         }
@@ -81,9 +93,8 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
     /**
      *
      * @param resulSet
-     * @return Este méto se usa cuando una tabla tiene el susucambio y un campo
-     * usuarionormal. Monta la sql con otros nombre s de columnas usueid,
-     * usue....
+     * @return Este méto se usa cuando una tabla tiene el usucambio y un campo
+     * usuarionormal. Monta la sql con otros nombre de columnas usueid, usue....
      */
     public static UsuarioBean getRegistroResulsetUsuario(ResultSet resulSet) {
         UsuarioBean usuario = null;
@@ -99,6 +110,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             usuario.setCategoria(new CategoriaDao().getPorId(resulSet.getLong("usuarioidcategoria")));
             usuario.setGfh(new GfhDao().getPorId(resulSet.getLong("usuarioidgfh")));
             usuario.setEstado(resulSet.getInt("usueestado"));
+
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         }
@@ -236,7 +248,12 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         try {
             connection = super.getConexionBBDD();
             sql = " UPDATE  usuarios  SET dni=?,apellido1=?,apellido2=?,nombre=?"
+<<<<<<< HEAD
                     + ", mail=?,telefono=?,idcategoria=?,idgfh=?,usucambio=?,fechacambio=?,estado=? "
+=======
+                    + ", mail=?,telefono=?,usucambio=?,fechacambio=?,estado=? ,movil=?,mailprivado=?,telegram=?"
+                    + ", solicita =?, idcategoria=?"
+>>>>>>> 8b9a5f7906000c7e95091622141998434c99725e
                     + " WHERE id=?  ";
             PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -251,12 +268,43 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             if (usuarioBean.getUsucambio() == null) {
                 statement.setLong(9, usuarioBean.getUsucambio().getId());
             } else {
+<<<<<<< HEAD
                 // si no hay usuario de cambio pone el mismo
                 statement.setLong(9, new Long(1));
             }
             statement.setLong(10, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
             statement.setInt(11, usuarioBean.getEstado());
             statement.setLong(12, usuarioBean.getId());
+=======
+                statement.setLong(7, UsuarioBean.USUARIO_SISTEMA.getId());
+            }
+            statement.setLong(8, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
+            statement.setInt(9, usuarioBean.getEstado());
+
+            if (usuarioBean.getMovilUsuario() != null) {
+                statement.setString(10, usuarioBean.getMovilUsuario());
+            } else {
+                statement.setNull(10, Types.CHAR);
+            }
+            if (usuarioBean.getCorreoPrivadoUsuario() != null) {
+                statement.setString(11, usuarioBean.getCorreoPrivadoUsuario());
+            } else {
+                statement.setNull(11, Types.CHAR);
+            }
+            if (usuarioBean.getTelegram() != null) {
+                statement.setString(12, usuarioBean.getTelegram());
+            } else {
+                statement.setNull(12, Types.CHAR);
+            }
+            statement.setString(13, usuarioBean.getSolicita());
+            if (usuarioBean.getCategoria() != null && usuarioBean.getId() != null) {
+                statement.setLong(14, usuarioBean.getCategoria().getId());
+            } else {
+                statement.setNull(14, Types.INTEGER);
+            }
+
+            statement.setLong(15, usuarioBean.getId());
+>>>>>>> 8b9a5f7906000c7e95091622141998434c99725e
             insertado = statement.executeUpdate() > 0;
             statement.close();
             logger.debug(sql);
@@ -311,8 +359,14 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         Long id = null;
         try {
             connection = super.getConexionBBDD();
+<<<<<<< HEAD
             sql = " INSERT INTO usuarios (id,dni,apellido1,apellido2,nombre,mail,telefono,idcategoria,idgfh,usucambio,fechacambio,estado)"
                     + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)  ";
+=======
+            sql = " INSERT INTO usuarios (id,dni,apellido1,apellido2,nombre,mail,telefono,usucambio,fechacambio,estado"
+                    + "movil,mailprivado,telegram, solicita ) "
+                    + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)  ";
+>>>>>>> 8b9a5f7906000c7e95091622141998434c99725e
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setLong(1, usuarioBean.getId());
             statement.setString(2, usuarioBean.getDni());
@@ -326,11 +380,37 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             if (usuarioBean.getUsucambio() != null) {
                 statement.setLong(10, usuarioBean.getUsucambio().getId());
             } else {
+<<<<<<< HEAD
                 // si no hay usuario de cambio pone el mismo
                 statement.setLong(10, new Long(1));
             }
             statement.setLong(11, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
             statement.setInt(12, usuarioBean.getEstado());
+=======
+                // si no hay usuario de cambio pone el del sistema
+                statement.setLong(8, UsuarioBean.USUARIO_SISTEMA.getId());
+            }
+            statement.setLong(9, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
+            statement.setInt(10, usuarioBean.getEstado());
+
+            if (usuarioBean.getMovilUsuario() != null) {
+                statement.setString(11, usuarioBean.getMovilUsuario());
+            } else {
+                statement.setNull(11, Types.CHAR);
+            }
+            if (usuarioBean.getCorreoPrivadoUsuario() != null) {
+                statement.setString(12, usuarioBean.getCorreoPrivadoUsuario());
+            } else {
+                statement.setNull(12, Types.CHAR);
+            }
+            if (usuarioBean.getTelegram() != null) {
+                statement.setString(13, usuarioBean.getTelegram());
+            } else {
+                statement.setNull(13, Types.CHAR);
+            }
+            statement.setString(14, usuarioBean.getSolicita());
+
+>>>>>>> 8b9a5f7906000c7e95091622141998434c99725e
             insertado = statement.executeUpdate() > 0;
             insertado = true;
             statement.close();
@@ -384,7 +464,13 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
 
         try {
             connection = super.getConexionBBDD();
-
+            if (texto != null && !texto.isEmpty()) {
+                if (Utilidades.isNumeric(texto.substring(0))) {
+                    sql = sql.concat(" AND dni like '" + texto + "%'");
+                } else {
+                    sql = sql.concat(" AND  (upper( apellido1) like '" + texto.toUpperCase() + "%'  OR  upper(apellido2) like '" + texto.toUpperCase() + "%')");
+                }
+            }
             sql = sql.concat(" AND estado=" + ConexionDao.BBDD_ACTIVOSI);
             sql = sql.concat(" ORDER BY apellido1,apellido2,nombre	");
 
@@ -441,8 +527,8 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             if (registros != 0) {
                 sqlusu = sqlusu.concat(" AND rownum<=" + registros);
             }
-            sqlusu = sqlusu.concat(" AND estado=" + ConexionDao.BBDD_ACTIVOSI);
-            sqlusu = sqlusu.concat(" ORDER BY apellido1,apellido2,nombre	");
+            sqlusu = sqlusu.concat(" AND usu.estado=" + ConexionDao.BBDD_ACTIVOSI);
+            sqlusu = sqlusu.concat(" ORDER BY usu.apellido1,usu.apellido2,usu.nombre	");
 
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sqlusu);
@@ -489,20 +575,6 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
     public ArrayList<UsuarioBean> getInformaticos() {
 
         ArrayList<UsuarioBean> listaUsuarios = new ArrayList<>();
-        /*
-        UsuarioBean juan = new UsuarioBean();
-        juan.setId(new Long(1));
-        juan.setApellido1("Nieto");
-        juan.setApellido2("Pajares");
-        juan.setNombre("Juan");
-        listaUsuarios.add(juan);
-        UsuarioBean antonio = new UsuarioBean();
-        antonio.setId(new Long(1651));
-        antonio.setApellido1("Hurtado");
-        antonio.setApellido2("Losáñez");
-        antonio.setNombre("Antonio");
-        listaUsuarios.add(antonio);
-         */
         String dnis = new ParametroDao().getPorCodigo(ParametroBean.USR_INFORMATICOS).getValor();
         String[] dni = dnis.split(",");
         for (String undni : dni) {
@@ -511,7 +583,6 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 listaUsuarios.add(usu);
             }
         }
-
         return listaUsuarios;
     }
 
