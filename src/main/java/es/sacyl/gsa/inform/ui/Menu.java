@@ -62,10 +62,10 @@ public class Menu extends MenuBar {
             this.contenedorFormularios.add(new FrmTarjetasCribado());
         });
 
-        MenuItem viajes = this.addItem("Viajes");
+        MenuItem viajes = this.addItem("Actividad");
 
         SubMenu viajesSubmenu = viajes.getSubMenu();
-        viajesSubmenu.addItem("Nuevo", e -> {
+        viajesSubmenu.addItem("Viajes", e -> {
             this.contenedorFormularios.removeAll();
             this.contenedorFormularios.add(new FrmViajesRegistrar());
         });

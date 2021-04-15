@@ -78,8 +78,8 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + " ,e.servicio as  equiposervicio, e.ip as  equipoip, e.comentario as  equipocomentario,e.mac as equipomac "
                 + " ,e.estado as equipoestado,e.fechacambio as equipofechacambio, e.usucambio as equipousucambio "
                 + " ,e.usuario as equipousuario, e.nombredominio as equiponombredominio"
-                + " ,gfh.id as gfhid,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasistencial,gfh.idjimena as gfhidjimena, gfh.estado as gfhestado"
+                + " ,gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
+                + " ,gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
                 + " ,u.id as ubicacionesid , u.centro as ubicacionescentro, u.descripcion as ubicacionesdescripcion"
                 + " ,u.idpadre ubicacionesidpadre, u.nivel  as ubicacionesnivel  "
                 + " ,usu.id as usuarioid,usu.dni as usuariodni,usu.apellido1 as usuarioapellido1"
@@ -134,7 +134,11 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
         try {
             equipoBean.setId(rs.getLong("equipoid"));
             equipoBean.setTipo(rs.getString("equipotipo"));
+
             equipoBean.setInventario(rs.getLong("equipoinventario"));
+            if (equipoBean.getInventario().equals(new Long(0))) {
+                equipoBean.setInventario(null);
+            }
             equipoBean.setMarca(rs.getString("equipomarca"));
             equipoBean.setModelo(rs.getString("equipomodelo"));
             equipoBean.setNumeroSerie(rs.getString("equiponumeroserie"));
@@ -541,10 +545,13 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 sql = sql.concat(" AND e.servicio='" + servicio.getId() + "'");
             }
             if (texto != null && !texto.isEmpty()) {
+
                 if (IpCtrl.isValid(texto)) {
                     sql = sql.concat("  AND e.id IN (select  equipo from ips where not equipo  is null AND  ip = '" + texto + "')");
                 } else if (texto.contains("10.")) {
                     sql = sql.concat(" AND  e.id IN (select  equipo from ips where not equipo  is null AND  ip LIKE  '" + texto + "%')");
+                } else if (texto.charAt(2) == ":".charAt(0)) {
+                    sql = sql.concat(" AND  e.mac  LIKE  '" + texto + "%'");
                 } else {
                     sql = sql.concat(" AND e.nombredominio like '%" + texto + "%'");
                 }

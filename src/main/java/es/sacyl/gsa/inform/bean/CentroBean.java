@@ -79,6 +79,14 @@ public class CentroBean extends MasterBean implements Serializable {
         return nomcen;
     }
 
+    public String getNomcenParaCombo() {
+        if (nomcorto != null) {
+            return nomcorto;
+        } else {
+            return nomcen;
+        }
+    }
+
     public String getNomcenCorto() {
         if (nomcen != null && nomcen.length() > 15) {
             return nomcen.substring(0, 15);

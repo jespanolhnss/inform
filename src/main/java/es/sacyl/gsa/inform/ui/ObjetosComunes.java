@@ -159,13 +159,13 @@ public class ObjetosComunes {
         aplicacion.setId(id);
         RadioButtonGroup<AplicacionPerfilBean> radioButtonGroup;
         radioButtonGroup = new RadioButtonGroup<>();
-        radioButtonGroup.setItems(new AplicacionPerfilDao().getLista(null, aplicacion));      
+        radioButtonGroup.setItems(new AplicacionPerfilDao().getLista(null, aplicacion));
         radioButtonGroup.setRenderer(new ComponentRenderer<>(aplicacionPerfilBean -> {
             Div title = new Div();
             title.setText(aplicacionPerfilBean.getNombre());
             return title;
         }));
-       
+
         return radioButtonGroup;
     }
 
@@ -189,13 +189,13 @@ public class ObjetosComunes {
      */
     public CheckboxGroup<CentroBean> getCentrosCheckboxGroup() {
         CheckboxGroup<CentroBean> centros = new CheckboxGroup<>();
-        ArrayList<CentroBean> centrosArrayList = new CentroDao().getLista(null, AutonomiaBean.AUTONOMIADEFECTO, 
-                ProvinciaBean.PROVINCIA_DEFECTO, null, null, null, null, ConexionDao.BBDD_ACTIVOSI);        
+        ArrayList<CentroBean> centrosArrayList = new CentroDao().getLista(null, AutonomiaBean.AUTONOMIADEFECTO,
+                ProvinciaBean.PROVINCIA_DEFECTO, null, null, null, null, ConexionDao.BBDD_ACTIVOSI);
         centros.setItems(centrosArrayList);
         centros.setItemLabelGenerator(CentroBean::getNomcorto);
         return centros;
     }
-    
+
     /**
      *
      * @param valor el valor que esté seleccionado del combo
@@ -414,6 +414,14 @@ public class ObjetosComunes {
         dateTimePicker.setMinWidth("240px");
         dateTimePicker.setMaxWidth("240px");
         return dateTimePicker;
+    }
+
+    public TextField getId() {
+        TextField campo = getTextField("Id");
+        campo.setMaxWidth("100px");
+        campo.setMinWidth("100px");
+        campo.setWidth("100px");
+        return campo;
     }
 
     /**

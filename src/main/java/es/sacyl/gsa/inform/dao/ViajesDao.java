@@ -77,7 +77,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
                      */
                     if (viajeCompleto == Boolean.FALSE) {
                         viajeBean.setListaCentros(getViajeCentros(viajeBean));
-                        viajeBean.setListaTecnicos(getViajeTecnicos(viajeBean));
+                        viajeBean.setListaTecnicos(getListaTecnicosViaje(viajeBean));
                     }
                 }
                 statement.close();
@@ -259,7 +259,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
             while (resulSet.next()) {
                 ViajeBean viajeBean = getRegistroResulset(resulSet);
                 viajeBean.setListaCentros(getViajeCentros(viajeBean));
-                viajeBean.setListaTecnicos(getViajeTecnicos(viajeBean));
+                viajeBean.setListaTecnicos(getListaTecnicosViaje(viajeBean));
                 listaViajes.add(viajeBean);
             }
             statement.close();
@@ -313,7 +313,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
      * @param viajeBean
      * @return Un ArrayList de Usuarios asociados al viaje
      */
-    public ArrayList<UsuarioBean> getViajeTecnicos(ViajeBean viajeBean) {
+    public ArrayList<UsuarioBean> getListaTecnicosViaje(ViajeBean viajeBean) {
         ArrayList<UsuarioBean> listaTecnicos = new ArrayList<>();
         Connection connection = null;
         try {
@@ -482,6 +482,44 @@ public class ViajesDao extends ConexionDao implements Serializable {
 
     /**
      *
+     * @param viajeCentroBean
+     * @return
+     *
+     */
+    public ViajeCentroBean getViajeCentroObj(ViajeCentroBean viajeCentroBean) {
+        Connection connection = null;
+        ViajeCentroBean viajeCentroBeanR = null;
+        String sqlViaj;
+
+        sqlViaj = " SELECT * FROM  viajescentros WHERE idviaje='" + viajeCentroBean.getIdViaje() + "' "
+                + "AND idcentro='" + viajeCentroBean.getCentroDestino().getId() + "'";
+        try {
+            connection = super.getConexionBBDD();
+            try (Statement statement = connection.createStatement()) {
+                LOGGER.debug(sqlViaj);
+                ResultSet resulSet = statement.executeQuery(sqlViaj);
+                if (resulSet.next()) {
+                    viajeCentroBeanR = new ViajeCentroBean();
+                    viajeCentroBeanR.setId(resulSet.getLong("id"));
+                    viajeCentroBeanR.setIdViaje(resulSet.getLong("idviaje"));
+                    viajeCentroBeanR.setCentroDestino(new CentroDao().getPorId(resulSet.getLong("idcentro")));
+                    viajeCentroBeanR.setPreparacion(resulSet.getString("preparacion"));
+                    viajeCentroBeanR.setActuacion(resulSet.getString("actuacion"));
+                }
+                statement.close();
+            }
+        } catch (SQLException e) {
+            LOGGER.error(sqlViaj + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return viajeCentroBeanR;
+    }
+
+    /**
+     *
      * @param viajeBean
      * @param usuarioBean
      * @return Borra un tecnicos asociados al viaje id
@@ -495,7 +533,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
                     + "' AND idtecnico='" + usuarioBean.getId() + "'";
             try (Statement statement = connection.createStatement()) {
                 booradoBoolean = statement.execute(sql);
-                //  booradoBoolean = true;
+                booradoBoolean = true;
                 statement.close();
             }
             LOGGER.debug(sql);
@@ -575,6 +613,17 @@ public class ViajesDao extends ConexionDao implements Serializable {
             insertadoBoolean = doActualizaUnCentro(viajeCentroBean);
         }
         return insertadoBoolean;
+    }
+
+    public boolean doGrabaUnCenttro(ViajeCentroBean viajeCentroBean) {
+        boolean actualizado = false;
+        if (getViajeCentroObj(viajeCentroBean) == null) {
+
+            actualizado = this.doInsertaUnCentros(viajeCentroBean);
+        } else {
+            actualizado = this.doActualizaUnCentro(viajeCentroBean);
+        }
+        return actualizado;
     }
 
     public Boolean doActualizaUnCentro(ViajeCentroBean viajeCentroBean) {

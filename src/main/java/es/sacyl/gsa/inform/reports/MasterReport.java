@@ -8,6 +8,11 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.property.TextAlignment;
+import com.vaadin.flow.server.VaadinRequest;
+import com.vaadin.flow.server.VaadinServletRequest;
+import es.sacyl.gsa.inform.bean.ParametroBean;
+import es.sacyl.gsa.inform.dao.ParametroDao;
+import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -167,4 +172,26 @@ public abstract class MasterReport {
         this.pdf = pdf;
     }
 
+    public void doActualizaNombreFicheros() {
+        nombrePdfAbsoluto = Constantes.PDFPATHABSOLUTO + nombreDelFicheroPdf;
+        nombrePdfRelativo = Constantes.PDFPATHRELATIVO + nombreDelFicheroPdf;
+        String adr, port;
+        VaadinRequest currentRequest = VaadinRequest.getCurrent();
+        VaadinServletRequest vaadinServletRequest = null;
+        if (currentRequest instanceof VaadinServletRequest) {
+            vaadinServletRequest = (VaadinServletRequest) currentRequest;
+            adr = vaadinServletRequest.getLocalAddr();
+            if (adr.charAt(0) == "0".charAt(0)) {
+                adr = "localhost";
+            }
+            port = Integer.toString(vaadinServletRequest.getLocalPort());
+            urlDelPdf = "http://" + adr + ":" + port + nombrePdfRelativo;
+        } else {
+            adr = new ParametroDao().getPorCodigo(ParametroBean.URL_INSTANCIASERVIDOR).getValor();
+            urlDelPdf = "http://" + adr + nombrePdfRelativo;
+        }
+
+        //  System.out.println("name" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalName());
+        //   urlDelPdf = "http://localhost:8080" + nombrePdfRelativo;
+    }
 }

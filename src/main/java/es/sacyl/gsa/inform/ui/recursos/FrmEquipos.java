@@ -93,8 +93,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     private final Button etiquetaButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.BARCODE.create());
 
-    private final TextField id = new ObjetosComunes().getTextField("Id");
-    private final ComboBox<String> equipoTipoCombo = new CombosUi().getEquipoTipoCombo(null, 50);
+    private final TextField id = new ObjetosComunes().getId();
+    private final ComboBox<String> equipoTipoCombo = new CombosUi().getEquipoTipoCombo(null, 70);
     private final ComboBox<String> equipoMarcaCombo = new CombosUi().getGrupoRamaComboValor(ComboBean.TIPOEQUIPOMARCA, equipoTipoCombo.getValue(), null, "Marca");
 
     private final TextField inventario = new ObjetosComunes().getTextField("Inventario");
@@ -455,6 +455,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     @Override
     public void doComponenesAtributos() {
+        botonBorrar.setText("");
+        botonLimpiar.setText("");
+        botonAyuda.setText("");
         autonomiaComboBuscador.setVisible(Boolean.FALSE);
         ubicacionCombo.setLabel("Ubicación");
         ubicacionCombo.setMaxWidth("450px");
@@ -464,10 +467,25 @@ public final class FrmEquipos extends FrmMasterPantalla {
         centroComboBuscador.setLabel("");
         equipoTipoComboBuscador.setLabel("");
         equipoMarcaComboBuscador.setLabel("");
+
+        equipoTipoCombo.setMaxWidth("150px");
+        equipoTipoCombo.setMinWidth("150px");
+        equipoTipoCombo.setWidth("150px");
+
+        equipoMarcaCombo.setMaxWidth("150px");
+        equipoMarcaCombo.setMinWidth("150px");
+        equipoMarcaCombo.setWidth("150px");
+
+        modelo.setMaxWidth("200px");
+        modelo.setMinWidth("200px");
+        modelo.setWidth("200px");
+
         botonImprimir.setEnabled(true);
 
         nombredominio.setMinWidth("170px");
+
         wwwimage.setVisible(false);
+        comentario.setMaxWidth("640px");
 
         page1.setWidthFull();
         page2.setWidthFull();
@@ -504,21 +522,25 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorIzquierda.add(tabs, page1, page2, page3);
 
         contenedorDerecha.removeAll();
-        contenedorBuscadores.add(autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador);
+        buscador.setPlaceholder("Valor a buscar");
+        buscador.setWidth("200px");
+        contenedorBuscadores.add(autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador, buscador);
         contenedorBuscadores1.add(equipoTipoComboBuscador, equipoMarcaComboBuscador, botonImprimir, excelButton, etiquetaListaButton);
 
         contenedorDerecha.add(this.contenedorBuscadores, this.contenedorBuscadores1, equipoGrid);
 
-        contenedorFormulario.add(id, 2);
-        contenedorFormulario.add(equipoTipoCombo, 2);
-        contenedorFormulario.add(equipoMarcaCombo, 2);
+        contenedorFormulario.add(id);
+        contenedorFormulario.add(equipoTipoCombo);
+        contenedorFormulario.add(equipoMarcaCombo);
+        contenedorFormulario.add(modelo, 2);
+        contenedorFormulario.add(ayudaModelo);
 
         contenedorFormulario.add(inventario, ayudaInventario);
-        contenedorFormulario.add(modelo, ayudaModelo);
         contenedorFormulario.add(numeroSerie, 2);
-
         contenedorFormulario.add(ip, 2);
+
         contenedorFormulario.add(ayudaIp, wwwimage);
+
         contenedorFormulario.add(macAdress);
         contenedorFormulario.add(nombredominio);
 
@@ -603,6 +625,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
             doActualizaGrid();
         });
 
+        buscador.addBlurListener(event -> {
+            doActualizaGrid();
+        });
         /**
          * Si cambia el valor del combo de centro en el formulario actualiza los
          * valores de combo hijo de ubicaciones.
@@ -750,9 +775,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 -> {
             imprimeEtiqueta(equipoBean);
         });
-        etiquetaButton.addClickListener(event
+        etiquetaListaButton.addClickListener(event
                 -> {
-            doImprimeEtiquetas();
+            doImprimeListaEtiquetas();
         });
 
         /**
@@ -882,6 +907,18 @@ public final class FrmEquipos extends FrmMasterPantalla {
         });
     }
 
+    public void doImprimeListaEtiquetas() {
+        final ConfirmDialog dialog = new ConfirmDialog(
+                " Etiquetas de código de barras ",
+                " Se van a imprimir " + equipoArrayList.size() + " etiquetas ",
+                " Confirma la impresión ",
+                () -> {
+
+                    doImprimeEtiquetas();
+                });
+        dialog.open();
+    }
+
     public void doActualizaDatosBotones(EquipoBean equipoBean) {
 
         // actualiza lista de ips
@@ -917,6 +954,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 wwwimage.setVisible(true);
             } else {
                 wwwimage.setVisible(false);
+            }
+            if (equipoBean.getInventario() != null && equipoBean.getInventario() != null) {
+                ayudaInventario.setEnabled(false);
+            } else {
+                ayudaInventario.setEnabled(true);
             }
         }
     }
@@ -1027,8 +1069,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
         String inventario = "", ip = "", sn = "";
         String valores = new ParametroDao().getPorCodigo(ParametroBean.PRINT_ETIQUETAS).getValor();
         String ipPrinter = null;
+        int puerto = 0;
         try {
-            int puerto = Integer.parseInt(valores.split(",")[1]);
+            puerto = Integer.parseInt(valores.split(",")[1]);
             ipPrinter = valores.split(",")[0];
             if (equipoBean.getInventario() != null) {
                 inventario = equipoBean.getInventario().toString();
@@ -1042,10 +1085,22 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
             Socket clientSocket = new Socket(ipPrinter, puerto);
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            String inventarioEti = "";
+            if (inventario != null && !inventario.isEmpty() && inventario != "0") {
+                inventarioEti = "^A0N,25,25^BY2,2^FO50,35^BCN,50,Y^FD" + inventario + "^FS";
+            }
+            String ipEti = "";
+            if (ip != null && !ip.isEmpty()) {
+                ipEti = "^FO40,120^A0,30,40^FDIP: " + ip + "^FS ";
+            }
+            String snEti = "";
+            if (sn != null && !sn.isEmpty()) {
+                snEti = "^FO30,170^A0,30,25^FDN/S: " + sn + "^FS ";
+            }
             String[] datos = new String[]{"^XA", "^FO0,0",
-                "^A0N,25,25^BY2,2^FO50,35^BCN,50,Y^FD" + inventario + "^FS",
-                "^FO40,120^A0,30,40^FDIP: " + ip + "^FS ",
-                "^FO30,170^A0,30,25^FDN/S: " + sn + "^FS ",
+                inventarioEti,
+                ipEti,
+                snEti,
                 "^FO60,220^A0,15,15^FH^FDGerencia de Asistencia Sanitaria de _B5vila^FS ",
                 "^FO6,50^A0B,15,20^FH^FDINFORM_B5TICA^FS ",
                 /*
@@ -1070,6 +1125,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
             clientSocket.close();
         } catch (IOException e) {
             LOGGER.error("Sin conexion con impresora" + ipPrinter + Utilidades.getStackTrace(e));
+            Notification.show("Error de conexion a la impresora: " + ipPrinter + ":" + puerto, 40000, Notification.Position.MIDDLE);
         }
     }
 

@@ -27,7 +27,7 @@ public class ViajeBean extends MasterBean implements Serializable {
     }
 
     public String getSalidaString() {
-        DateTimeFormatter formatterdd_mm_yyyy_hh_mm = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm");
+        DateTimeFormatter formatterdd_mm_yyyy_hh_mm = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         return formatterdd_mm_yyyy_hh_mm.format(salida);
     }
 

@@ -37,11 +37,14 @@ public class ParametroBean implements Serializable {
     public static String URL_CONEXION_JIMENA = "url.conexion.jimena";
     public static String URL_CONEXION_GALENO = "url.conexion.galeno";
 
+    // IP del servidor dodne está instalada la instancia de la app
+    public static String URL_INSTANCIASERVIDOR = " url.instanciaservidor";
+
     public static String USR_INFORMATICOS = "usr.informaticos";
 
     public static String PRINT_ETIQUETAS = "print.etitquetas";
 
-    public static String VALORDEFECTO_TIPOCENTRO = "valordefecto.tipocentro";
+    public static String VALORDEFECTO_TIPOCENTRO = " valordefecto.tipocentro";
 
     public Long getId() {
         return id;

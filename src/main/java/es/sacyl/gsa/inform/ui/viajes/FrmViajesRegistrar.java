@@ -14,6 +14,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
@@ -32,6 +33,7 @@ import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
 import es.sacyl.gsa.inform.dao.ViajesDao;
+import es.sacyl.gsa.inform.reports.viajes.ViajesListadoResumenPdf;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterConstantes;
@@ -108,15 +110,14 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
     }
 
     public void doControlBotones(Object obj) {
+        botonImprimir.setVisible(true);
         if (obj != null) {
             botonBorrar.setEnabled(true);
-            botonImprimir.setEnabled(true);
             lanzarVentana.setEnabled(true);
             tecnicosButton.setEnabled(true);
             page1.setVisible(true);
         } else {
             botonBorrar.setEnabled(false);
-            botonImprimir.setEnabled(false);
             lanzarVentana.setEnabled(false);
             tecnicosButton.setEnabled(false);
             page1.setVisible(false);
@@ -306,7 +307,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         contenedorIzquierda.setWidth("50%");
         contenedorDerecha.setWidth("50%");
         autonomiaComboBuscador.setVisible(false);
-
+        botonImprimir.setVisible(true);
         id.setWidth("150px");
         id.setMaxWidth("150px");
         id.setMinWidth("150px");
@@ -349,7 +350,8 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         contenedorFormulario.add(id, salida, llegada, matricula);
 
         contenedorBuscadores.add(autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador);
-        contenedorBuscadores1.add(desde, hasta);
+        contenedorBuscadores1.add(desde, hasta, botonImprimir);
+
         contenedorDerecha.add(contenedorBuscadores);
         contenedorDerecha.add(contenedorBuscadores1);
         contenedorDerecha.add(tituloGridViajes);
@@ -446,6 +448,14 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
             Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
             selectedPage.setVisible(true);
         });
+
+        botonImprimir.addClickListener(event -> {
+            ViajesListadoResumenPdf viajesListadoResumen = new ViajesListadoResumenPdf(desde.getValue(), hasta.getValue());
+            viajesListadoResumen.doCreaFicheroPdf();
+            Page page = new Page(getUI().get());
+            page.open(viajesListadoResumen.getUrlDelPdf(), "_blank");
+        });
+
     }
 
     public void doActualizaComboProvinicas(ComboBox<ProvinciaBean> combo, AutonomiaBean autonomia) {
@@ -471,7 +481,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
     }
 
     private void doActualizaGridTecnicos(ViajeBean viajeBean) {
-        ArrayList<UsuarioBean> usuarioBeans = new ViajesDao().getViajeTecnicos(viajeBean);
+        ArrayList<UsuarioBean> usuarioBeans = new ViajesDao().getListaTecnicosViaje(viajeBean);
         viajeTecnicoGrid.setItems(usuarioBeans);
         tecnicosTab.setLabel("Técnicos (" + usuarioBeans.size() + ")");
     }

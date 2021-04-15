@@ -129,7 +129,7 @@ public class CombosUi {
         ComboBox<CentroBean> combo = new ComboBox<>("Centros ");
         combo.setItems(new CentroDao().getLista(null, autonomiaBean, provinciaBean, localidadBean,
                 nivelesAtencionBean, centroTipoBean, nivelesAtentionTipoBean, ConexionDao.BBDD_ACTIVOSI));
-        combo.setItemLabelGenerator(CentroBean::getNomcen);
+        combo.setItemLabelGenerator(CentroBean::getNomcenParaCombo);
 
         if (valor != null) {
             combo.setValue(valor);
@@ -624,7 +624,7 @@ public class CombosUi {
         combo.setClearButtonVisible(true);
         return combo;
     }
-    
+
     /**
      * Devuelve un listado con los gfhs por código
      *
