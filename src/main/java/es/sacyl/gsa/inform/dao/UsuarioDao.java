@@ -1,8 +1,12 @@
 package es.sacyl.gsa.inform.dao;
 
 import com.vaadin.flow.server.VaadinSession;
+import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.bean.FuncionalidadBean;
+import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
+import es.sacyl.gsa.inform.bean.UsuarioPeticionAppBean;
+import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
@@ -11,8 +15,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Iterator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -267,7 +273,6 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             statement.setInt(11, usuarioBean.getEstado());
             statement.setLong(12, usuarioBean.getId());
             statement.setLong(7, UsuarioBean.USUARIO_SISTEMA.getId());
-            }
             statement.setLong(8, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
             statement.setInt(9, usuarioBean.getEstado());
 
@@ -348,14 +353,9 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         Long id = null;
         try {
             connection = super.getConexionBBDD();
-<<<<<<< HEAD
-            sql = " INSERT INTO usuarios (id,dni,apellido1,apellido2,nombre,mail,telefono,idcategoria,idgfh,usucambio,fechacambio,estado)"
-                    + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)  ";
-=======
-            sql = " INSERT INTO usuarios (id,dni,apellido1,apellido2,nombre,mail,telefono,usucambio,fechacambio,estado"
+            sql = " INSERT INTO usuarios (id,dni,apellido1,apellido2,nombre,mail,telefono,usucambio,fechacambio,estado,"
                     + "movil,mailprivado,telegram, solicita ) "
                     + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)  ";
->>>>>>> 8b9a5f7906000c7e95091622141998434c99725e
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setLong(1, usuarioBean.getId());
             statement.setString(2, usuarioBean.getDni());
@@ -369,16 +369,13 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             if (usuarioBean.getUsucambio() != null) {
                 statement.setLong(10, usuarioBean.getUsucambio().getId());
             } else {
-<<<<<<< HEAD
                 // si no hay usuario de cambio pone el mismo
                 statement.setLong(10, new Long(1));
             }
             statement.setLong(11, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
             statement.setInt(12, usuarioBean.getEstado());
-=======
                 // si no hay usuario de cambio pone el del sistema
                 statement.setLong(8, UsuarioBean.USUARIO_SISTEMA.getId());
-            }
             statement.setLong(9, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
             statement.setInt(10, usuarioBean.getEstado());
 
@@ -399,7 +396,6 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             }
             statement.setString(14, usuarioBean.getSolicita());
 
->>>>>>> 8b9a5f7906000c7e95091622141998434c99725e
             insertado = statement.executeUpdate() > 0;
             insertado = true;
             statement.close();
@@ -455,13 +451,13 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             connection = super.getConexionBBDD();
             if (texto != null && !texto.isEmpty()) {
                 if (Utilidades.isNumeric(texto.substring(0))) {
-                    sql = sql.concat(" AND dni like '" + texto + "%'");
+                    sql = sql.concat(" AND usu.dni like '" + texto + "%'");
                 } else {
-                    sql = sql.concat(" AND  (upper( apellido1) like '" + texto.toUpperCase() + "%'  OR  upper(apellido2) like '" + texto.toUpperCase() + "%')");
+                    sql = sql.concat(" AND  (upper( usu.apellido1) like '" + texto.toUpperCase() + "%'  OR  upper(usu.apellido2) like '" + texto.toUpperCase() + "%')");
                 }
             }
-            sql = sql.concat(" AND estado=" + ConexionDao.BBDD_ACTIVOSI);
-            sql = sql.concat(" ORDER BY apellido1,apellido2,nombre	");
+            sql = sql.concat(" AND usu.estado=" + ConexionDao.BBDD_ACTIVOSI);
+            sql = sql.concat(" ORDER BY usu.apellido1,usu.apellido2,usu.nombre	");
 
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sql);
@@ -537,7 +533,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         return lista;
     }
 
-    public UsuarioBean getUsuairoResulSetJimena(ResultSet resulSet, UsuarioBean usuarioParam) {
+    public UsuarioBean getUsuarioResulSetJimena(ResultSet resulSet, UsuarioBean usuarioParam) {
         UsuarioBean usuario = null;
         if (usuarioParam != null) {
             usuario = usuarioParam;

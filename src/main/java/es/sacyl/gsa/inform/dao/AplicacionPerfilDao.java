@@ -42,11 +42,16 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
                 + ",usu.estado as usuarioestado,usu.usucambio as usuariousucambio"
                 + ",usu.fechacambio as usuariofechacambio,usu.mail as usuariomail"
                 + ",usu.telefono as usuariotelefon,usu.idgfh as usuarioidgfh"
-                + ",usu.idcategoria as usuarioidcategoria"
+                + ",usu.idcategoria as usuarioidcategoria,usu.movil as usuariomovil"
+                + ",usu.mailprivado as usuariomailprivado,usu.telegram as usuariotegegram"
+                + ",usu.solicita as usuariosolicita"
+                + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
+                + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
                 + " FROM aplicacionesPerfiles  appp "
                 + " JOIN aplicaciones ap ON ap.id=appp.idaplicaciones "
                 + " LEFT  JOIN gfh ON gfh.id=ap.gfh"
                 + " LEFT JOIN usuarios usu ON usu.id=appp.usucambio"
+                + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
                 + " WHERE 1=1 ";
     }
 

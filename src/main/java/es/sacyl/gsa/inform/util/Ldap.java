@@ -31,14 +31,15 @@ import org.slf4j.LoggerFactory;
 public class Ldap {
 
     private static final Logger logger = LoggerFactory.getLogger(Ldap.class);
-
+    private UsuarioBean usuario = null;
+    
     public Ldap() {
 
     }
 
     public UsuarioBean loginActiveDirectory(String user, String password) throws LoginException {
 
-        UsuarioBean usuario = new UsuarioBean();
+        usuario = new UsuarioBean();
 
         try {
 

@@ -41,7 +41,7 @@ public class ParametroBean implements Serializable {
 
     public static String PRINT_ETIQUETAS = "print.etitquetas";
 
-    public static String VALORDEFECTO_TIPOCENTRO = " valordefecto.tipocentro";
+    public static String VALORDEFECTO_TIPOCENTRO = "valordefecto.tipocentro";
 
     public Long getId() {
         return id;
