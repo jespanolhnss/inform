@@ -133,10 +133,7 @@ public class ConexionDao implements Serializable {
                 if (ctx == null) {
                     throw new Exception(ConexionDao.ERROR_BBDD_CONTEXTO);
                 } else {
-                    // dataSource = (DataSource) ctx.lookup("java:comp/env/jdbc/HCEL");
-//SET GLOBAL time_zone = '-3:00';
                     dataSource = (DataSource) ctx.lookup("java:comp/env/jdbc/dataSourceHnss");
-
                     if (dataSource != null) {
                         return dataSource.getConnection();
                     } else {
@@ -159,6 +156,15 @@ public class ConexionDao implements Serializable {
      *
      * @param tabla
      * @return
+     *
+     * Si existe una secuencia con el patron SEC_ID_nombre_tabla
+     *
+     * retorna la secuenta
+     *
+     * si no recupera el siguiente id de la tabla
+     *
+     * Si es el primer regisgtro por que la tabla esta vacía recupera un 1
+     *
      */
     public Long getSiguienteId(String tabla) {
         Connection connection = null;
@@ -166,8 +172,7 @@ public class ConexionDao implements Serializable {
         try {
 
             connection = this.getConexionBBDD();
-            if (existeSecuencia(tabla) == true) //  sql = " SELECT max(id) +1  as id FROM  " + tabla;
-            {
+            if (existeSecuencia(tabla) == true) {
                 sql = " select SEC_ID_" + tabla + ".nextval as id from dual ";
                 try (Statement statement = connection.createStatement()) {
                     ResultSet resulSet = statement.executeQuery(sql);
@@ -179,6 +184,7 @@ public class ConexionDao implements Serializable {
                     }
                 }
             } else {
+                LOGGER.debug("No hay secuencia para la tabla " + tabla + " Se recupera el siguiente id ");
                 sql = " SELECT max(id) +1  as id FROM  " + tabla;
                 try (Statement statement = connection.createStatement()) {
                     ResultSet resulSet = statement.executeQuery(sql);

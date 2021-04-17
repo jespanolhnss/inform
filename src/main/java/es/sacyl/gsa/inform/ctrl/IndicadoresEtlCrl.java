@@ -14,6 +14,8 @@ import org.apache.logging.log4j.Logger;
 /**
  *
  * @author 06551256M
+ *
+ *
  */
 public final class IndicadoresEtlCrl {
 
@@ -25,6 +27,15 @@ public final class IndicadoresEtlCrl {
     private ArrayList<DWIndicador> indicadoresLista = new ArrayList<>();
     private int norden = 0;
 
+    /**
+     *
+     * @param desde
+     * @param hasta
+     * @param tipo es el tipo de ára his HOS CEX QUI URG LEQ HDIA que se va a
+     * procesar
+     *
+     * Tiene que existir en his un cálculo único para ese intervalo de fechas
+     */
     public IndicadoresEtlCrl(LocalDate desde, LocalDate hasta, String tipo) {
         this.desde = desde;
         this.hasta = hasta;
@@ -41,6 +52,11 @@ public final class IndicadoresEtlCrl {
         }
     }
 
+    /**
+     *
+     * @param tipo
+     * @return En función del área de cáculo recupera el área paa dw_indicadores
+     */
     public String getAreaDW(String tipo) {
         String area = "";
         switch (tipo) {
@@ -63,6 +79,9 @@ public final class IndicadoresEtlCrl {
         return area;
     }
 
+    /**
+     * para cada área de his HOS CEX QUI URG LEQ HDIA método diferente
+     */
     public void doProcesa() {
         if (tipo.equals(DWIndicador.AREACALCULOCEX)) {
 
@@ -78,6 +97,18 @@ public final class IndicadoresEtlCrl {
     }
 
     /**
+     * Lee los datos de la tabla est_servi de his en función del norden que ha
+     * validado que existe y es único para las fechas desde hasta en
+     * clinica.est_servi
+     *
+     * Para cada registro calcula en indicador DW a partir del
+     * clinica.est_servi.codivar
+     *
+     * calcual el área de hospitalización a paritr de clinica.est_servi.servicio
+     *
+     * según siae recodifica los servicio clinica.est_servi.servicio
+     *
+     * graba en la tabla dw_hos_indicadors
      *
      */
     public void doProcesaHospitalizacion() {
@@ -95,7 +126,9 @@ public final class IndicadoresEtlCrl {
                 indicadorDw.setAreahosp(getAreaHospitalizacionSiae(indHis.getServicio()));
                 // recodifica servicio
                 indicadorDw.setServicio(getRecodificaServHis(indHis.getServicio()));
-                new DWDao().doGrabaDatos(indicadorDw, "DW_HOS_INDICADORES");
+                if (indicadorDw.getValor() != 0) {
+                    new DWDao().doGrabaDatos(indicadorDw, "DW_HOS_INDICADORES");
+                }
             }
         });
     }
@@ -125,12 +158,11 @@ public final class IndicadoresEtlCrl {
      * @return
      *
      * add("PSQAGUDOS"); add("PSQINFANTO"); add("PSQDESINTO"); add("PSQDUALES");
-     * add("PSQALIMENTO"); add("PALIATIVOS"); add("INTENSIVAPED");
-     * add("QUEMADOS");
+     * add("PSQALIMENTO"); add(""); add("INTENSIVAPED"); add("QUEMADOS");
      *
-     * recpera el área de hospitalización en función del servicio
+     * recupera el área de hospitalización en función del servicio his
      *
-     * ADM HPCP HPDS HPSQ PSQ
+     * ADM HPDS HPSQ
      *
      * "MEDICAS" CAR DIG HEMA MIR NEF NML NRL
      *
@@ -143,6 +175,12 @@ public final class IndicadoresEtlCrl {
      * "INTENSIVA" UCI
      *
      * "PEDIATRIA" PED
+     *
+     * PSQAGUDOS PSQ
+     *
+     * cronicos HPDS
+     *
+     * PALIATIVOS HPCP
      *
      *
      */
@@ -200,7 +238,13 @@ public final class IndicadoresEtlCrl {
             case "PED":
                 cadena = "PEDIATRIA";
                 break;
+            case "PSQ":
+                cadena = "PEDIATRIA";
+                break;
             case "UCI":
+                cadena = "INTENSIVA";
+                break;
+            case "HPCP":
                 cadena = "INTENSIVA";
                 break;
 
@@ -208,6 +252,14 @@ public final class IndicadoresEtlCrl {
         return cadena;
     }
 
+    /**
+     *
+     * @param servicio
+     * @return
+     *
+     * Para cada servicio HIS recodifica según la tabla oficia el servicio que
+     * va a insertar en al bbdd DW
+     */
     public String getRecodificaServHis(String servicio) {
         String cadena = "";
         switch (servicio) {
@@ -224,8 +276,11 @@ public final class IndicadoresEtlCrl {
                 cadena = "OBS";
                 break;
 
-            case "MIV":
-                cadena = "INTENSIVA";
+            case "HPCP":
+                cadena = "MIR";
+                break;
+            case "UCI":
+                cadena = "MIV";
                 break;
             default:
                 cadena = servicio;

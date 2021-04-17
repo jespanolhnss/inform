@@ -132,8 +132,14 @@ public class HpHisClinicaDao {
             indicadorValor.setAnyo(rs.getInt("anyo"));
             indicadorValor.setMes(rs.getInt("mes"));
             indicadorValor.setServicio(rs.getString("servicio"));
+            if (indicadorValor.getServicio() != null) {
+                indicadorValor.setServicio(indicadorValor.getServicio().trim());
+            }
             indicadorValor.setValor(rs.getDouble("valor"));
             indicadorValor.setCodivar(rs.getString("codivar"));
+            if (indicadorValor.getCodivar() != null) {
+                indicadorValor.setCodivar(indicadorValor.getCodivar().trim());
+            }
         } catch (SQLException es) {
             logger.error(Utilidades.getStackTrace(es));
         }

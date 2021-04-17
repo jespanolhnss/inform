@@ -110,6 +110,7 @@ public class DWDao extends ConexionDao {
                     sql = " SELECT id FROM " + tabla + " WHERE anyo=" + dWIndicadorValor.ano + " "
                             + " AND  mes=" + dWIndicadorValor.getMes() + " "
                             + " AND  indicador='" + dWIndicadorValor.indicador.getCodigo() + "'"
+                            + " AND  servicio='" + dWIndicadorValor.getServicio() + "'"
                             + " ";
                     break;
             }
@@ -166,13 +167,20 @@ public class DWDao extends ConexionDao {
         return insertadoBoolean;
     }
 
+    /**
+     *
+     * @param dWIndicadorValor
+     * @param tabla
+     * @return
+     *
+     * Actualiza una fila en la tabla de indicadores dada
+     */
     public Boolean doActualiza(DWIndicadorValor dWIndicadorValor, String tabla) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
         connection = super.getConexionBBDD();
         switch (tabla) {
             case "DW_HOS_INDICADORES":
-                dWIndicadorValor.setId(this.getSiguienteId(tabla));
                 sql = " UPDATE  DW_HOS_INDICADORES  set valor =? "
                         + " WHERE id=?  ";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
