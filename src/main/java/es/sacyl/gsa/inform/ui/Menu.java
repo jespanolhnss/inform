@@ -15,6 +15,7 @@ import es.sacyl.gsa.inform.bean.UbicacionBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.ctrl.SesionCtrl;
 import es.sacyl.gsa.inform.ui.covid.FrmTarjetasCribado;
+import es.sacyl.gsa.inform.ui.indicadores.FrmIndicadores;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaGestionar;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaNueva;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdTipos;
@@ -60,6 +61,13 @@ public class Menu extends MenuBar {
         covidSubmenu.addItem("Tarjetas", e -> {
             this.contenedorFormularios.removeAll();
             this.contenedorFormularios.add(new FrmTarjetasCribado());
+        });
+
+        MenuItem indicadores = this.addItem("Indicadores");
+        SubMenu indicadoresSubmenu = indicadores.getSubMenu();
+        indicadoresSubmenu.addItem("ETL His ", e -> {
+            this.contenedorFormularios.removeAll();
+            this.contenedorFormularios.add(new FrmIndicadores());
         });
 
         MenuItem viajes = this.addItem("Actividad");

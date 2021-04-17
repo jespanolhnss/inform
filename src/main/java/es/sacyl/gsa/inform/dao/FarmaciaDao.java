@@ -21,7 +21,7 @@ public class FarmaciaDao {
 
         String dbURL2, username, password;
 
-        String cadena = new ParametroDao().getPorCodigo(ParametroBean.URL_CONEXION_HIS).getValor();
+        String cadena = new ParametroDao().getPorCodigo(ParametroBean.URL_CONEXION_CLINICA).getValor();
 
         String[] conex = cadena.split("\\|");
         dbURL2 = "jdbc:oracle:thin:@" + conex[0];

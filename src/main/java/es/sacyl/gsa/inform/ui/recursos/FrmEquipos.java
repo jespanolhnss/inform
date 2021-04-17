@@ -333,7 +333,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
             equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
             equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
         }
-        doActualizaGrid();
+        //    doActualizaGrid();
 
     }
 

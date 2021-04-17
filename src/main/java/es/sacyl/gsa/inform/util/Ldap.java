@@ -32,13 +32,14 @@ public class Ldap {
 
     private static final Logger logger = LoggerFactory.getLogger(Ldap.class);
     private UsuarioBean usuario = null;
-    
+
     public Ldap() {
 
     }
 
     public UsuarioBean loginActiveDirectory(String user, String password) throws LoginException {
 
+        System.out.println(System.getProperty("java.classpath"));
         usuario = new UsuarioBean();
 
         try {

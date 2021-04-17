@@ -164,21 +164,36 @@ public class ConexionDao implements Serializable {
         Connection connection = null;
         Long id = new Long(1);
         try {
+
             connection = this.getConexionBBDD();
-            //  sql = " SELECT max(id) +1  as id FROM  " + tabla;
-            sql = " select SEC_ID_" + tabla + ".nextval as id from dual ";
-            try (Statement statement = connection.createStatement()) {
-                ResultSet resulSet = statement.executeQuery(sql);
-                if (resulSet.next()) {
-                    id = resulSet.getLong("id");
-                    if (id.equals(new Long(0))) {
-                        id = new Long(1);
+            if (existeSecuencia(tabla) == true) //  sql = " SELECT max(id) +1  as id FROM  " + tabla;
+            {
+                sql = " select SEC_ID_" + tabla + ".nextval as id from dual ";
+                try (Statement statement = connection.createStatement()) {
+                    ResultSet resulSet = statement.executeQuery(sql);
+                    if (resulSet.next()) {
+                        id = resulSet.getLong("id");
+                        if (id.equals(new Long(0))) {
+                            id = new Long(1);
+                        }
+                    }
+                }
+            } else {
+                sql = " SELECT max(id) +1  as id FROM  " + tabla;
+                try (Statement statement = connection.createStatement()) {
+                    ResultSet resulSet = statement.executeQuery(sql);
+                    if (resulSet.next()) {
+                        id = resulSet.getLong("id");
+                        if (id.equals(new Long(0))) {
+                            id = new Long(1);
+                        }
                     }
                 }
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
+
         } catch (Exception e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         } finally {
@@ -225,5 +240,32 @@ public class ConexionDao implements Serializable {
             this.doCierraConexion(connection);
         }
         return resultado;
+    }
+
+    public Boolean existeSecuencia(String tabla) {
+        Connection connection = null;
+        Boolean existe = false;
+        String secuencia = "SEC_ID_" + tabla;
+        try {
+            connection = this.getConexionBBDD();
+            //  sql = " SELECT max(id) +1  as id FROM  " + tabla;
+            sql = "  SELECT sequence_name FROM all_sequences  "
+                    + " WHERE  sequence_name = '" + secuencia + "'";
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sql);
+                if (resulSet.next()) {
+                    existe = true;
+                }
+            }
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            doCierraConexion(connection);
+        }
+        return existe;
     }
 }
