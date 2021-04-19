@@ -19,6 +19,7 @@ public class UsuarioPeticionBean extends MasterBean implements Serializable {
     LocalDate fechaSolicitud;
     String centros;
     String comentario;
+    String tipo;
 
     public Long getIdusuario() {
         return idusuario;
@@ -58,6 +59,14 @@ public class UsuarioPeticionBean extends MasterBean implements Serializable {
 
     public void setComentario(String comentario) {
         this.comentario = comentario;
+    }
+    
+    public String getTipo() {
+        return tipo;
+    }
+    
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     public Long getId() {

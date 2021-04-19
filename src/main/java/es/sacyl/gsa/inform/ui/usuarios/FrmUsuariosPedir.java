@@ -7,6 +7,7 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
@@ -57,7 +58,9 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     TextField apellido2Usuario = new ObjetosComunes().getTextField("Apellido 2", "teclea segundo apellido", 25, "100px", "30px");
     TextField nifUsuario = new ObjetosComunes().getDni();
     TextField correoUsuario = new ObjetosComunes().getMail("Correo Electrónico", "Correo del usuario");
+    TextField correoPrivadoUsuario = new ObjetosComunes().getMail("Correo Electrónico Privado", "Correo privado del usuario");
     TextField telefonoUsuario = new ObjetosComunes().getTelefono();
+    TextField movilUsuario = new ObjetosComunes().getTelefono();
     ComboBox<CategoriaBean> categoriaUsuario = new CombosUi().getCategoriasUsuarios(null);
     ComboBox<GfhBean> gfhUsuario = new CombosUi().getGfhPorCodigoUsuarios(null);
     ComboBox<String> tipo = new ComboBox();
@@ -72,6 +75,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     RadioButtonGroup<AplicacionPerfilBean> perfilesJimena
                 = new ObjetosComunes().getAplicacionesPerfilesPorIdRadioButtonGroup(idJimena);
     TextField comentario = new TextField();
+    Label peticionarioLabel = new Label();
     Accordion aplicacionesAccordion = new Accordion();
 
     /* Campos para el Grid */
@@ -91,13 +95,13 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     public FrmUsuariosPedir() {
         super();
         setSizeFull();
+        recuperaSolicitante();
         doComponentesOrganizacion();
         doGrid();
         doComponenesAtributos();
         doCompentesEventos();
         doBinderPropiedades();
         construirAccordion();
-        recuperaSolicitante();
     }
 
     
@@ -113,6 +117,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
             }            
             peticionBean.setCentros(centrosString);
             peticionBean.setComentario(comentario.getValue());
+            peticionBean.setTipo(tipo.getValue());
             if ((new UsuarioDao().doGrabaDatos(usuarioBean) == true) && 
                     (new UsuarioDao().doGrabaPeticion(usuarioBean, peticionBean) == true) && 
                     (new UsuarioDao().doGrabaPeticionApp(peticionBean, aplicacionesArrayList))) {
@@ -167,6 +172,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         usuariosGrid.addColumn(UsuarioBean::getDni).setHeader("NIF");
         usuariosGrid.addColumn(UsuarioBean::getMail).setHeader("Correo electrónico");
         usuariosGrid.addColumn(UsuarioBean::getTelefono).setHeader("Teléfono");
+        usuariosGrid.addColumn(UsuarioBean::getMovilUsuario).setHeader("Movil");
         usuariosGrid.addColumn(UsuarioBean::getNombreCategoria).setHeader("Categoria");
         usuariosGrid.addColumn(UsuarioBean::getNombreGfh).setHeader("GFH");
         
@@ -175,7 +181,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
 
     @Override
     public void doActualizaGrid() {
-        arrayListUsuarios = new UsuarioDao().getLista(null);
+        arrayListUsuarios = new UsuarioDao().getListaPeticiones(solicitanteBean.getId());
         usuariosGrid.setItems(arrayListUsuarios);
     }
 
@@ -191,7 +197,9 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
                 .asRequired("El NIF es obligatorio")
                 .bind(UsuarioBean::getDni, UsuarioBean::setDni);
         usuarioBinder.forField(correoUsuario).bind(UsuarioBean::getMail, UsuarioBean::setMail);
+        usuarioBinder.forField(correoPrivadoUsuario).bind(UsuarioBean::getCorreoPrivadoUsuario, UsuarioBean::setCorreoPrivadoUsuario);
         usuarioBinder.forField(telefonoUsuario).bind(UsuarioBean::getTelefono, UsuarioBean::setTelefono);
+        usuarioBinder.forField(movilUsuario).bind(UsuarioBean::getMovilUsuario, UsuarioBean::setMovilUsuario);
         usuarioBinder.forField(categoriaUsuario).bind(UsuarioBean::getCategoria, UsuarioBean::setCategoria);
         usuarioBinder.forField(gfhUsuario).bind(UsuarioBean::getGfh, UsuarioBean::setGfh);
         usuarioBinder.forField(tipo).bind(UsuarioBean::getTipo, UsuarioBean::setTipo);
@@ -222,10 +230,12 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         tipo.setLabel("Tipo");
         tipo.setPlaceholder("Alta o Baja");
         comentario.setWidthFull();
+        contenedorIzquierda.addComponentAtIndex(2, peticionarioLabel); contenedorIzquierda.setSizeFull();
     }
 
     @Override
     public void doComponentesOrganizacion() {
+        contenedorIzquierda.add(peticionarioLabel);
         contenedorFormulario.add(aplicacionesAccordion);
         contenedorFormulario.setSizeFull();
         contenedorBuscadores.add(camposFiltro, buscador);
@@ -293,14 +303,14 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
             new ResponsiveStep("25em", 1), 
             new ResponsiveStep("32em", 2),
             new ResponsiveStep("40em", 3));        
-        solicitanteLayout.add(nifSolicitante, nombreSolicitante, apellido1Solicitante, apellido2Solicitante, 
-                movilSolicitante, telefonoSolicitante, fechaSolicitud);
-        aplicacionesAccordion.add("Datos del Solicitante", solicitanteLayout);
         
-        FormLayout usuarioLayout = new FormLayout();
-        
+        FormLayout usuarioLayout = new FormLayout();      
+        usuarioLayout.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("50px", 1),
+                new FormLayout.ResponsiveStep("50px", 2),
+                new FormLayout.ResponsiveStep("50px", 3));
         usuarioLayout.add(nifUsuario, nombreUsuario, apellido1Usuario, apellido2Usuario, correoUsuario, 
-                telefonoUsuario, categoriaUsuario, gfhUsuario, tipo);
+                telefonoUsuario, movilUsuario, categoriaUsuario, gfhUsuario, tipo, correoPrivadoUsuario);
         aplicacionesAccordion.add("Datos del Usuario", usuarioLayout);
         
         VerticalLayout tipoCentroLayout = new VerticalLayout();
@@ -345,6 +355,10 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         correoSolicitante.setValue(solicitanteBean.getMail());
         telefonoSolicitante.setValue(solicitanteBean.getTelefono());
         
+        String filiacionSolicitante = "SOLICITANTE: " + solicitanteBean.getNombre() + " " + 
+                solicitanteBean.getApellido1() + " " + 
+                solicitanteBean.getApellido2();
+        peticionarioLabel.setText(filiacionSolicitante);
         peticionBean.setIdpeticionario(solicitanteBean.getId());        
     }
 }

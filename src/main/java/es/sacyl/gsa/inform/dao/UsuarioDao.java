@@ -248,60 +248,86 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         Long id = null;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE  usuarios  SET dni=?,apellido1=?,apellido2=?,nombre=?"
-                    + ", mail=?,telefono=?,idcategoria=?,idgfh=?,usucambio=?,fechacambio=?,estado=? "
-                    + ", mail=?,telefono=?,usucambio=?,fechacambio=?,estado=? ,movil=?,mailprivado=?,telegram=?"
-                    + ", solicita =?, idcategoria=?"
+            String inserta;
+            inserta = " UPDATE  usuarios " + 
+                    "SET dni=?,apellido1=?,apellido2=?,nombre=?, mail=? " + 
+                    ", telefono=?,idcategoria=?,idgfh=?,usucambio=?,fechacambio=? " + 
+                    ",estado=?, movil=?,mailprivado=?,telegram=?, solicita =? "
                     + " WHERE id=?  ";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = connection.prepareStatement(inserta);
 
             statement.setString(1, usuarioBean.getDni());
-            statement.setString(2, usuarioBean.getApellido1());
-            statement.setString(3, usuarioBean.getApellido2());
-            statement.setString(4, usuarioBean.getNombre());
-            statement.setString(5, usuarioBean.getMail());
-            statement.setString(6, usuarioBean.getTelefono());
-            statement.setLong(7, usuarioBean.getIdCategoria());
-            statement.setLong(8, usuarioBean.getIdGfh());
+            if (usuarioBean.getApellido1() != null) {
+                statement.setString(2, usuarioBean.getApellido1());
+            } else {
+                statement.setNull(2, Types.CHAR);
+            }            
+            if (usuarioBean.getApellido2() != null) {
+                statement.setString(3, usuarioBean.getApellido2());
+            } else {
+                statement.setNull(3, Types.CHAR);
+            }            
+            if (usuarioBean.getNombre() != null) {
+                statement.setString(4, usuarioBean.getNombre());
+            } else {
+                statement.setNull(4, Types.CHAR);
+            }            
+            if (usuarioBean.getMail() != null) {
+                statement.setString(5, usuarioBean.getMail());
+            } else {
+                statement.setNull(5, Types.CHAR);
+            }            
+            if (usuarioBean.getTelefono() != null) {
+                statement.setString(6, usuarioBean.getTelefono());
+            } else {
+                statement.setNull(6, Types.CHAR);
+            }            
+            if (usuarioBean.getIdCategoria() != null) {
+                statement.setLong(7, usuarioBean.getIdCategoria());
+            } else {
+                statement.setNull(7, Types.INTEGER);
+            }            
+            if (usuarioBean.getIdGfh() != null) {
+                statement.setLong(8, usuarioBean.getIdGfh());
+            } else {
+                statement.setNull(8, Types.INTEGER);
+            }
             if (usuarioBean.getUsucambio() == null) {
                 statement.setLong(9, usuarioBean.getUsucambio().getId());
             } else {
                 // si no hay usuario de cambio pone el mismo
-                statement.setLong(9, new Long(1));
+                statement.setLong(9, UsuarioBean.USUARIO_SISTEMA.getId());
             }
             statement.setLong(10, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
-            statement.setInt(11, usuarioBean.getEstado());
-            statement.setLong(12, usuarioBean.getId());
-            statement.setLong(7, UsuarioBean.USUARIO_SISTEMA.getId());
-            statement.setLong(8, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
-            statement.setInt(9, usuarioBean.getEstado());
-
+            if (usuarioBean.getEstado() != null) {
+                statement.setInt(11, usuarioBean.getEstado());
+            } else {
+                statement.setNull(11, Types.INTEGER);
+            }            
             if (usuarioBean.getMovilUsuario() != null) {
-                statement.setString(10, usuarioBean.getMovilUsuario());
-            } else {
-                statement.setNull(10, Types.CHAR);
-            }
-            if (usuarioBean.getCorreoPrivadoUsuario() != null) {
-                statement.setString(11, usuarioBean.getCorreoPrivadoUsuario());
-            } else {
-                statement.setNull(11, Types.CHAR);
-            }
-            if (usuarioBean.getTelegram() != null) {
-                statement.setString(12, usuarioBean.getTelegram());
+                statement.setString(12, usuarioBean.getMovilUsuario());
             } else {
                 statement.setNull(12, Types.CHAR);
             }
-            statement.setString(13, usuarioBean.getSolicita());
-            if (usuarioBean.getCategoria() != null && usuarioBean.getId() != null) {
-                statement.setLong(14, usuarioBean.getCategoria().getId());
+            if (usuarioBean.getCorreoPrivadoUsuario() != null) {
+                statement.setString(13, usuarioBean.getCorreoPrivadoUsuario());
             } else {
-                statement.setNull(14, Types.INTEGER);
+                statement.setNull(13, Types.CHAR);
             }
-
-            statement.setLong(15, usuarioBean.getId());
+            if (usuarioBean.getTelegram() != null) {
+                statement.setString(14, usuarioBean.getTelegram());
+            } else {
+                statement.setNull(14, Types.CHAR);
+            } 
+            if (usuarioBean.getSolicita() != null) {
+                statement.setString(15, usuarioBean.getSolicita());
+            } else {
+                statement.setNull(14, Types.CHAR);
+            } 
+            statement.setLong(16, usuarioBean.getId());
             insertado = statement.executeUpdate() > 0;
             statement.close();
-            logger.debug(sql);
+            logger.debug(inserta);
         } catch (SQLException e) {
             logger.error(Utilidades.getStackTrace(e));
             logger.error(ConexionDao.ERROR_BBDD_SQL, e);
@@ -350,56 +376,86 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
     public boolean doInsertaDatos(UsuarioBean usuarioBean) {
         Connection connection = null;
         boolean insertado = false;
-        Long id = null;
+        //Long id = null;
         try {
             connection = super.getConexionBBDD();
-            sql = " INSERT INTO usuarios (id,dni,apellido1,apellido2,nombre,mail,telefono,usucambio,fechacambio,estado,"
-                    + "movil,mailprivado,telegram, solicita ) "
-                    + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)  ";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            String inserta;
+            inserta = " INSERT INTO usuarios " +
+                    "(id,dni,apellido1,apellido2,nombre,mail,telefono,idcategoria " 
+                    + ",idgfh,usucambio,fechacambio,estado " 
+                    + ",movil,mailprivado,telegram,solicita)" 
+                    + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)  ";
+            PreparedStatement statement = connection.prepareStatement(inserta);
             statement.setLong(1, usuarioBean.getId());
             statement.setString(2, usuarioBean.getDni());
-            statement.setString(3, usuarioBean.getApellido1());
-            statement.setString(4, usuarioBean.getApellido2());
-            statement.setString(5, usuarioBean.getNombre());
-            statement.setString(6, usuarioBean.getMail());
-            statement.setString(7, usuarioBean.getTelefono());
-            statement.setLong(8, usuarioBean.getIdCategoria());
-            statement.setLong(9, usuarioBean.getIdGfh());
+            if (usuarioBean.getApellido1() != null) {
+                statement.setString(3, usuarioBean.getApellido1());
+            } else {
+                statement.setNull(3, Types.CHAR);
+            }            
+            if (usuarioBean.getApellido2() != null) {
+                statement.setString(4, usuarioBean.getApellido2());
+            } else {
+                statement.setNull(4, Types.CHAR);
+            }            
+            if (usuarioBean.getNombre() != null) {
+                statement.setString(5, usuarioBean.getNombre());
+            } else {
+                statement.setNull(5, Types.CHAR);
+            }            
+            if (usuarioBean.getMail() != null) {
+                statement.setString(6, usuarioBean.getMail());
+            } else {
+                statement.setNull(6, Types.CHAR);
+            }            
+            if (usuarioBean.getTelefono() != null) {
+                statement.setString(7, usuarioBean.getTelefono());
+            } else {
+                statement.setNull(7, Types.CHAR);
+            }            
+            if (usuarioBean.getIdCategoria() != null) {
+                statement.setLong(8, usuarioBean.getIdCategoria());
+            } else {
+                statement.setNull(8, Types.INTEGER);
+            }            
+            if (usuarioBean.getIdGfh()!= null) {
+                statement.setLong(9, usuarioBean.getIdGfh());
+            } else {
+                statement.setNull(9, Types.INTEGER);
+            }            
             if (usuarioBean.getUsucambio() != null) {
                 statement.setLong(10, usuarioBean.getUsucambio().getId());
             } else {
                 // si no hay usuario de cambio pone el mismo
-                statement.setLong(10, new Long(1));
+                statement.setLong(10, UsuarioBean.USUARIO_SISTEMA.getId());
             }
             statement.setLong(11, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
-            statement.setInt(12, usuarioBean.getEstado());
-                // si no hay usuario de cambio pone el del sistema
-                statement.setLong(8, UsuarioBean.USUARIO_SISTEMA.getId());
-            statement.setLong(9, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
-            statement.setInt(10, usuarioBean.getEstado());
-
+            statement.setInt(12, usuarioBean.getEstado());         
             if (usuarioBean.getMovilUsuario() != null) {
-                statement.setString(11, usuarioBean.getMovilUsuario());
-            } else {
-                statement.setNull(11, Types.CHAR);
-            }
-            if (usuarioBean.getCorreoPrivadoUsuario() != null) {
-                statement.setString(12, usuarioBean.getCorreoPrivadoUsuario());
-            } else {
-                statement.setNull(12, Types.CHAR);
-            }
-            if (usuarioBean.getTelegram() != null) {
-                statement.setString(13, usuarioBean.getTelegram());
+                statement.setString(13, usuarioBean.getMovilUsuario());
             } else {
                 statement.setNull(13, Types.CHAR);
             }
-            statement.setString(14, usuarioBean.getSolicita());
+            if (usuarioBean.getCorreoPrivadoUsuario() != null) {
+                statement.setString(14, usuarioBean.getCorreoPrivadoUsuario());
+            } else {
+                statement.setNull(14, Types.CHAR);
+            }
+            if (usuarioBean.getTelegram() != null) {
+                statement.setString(15, usuarioBean.getTelegram());
+            } else {
+                statement.setNull(15, Types.CHAR);
+            }
+            if (usuarioBean.getSolicita() != null) {
+                statement.setString(16, usuarioBean.getSolicita());
+            } else {
+                statement.setNull(16, Types.CHAR);
+            }            
 
             insertado = statement.executeUpdate() > 0;
             insertado = true;
             statement.close();
-            logger.debug(sql);
+            logger.debug(inserta);
         } catch (SQLException e) {
             logger.error(Utilidades.getStackTrace(e));
             logger.error(ConexionDao.ERROR_BBDD_SQL, e);
@@ -610,16 +666,29 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             connection = super.getConexionBBDD();
             String insertar;
             insertar = "insert into usuariospeticiones " + 
-                    "(id,idpeticionario,idusuario,estado,fechasolicitud,centro,comentario) " +
-                    "values (?,?,?,?,?,?,?)";
+                    "(id,idpeticionario,idusuario,estado,fechasolicitud,centro,comentario,tipo) " +
+                    "values (?,?,?,?,?,?,?,?)";
             PreparedStatement statement = connection.prepareStatement(insertar);
             statement.setLong(1, peticion.getId());
             statement.setLong(2, peticion.getIdpeticionario());
             statement.setLong(3, peticion.getIdusuario());
             statement.setInt(4, ConexionDao.BBDD_ACTIVONO);
             statement.setInt(5, Integer.parseInt(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
-            statement.setString(6, peticion.getCentros());
-            statement.setString(7, peticion.getComentario());
+            if (peticion.getCentros() != null) {
+                statement.setString(6, peticion.getCentros());
+            } else {
+                statement.setNull(6, Types.CHAR);
+            }
+            if (peticion.getComentario() != null) {
+                statement.setString(7, peticion.getComentario());
+            } else {
+                statement.setNull(7, Types.CHAR);
+            }            
+            if (peticion.getTipo() != null) {
+                statement.setString(8, peticion.getTipo());
+            } else {
+                statement.setNull(9, Types.CHAR);
+            }           
             insertado = statement.executeUpdate() > 0;
             statement.close();
             logger.debug(insertar);           
@@ -651,11 +720,31 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                         "values (?,?,?,?,?,?)";
                 PreparedStatement statement = connection.prepareStatement(insertar);
                 statement.setLong(1, peticionAppBean.getId());
-                statement.setLong(2, peticionAppBean.getIdPeticion());
-                statement.setLong(3, peticionAppBean.getIdAplicacion());
-                statement.setLong(4, peticionAppBean.getIdPerfil());
-                statement.setString(5, peticionAppBean.getTipo());
-                statement.setString(6, peticionAppBean.getComentario());
+                if (peticionAppBean.getIdPeticion() != null) {
+                    statement.setLong(2, peticionAppBean.getIdPeticion());
+                } else {
+                    statement.setNull(2, Types.INTEGER);
+                }                
+                if (peticionAppBean.getIdAplicacion() != null) {
+                    statement.setLong(3, peticionAppBean.getIdAplicacion());
+                } else {
+                    statement.setNull(3, Types.INTEGER);
+                }                
+                if (peticionAppBean.getPerfil() != null) {
+                    statement.setLong(4, peticionAppBean.getIdPerfil());
+                } else {
+                    statement.setNull(4, Types.INTEGER);
+                }                
+                if (peticionAppBean.getTipo() != null) {
+                    statement.setString(5, peticionAppBean.getTipo());
+                } else {
+                    statement.setNull(5, Types.CHAR);
+                }
+                if (peticionAppBean.getComentario() != null) {
+                    statement.setString(6, peticionAppBean.getComentario());
+                } else {
+                    statement.setNull(6, Types.CHAR);
+                }               
                 insertado = statement.executeUpdate() > 0;
                 insertado = true;
                 statement.close();
@@ -672,7 +761,44 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         
             return insertado;     
         
-        }   
+        }  
+    
+    /**
+     *
+     * @param texto
+     * @return
+     */
+    public ArrayList<UsuarioBean> getListaPeticiones(Long id) {
+        Connection connection = null;
+        ArrayList<UsuarioBean> lista = new ArrayList<>();
+        
+        try {
+            connection = super.getConexionBBDD();
+            
+            if (id != null) {
+                //sql = sql.concat(" AND up.idpeticionario = '" + texto + "'");   
+                sql = sql.concat(" and usu.id in (select idusuario from usuariospeticiones where idpeticionario = " + id + ")");
+            }           
+            //select = select.concat(" ORDER BY usu.apellido1,usu.apellido2,usu.nombre");
+
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(sql);
+            while (resulSet.next()) {
+                UsuarioBean peticion = getRegistroResulset(resulSet);                
+                lista.add(peticion);
+            }           
+            statement.close();
+            logger.debug(sql);
+        } catch (SQLException e) {
+            logger.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+
         
               
     
