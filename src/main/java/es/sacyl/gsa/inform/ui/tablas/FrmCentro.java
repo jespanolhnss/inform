@@ -101,6 +101,7 @@ public final class FrmCentro extends FrmMasterPantalla {
     private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
     private final TextField mapgoogle = new ObjetosComunes().getTextField("Google Map");
     private final Image googleMapsImage = new Image("icons/googlemap.jpg", "Mapa");
+
     private CentroBean centroBean = null;
     private final Binder<CentroBean> centroBinder = new Binder<>();
     private final PaginatedGrid<CentroBean> centroGrid = new PaginatedGrid<>();

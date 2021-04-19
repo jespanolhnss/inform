@@ -2,8 +2,9 @@ package es.sacyl.gsa.inform.bean;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -39,9 +40,9 @@ public class UsuarioBean extends MasterBean implements Serializable {
     private String correoPrivadoUsuario;
     private String telegram;
     private Set<String> funcionalidadStrings = new HashSet<String>();
+    private Map<String, FuncionalidadBean> fucionalidadesMap = new HashMap<>();
 
-    private ArrayList<FuncionalidadBean> fucionalidadesArrayList = new ArrayList<FuncionalidadBean>();
-
+//    private ArrayList<FuncionalidadBean> fucionalidadesArrayList = new ArrayList<FuncionalidadBean>();
     public static String PASSWORD_DEFECTO = "murallas";
     public static int USUARIO_DEBAJA = 0;
     public static int USUARIO_ACTIVO = 1;
@@ -176,14 +177,6 @@ public class UsuarioBean extends MasterBean implements Serializable {
         this.servicioFarmatols = servicioFarmatols;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getClave() {
         return clave;
     }
@@ -207,26 +200,25 @@ public class UsuarioBean extends MasterBean implements Serializable {
     public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
-    
+
     public Long getIdCategoria() {
-        Long idCategoria = new Long(0)
-                ;
+        Long idCategoria = new Long(0);
         if (categoria != null) {
             idCategoria = categoria.id;
         }
-        
+
         return idCategoria;
     }
-    
+
     public String getNombreCategoria() {
         String nombreCategoria = "";
-        
+
         if (categoria != null) {
             nombreCategoria = categoria.getNombre();
         }
         return nombreCategoria;
     }
-    
+
     public CategoriaBean getCategoria() {
         return categoria;
     }
@@ -234,38 +226,38 @@ public class UsuarioBean extends MasterBean implements Serializable {
     public void setCategoria(CategoriaBean categoria) {
         this.categoria = categoria;
     }
-    
+
     public void setIdCategoria(Long categoria) {
         this.categoria.id = categoria;
     }
-    
+
     public GfhBean getGfh() {
         return gfh;
     }
-    
+
     public Long getIdGfh() {
         Long idGfh = new Long(0);
-        
+
         if (gfh != null) {
             idGfh = gfh.getId();
         }
-        
+
         return idGfh;
     }
-    
+
     public String getNombreGfh() {
         String nombreGfh = "";
-        
+
         if (gfh != null) {
             nombreGfh = gfh.getDescripcion();
         }
         return nombreGfh;
     }
-    
+
     public void setGfh(GfhBean gfh) {
         this.gfh = gfh;
     }
-    
+
     public String getTipo() {
         return tipo;
     }
@@ -273,15 +265,15 @@ public class UsuarioBean extends MasterBean implements Serializable {
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
-    
+
     public String getComentario() {
         return comentario;
     }
-    
+
     public void setComentario(String comentario) {
         this.comentario = comentario;
     }
-    
+
     public UsuarioBean getUsucambio() {
         return usucambio;
     }
@@ -310,14 +302,6 @@ public class UsuarioBean extends MasterBean implements Serializable {
 
     public void setFuncionalidadStrings(Set<String> funcionalidadStrings) {
         this.funcionalidadStrings = funcionalidadStrings;
-    }
-
-    public ArrayList<FuncionalidadBean> getFucionalidadesArrayList() {
-        return fucionalidadesArrayList;
-    }
-
-    public void setFucionalidadesArrayList(ArrayList<FuncionalidadBean> fucionalidadesArrayList) {
-        this.fucionalidadesArrayList = fucionalidadesArrayList;
     }
 
     public static String getPASSWORD_DEFECTO() {
@@ -384,4 +368,28 @@ public class UsuarioBean extends MasterBean implements Serializable {
         this.telegram = telegram;
     }
 
+    public Map<String, FuncionalidadBean> getFucionalidadesMap() {
+        return fucionalidadesMap;
+    }
+
+    public void setFucionalidadesMap(Map<String, FuncionalidadBean> fucionalidadesMap) {
+        this.fucionalidadesMap = fucionalidadesMap;
+    }
+
+    /**
+     *
+     * @param usuario
+     * @param fun
+     * @return Compara el nombre del menu con el SET de funcionalidades que
+     * guarda en textomenu
+     */
+    public Boolean tieneLaFuncionalidad(String fun) {
+        Boolean laTiene = false;
+        for (String funcionaliad : getFuncionalidadStrings()) {
+            if (funcionaliad.trim().toUpperCase().equals(fun.trim().toUpperCase())) {
+                laTiene = true;
+            }
+        }
+        return laTiene;
+    }
 }

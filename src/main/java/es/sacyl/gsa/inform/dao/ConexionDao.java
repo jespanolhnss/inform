@@ -133,10 +133,7 @@ public class ConexionDao implements Serializable {
                 if (ctx == null) {
                     throw new Exception(ConexionDao.ERROR_BBDD_CONTEXTO);
                 } else {
-                    // dataSource = (DataSource) ctx.lookup("java:comp/env/jdbc/HCEL");
-//SET GLOBAL time_zone = '-3:00';
                     dataSource = (DataSource) ctx.lookup("java:comp/env/jdbc/dataSourceHnss");
-
                     if (dataSource != null) {
                         return dataSource.getConnection();
                     } else {
@@ -159,26 +156,50 @@ public class ConexionDao implements Serializable {
      *
      * @param tabla
      * @return
+     *
+     * Si existe una secuencia con el patron SEC_ID_nombre_tabla
+     *
+     * retorna la secuenta
+     *
+     * si no recupera el siguiente id de la tabla
+     *
+     * Si es el primer regisgtro por que la tabla esta vacía recupera un 1
+     *
      */
     public Long getSiguienteId(String tabla) {
         Connection connection = null;
         Long id = new Long(1);
         try {
+
             connection = this.getConexionBBDD();
-            //  sql = " SELECT max(id) +1  as id FROM  " + tabla;
-            sql = " select SEC_ID_" + tabla + ".nextval as id from dual ";
-            try (Statement statement = connection.createStatement()) {
-                ResultSet resulSet = statement.executeQuery(sql);
-                if (resulSet.next()) {
-                    id = resulSet.getLong("id");
-                    if (id.equals(new Long(0))) {
-                        id = new Long(1);
+            if (existeSecuencia(tabla) == true) {
+                sql = " select SEC_ID_" + tabla + ".nextval as id from dual ";
+                try (Statement statement = connection.createStatement()) {
+                    ResultSet resulSet = statement.executeQuery(sql);
+                    if (resulSet.next()) {
+                        id = resulSet.getLong("id");
+                        if (id.equals(new Long(0))) {
+                            id = new Long(1);
+                        }
+                    }
+                }
+            } else {
+                LOGGER.error("No hay secuencia para la tabla " + tabla + " Se recupera el siguiente id ");
+                sql = " SELECT max(id) +1  as id FROM  " + tabla;
+                try (Statement statement = connection.createStatement()) {
+                    ResultSet resulSet = statement.executeQuery(sql);
+                    if (resulSet.next()) {
+                        id = resulSet.getLong("id");
+                        if (id.equals(new Long(0))) {
+                            id = new Long(1);
+                        }
                     }
                 }
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
+
         } catch (Exception e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         } finally {
@@ -225,5 +246,32 @@ public class ConexionDao implements Serializable {
             this.doCierraConexion(connection);
         }
         return resultado;
+    }
+
+    public Boolean existeSecuencia(String tabla) {
+        Connection connection = null;
+        Boolean existe = false;
+        String secuencia = "SEC_ID_" + tabla;
+        try {
+            connection = this.getConexionBBDD();
+            //  sql = " SELECT max(id) +1  as id FROM  " + tabla;
+            sql = "  SELECT sequence_name FROM all_sequences  "
+                    + " WHERE  sequence_name = '" + secuencia + "'";
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sql);
+                if (resulSet.next()) {
+                    existe = true;
+                }
+            }
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            doCierraConexion(connection);
+        }
+        return existe;
     }
 }

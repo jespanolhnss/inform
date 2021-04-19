@@ -94,6 +94,13 @@ public abstract class MasterBean implements Serializable {
         }
     }
 
+    /**
+     * actualiza los valores de auditoría
+     *
+     * fechacambio fecha actual
+     *
+     * usucambio usuario de la sesion
+     */
     public void setValoresAut() {
         this.setFechacambio(LocalDate.now());
         this.setUsucambio(((UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME)));

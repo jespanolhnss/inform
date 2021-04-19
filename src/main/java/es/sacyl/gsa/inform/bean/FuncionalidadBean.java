@@ -1,35 +1,21 @@
 package es.sacyl.gsa.inform.bean;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 
-public class FuncionalidadBean implements Serializable {
+public class FuncionalidadBean extends MasterBean implements Serializable, Comparable<FuncionalidadBean> {
 
     private static final long serialVersionUID = 1L;
 
-    private Long id;
     private String descripcion;
     private String textomenu;
-    private Boolean estado;
-    private LocalDate fechacambio;
-    private UsuarioBean usucambio;
-    private Boolean permitida;
 
     public static FuncionalidadBean PEDIRUSUARIO = new FuncionalidadBean(new Long(2));
 
     public FuncionalidadBean() {
-        this.id = new Long(0);
+        super();
     }
 
     public FuncionalidadBean(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
         this.id = id;
     }
 
@@ -49,36 +35,14 @@ public class FuncionalidadBean implements Serializable {
         this.textomenu = textomenu;
     }
 
-    public Boolean getEstado() {
-        return estado;
-    }
+    @Override
+    public int compareTo(FuncionalidadBean o) {
 
-    public void setEstado(Boolean estado) {
-        this.estado = estado;
-    }
-
-    public LocalDate getFechacambio() {
-        return fechacambio;
-    }
-
-    public void setFechacambio(LocalDate fechacambio) {
-        this.fechacambio = fechacambio;
-    }
-
-    public UsuarioBean getUsucambio() {
-        return usucambio;
-    }
-
-    public void setUsucambio(UsuarioBean usucambio) {
-        this.usucambio = usucambio;
-    }
-
-    public Boolean getPermitida() {
-        return permitida;
-    }
-
-    public void setPermitida(Boolean permitida) {
-        this.permitida = permitida;
+        if (this.getId() == o.getId()) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
 }

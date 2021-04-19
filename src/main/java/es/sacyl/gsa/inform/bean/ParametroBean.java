@@ -30,12 +30,12 @@ public class ParametroBean implements Serializable {
 
     public static String MAIL_LDAP_DESTINOLOPD = "mail.ldap.destinolopd"; //	Destinatarios correo lopd para gestion de incidencias
 
-    public static String URL_CONEXION_HIS = "url.conexion.his";
     public static String URL_CONEXION_FARMCIA = "url.conexion.farmacia";
     public static String URL_CONEXION_TURNOS = "url.conexion.turnos";
     public static String URL_CONEXION_GACELA = "url.conexion.gacela";
     public static String URL_CONEXION_JIMENA = "url.conexion.jimena";
     public static String URL_CONEXION_GALENO = "url.conexion.galeno";
+    public static String URL_CONEXION_CLINICA = "url.conexion.calinica";
 
     // IP del servidor dodne está instalada la instancia de la app
     public static String URL_INSTANCIASERVIDOR = " url.instanciaservidor";

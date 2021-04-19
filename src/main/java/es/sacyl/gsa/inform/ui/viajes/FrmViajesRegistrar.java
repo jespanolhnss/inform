@@ -307,6 +307,13 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         contenedorIzquierda.setWidth("50%");
         contenedorDerecha.setWidth("50%");
         autonomiaComboBuscador.setVisible(false);
+
+        provinciaComboBuscador.setLabel("");
+        centroTipoComboBuscador.setLabel("");
+        centroComboBuscador.setLabel("");
+        desde.setLabel("");
+        hasta.setLabel("");
+
         botonImprimir.setVisible(true);
         id.setWidth("150px");
         id.setMaxWidth("150px");

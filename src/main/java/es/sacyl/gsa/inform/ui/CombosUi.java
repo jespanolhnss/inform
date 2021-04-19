@@ -635,9 +635,9 @@ public class CombosUi {
         ComboBox<GfhBean> combo;
         combo = new ComboBox<>("Gfhs");
         if (valor != null) {
-            combo.setItems(new GfhDao().getListaPorCodigo(valor.getCodigo(), ConexionDao.BBDD_ACTIVOSI));
+            combo.setItems(new GfhDao().getLista(valor.getCodigo(), ConexionDao.BBDD_ACTIVOSI));
         } else {
-            combo.setItems(new GfhDao().getListaPorCodigo(null, ConexionDao.BBDD_ACTIVOSI));
+            combo.setItems(new GfhDao().getLista(null, ConexionDao.BBDD_ACTIVOSI));
         }
         combo.setItemLabelGenerator(GfhBean::getDescripcion);
         combo.setMinWidth("150px");
