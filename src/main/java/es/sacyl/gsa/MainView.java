@@ -16,6 +16,8 @@ import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
+import com.vaadin.flow.server.ServiceException;
+import com.vaadin.flow.server.SessionInitEvent;
 import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinServlet;
 import com.vaadin.flow.server.VaadinSession;
@@ -24,6 +26,7 @@ import es.sacyl.gsa.inform.ctrl.LlamdasExternas;
 import es.sacyl.gsa.inform.ctrl.SesionCtrl;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
+import es.sacyl.gsa.inform.exceptiones.CustomExceptionHandler;
 import es.sacyl.gsa.inform.exceptiones.LoginException;
 import es.sacyl.gsa.inform.ui.Menu;
 import es.sacyl.gsa.inform.util.Constantes;
@@ -81,15 +84,21 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         this.setMargin(false);
         this.setSpacing(false);
         this.setAlignItems(Alignment.CENTER);
-        if (((UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME)) == null) {
+        UsuarioBean usuario = ((UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME));
+        if (usuario == null) {
             this.doLogin();
         } else {
-            domuestraMenu();
+            domuestraMenu(usuario);
         }
     }
 
     public void init() {
 
+    }
+
+    // https://vaadin.com/forum/thread/18453061/vaadin-error-handling-14
+    public void sessionInit(SessionInitEvent event) throws ServiceException {
+        event.getSession().setErrorHandler(new CustomExceptionHandler());
     }
 
     @Override
@@ -115,7 +124,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         }
     }
 
-    public void domuestraMenu() {
+    public void domuestraMenu(UsuarioBean usuarioBean) {
         this.removeAll();
         this.setMargin(false);
         this.setAlignItems(Alignment.START);
@@ -129,10 +138,16 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         contenedorFormularios.setSpacing(false);
         this.add(contenedorMenu);
         this.add(contenedorFormularios);
-        contenedorMenu.add(new Menu(contenedorFormularios));
+        contenedorMenu.add(new Menu(contenedorFormularios, usuarioBean));
     }
 
-    public boolean authenticate(String user, String pass) {
+    /**
+     *
+     * @param user
+     * @param pass
+     * @return
+     */
+    public UsuarioBean authenticate(String user, String pass) {
         //UsuarioBean usuario = new UsuarioDao().getUsuarioDni(user, Boolean.FALSE);
         UsuarioBean usuario = null;
         try {
@@ -142,22 +157,25 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
             Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
         }
         if (usuario != null || usuario.getDni() == null) {
-            usuario = new UsuarioDao().getUsuarioDni(user, Boolean.FALSE);
+            usuario = new UsuarioDao().getUsuarioDni(user, Boolean.TRUE);
             SesionCtrl.doCreaSesionUsuario(usuario);
         } else {
             SesionCtrl.doCreaSesionUsuario(usuario);
         }
-        return true;
+        return usuario;
     }
 
+    /**
+     *
+     */
     public void doLogin() {
         LoginForm componentLogin = new LoginForm();
         componentLogin.setForgotPasswordButtonVisible(false);
         componentLogin.setI18n(createEspanolI18n());
         componentLogin.addLoginListener(e -> {
-            boolean isAuthenticated = authenticate(e.getUsername(), e.getPassword());
-            if (isAuthenticated) {
-                this.domuestraMenu();
+            UsuarioBean usuario = authenticate(e.getUsername(), e.getPassword());
+            if (usuario != null) {
+                this.domuestraMenu(usuario);
             } else {
                 componentLogin.setError(true);
             }

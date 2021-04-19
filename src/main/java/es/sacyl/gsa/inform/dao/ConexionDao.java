@@ -184,7 +184,7 @@ public class ConexionDao implements Serializable {
                     }
                 }
             } else {
-                LOGGER.debug("No hay secuencia para la tabla " + tabla + " Se recupera el siguiente id ");
+                LOGGER.error("No hay secuencia para la tabla " + tabla + " Se recupera el siguiente id ");
                 sql = " SELECT max(id) +1  as id FROM  " + tabla;
                 try (Statement statement = connection.createStatement()) {
                     ResultSet resulSet = statement.executeQuery(sql);

@@ -34,13 +34,11 @@ public class Ldap {
     private UsuarioBean usuario = null;
 
     public Ldap() {
-
+        logger.debug("java.classpath" + ":" + System.getProperty("java.classpath"));
+        usuario = new UsuarioBean();
     }
 
     public UsuarioBean loginActiveDirectory(String user, String password) throws LoginException {
-
-        System.out.println(System.getProperty("java.classpath"));
-        usuario = new UsuarioBean();
 
         try {
 
