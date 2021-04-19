@@ -272,60 +272,38 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                     + ", movil=?,mailprivado=?,telegram=?, solicita =?"
                     + " WHERE id=?  ";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, usuarioBean.getDni());
-            statement.setString(2, usuarioBean.getApellido1());
-            statement.setString(3, usuarioBean.getApellido2());
-            statement.setString(4, usuarioBean.getNombre());
-            statement.setString(5, usuarioBean.getMail());
-
-            statement.setString(6, usuarioBean.getTelefono());
-            //  + ",idcategoria=?,idgfh=?,usucambio=?,fechacambio=?,estado=? "
-            if (usuarioBean.getCategoria() != null && usuarioBean.getCategoria().getId() != null) {
-                statement.setLong(7, usuarioBean.getIdCategoria());
-            } else {
-                statement.setNull(7, Types.INTEGER);
-            }
-            if (usuarioBean.getGfh() != null && usuarioBean.getGfh().getId() != null) {
-
-            String inserta;
-            inserta = " UPDATE  usuarios " + 
-                    "SET dni=?,apellido1=?,apellido2=?,nombre=?, mail=? " + 
-                    ", telefono=?,idcategoria=?,idgfh=?,usucambio=?,fechacambio=? " + 
-                    ",estado=?, movil=?,mailprivado=?,telegram=?, solicita =? "
-                    + " WHERE id=?  ";
-            PreparedStatement statement = connection.prepareStatement(inserta);
 
             statement.setString(1, usuarioBean.getDni());
             if (usuarioBean.getApellido1() != null) {
                 statement.setString(2, usuarioBean.getApellido1());
             } else {
                 statement.setNull(2, Types.CHAR);
-            }            
+            }
             if (usuarioBean.getApellido2() != null) {
                 statement.setString(3, usuarioBean.getApellido2());
             } else {
                 statement.setNull(3, Types.CHAR);
-            }            
+            }
             if (usuarioBean.getNombre() != null) {
                 statement.setString(4, usuarioBean.getNombre());
             } else {
                 statement.setNull(4, Types.CHAR);
-            }            
+            }
             if (usuarioBean.getMail() != null) {
                 statement.setString(5, usuarioBean.getMail());
             } else {
                 statement.setNull(5, Types.CHAR);
-            }            
+            }
             if (usuarioBean.getTelefono() != null) {
                 statement.setString(6, usuarioBean.getTelefono());
             } else {
                 statement.setNull(6, Types.CHAR);
-            }            
+            }
             if (usuarioBean.getIdCategoria() != null) {
                 statement.setLong(7, usuarioBean.getIdCategoria());
             } else {
                 statement.setNull(7, Types.INTEGER);
-            }            
+            }
             if (usuarioBean.getIdGfh() != null) {
 
                 statement.setLong(8, usuarioBean.getIdGfh());
@@ -342,12 +320,11 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             statement.setLong(10, Long.parseLong(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
 
             //   + ", movil=?,mailprivado=?,telegram=?, solicita =?"
-
             if (usuarioBean.getEstado() != null) {
                 statement.setInt(11, usuarioBean.getEstado());
             } else {
                 statement.setNull(11, Types.INTEGER);
-            }            
+            }
 
             if (usuarioBean.getMovilUsuario() != null) {
                 statement.setString(12, usuarioBean.getMovilUsuario());
@@ -366,17 +343,16 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
 
             }
 
-           
             if (usuarioBean.getSolicita() != null) {
                 statement.setString(15, usuarioBean.getSolicita());
             } else {
                 statement.setNull(15, Types.CHAR);
-            } 
+            }
 
             statement.setLong(16, usuarioBean.getId());
             insertado = statement.executeUpdate() > 0;
             statement.close();
-            logger.debug(inserta);
+            logger.debug(sql);
         } catch (SQLException e) {
             logger.error(Utilidades.getStackTrace(e));
             logger.error(ConexionDao.ERROR_BBDD_SQL, e);
@@ -429,10 +405,10 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         try {
             connection = super.getConexionBBDD();
             String inserta;
-            inserta = " INSERT INTO usuarios " +
-                    "(id,dni,apellido1,apellido2,nombre,mail,telefono,idcategoria " 
-                    + ",idgfh,usucambio,fechacambio,estado " 
-                    + ",movil,mailprivado,telegram,solicita)" 
+            inserta = " INSERT INTO usuarios "
+                    + "(id,dni,apellido1,apellido2,nombre,mail,telefono,idcategoria "
+                    + ",idgfh,usucambio,fechacambio,estado "
+                    + ",movil,mailprivado,telegram,solicita)"
                     + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)  ";
             PreparedStatement statement = connection.prepareStatement(inserta);
             statement.setLong(1, usuarioBean.getId());
@@ -441,37 +417,37 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 statement.setString(3, usuarioBean.getApellido1());
             } else {
                 statement.setNull(3, Types.CHAR);
-            }            
+            }
             if (usuarioBean.getApellido2() != null) {
                 statement.setString(4, usuarioBean.getApellido2());
             } else {
                 statement.setNull(4, Types.CHAR);
-            }            
+            }
             if (usuarioBean.getNombre() != null) {
                 statement.setString(5, usuarioBean.getNombre());
             } else {
                 statement.setNull(5, Types.CHAR);
-            }            
+            }
             if (usuarioBean.getMail() != null) {
                 statement.setString(6, usuarioBean.getMail());
             } else {
                 statement.setNull(6, Types.CHAR);
-            }            
+            }
             if (usuarioBean.getTelefono() != null) {
                 statement.setString(7, usuarioBean.getTelefono());
             } else {
                 statement.setNull(7, Types.CHAR);
-            }            
+            }
             if (usuarioBean.getIdCategoria() != null) {
                 statement.setLong(8, usuarioBean.getIdCategoria());
             } else {
                 statement.setNull(8, Types.INTEGER);
-            }            
-            if (usuarioBean.getIdGfh()!= null) {
+            }
+            if (usuarioBean.getIdGfh() != null) {
                 statement.setLong(9, usuarioBean.getIdGfh());
             } else {
                 statement.setNull(9, Types.INTEGER);
-            }            
+            }
             if (usuarioBean.getUsucambio() != null) {
                 statement.setLong(10, usuarioBean.getUsucambio().getId());
             } else {
@@ -501,7 +477,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 statement.setString(16, usuarioBean.getSolicita());
             } else {
                 statement.setNull(16, Types.CHAR);
-            }            
+            }
 
             insertado = statement.executeUpdate() > 0;
             insertado = true;
@@ -727,9 +703,9 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                     + "(id,idpeticionario,idusuario,estado,fechasolicitud,centro,comentario) "
                     + "values (?,?,?,?,?,?,?)";
 
-            insertar = "insert into usuariospeticiones " + 
-                    "(id,idpeticionario,idusuario,estado,fechasolicitud,centro,comentario,tipo) " +
-                    "values (?,?,?,?,?,?,?,?)";
+            insertar = "insert into usuariospeticiones "
+                    + "(id,idpeticionario,idusuario,estado,fechasolicitud,centro,comentario,tipo) "
+                    + "values (?,?,?,?,?,?,?,?)";
 
             PreparedStatement statement = connection.prepareStatement(insertar);
             statement.setLong(1, peticion.getId());
@@ -746,12 +722,12 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 statement.setString(7, peticion.getComentario());
             } else {
                 statement.setNull(7, Types.CHAR);
-            }            
+            }
             if (peticion.getTipo() != null) {
                 statement.setString(8, peticion.getTipo());
             } else {
                 statement.setNull(9, Types.CHAR);
-            }           
+            }
             insertado = statement.executeUpdate() > 0;
             statement.close();
             logger.debug(insertar);
@@ -787,17 +763,17 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                     statement.setLong(2, peticionAppBean.getIdPeticion());
                 } else {
                     statement.setNull(2, Types.INTEGER);
-                }                
+                }
                 if (peticionAppBean.getIdAplicacion() != null) {
                     statement.setLong(3, peticionAppBean.getIdAplicacion());
                 } else {
                     statement.setNull(3, Types.INTEGER);
-                }                
+                }
                 if (peticionAppBean.getPerfil() != null) {
                     statement.setLong(4, peticionAppBean.getIdPerfil());
                 } else {
                     statement.setNull(4, Types.INTEGER);
-                }                
+                }
                 if (peticionAppBean.getTipo() != null) {
                     statement.setString(5, peticionAppBean.getTipo());
                 } else {
@@ -807,7 +783,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                     statement.setString(6, peticionAppBean.getComentario());
                 } else {
                     statement.setNull(6, Types.CHAR);
-                }               
+                }
                 insertado = statement.executeUpdate() > 0;
                 insertado = true;
                 statement.close();
@@ -827,14 +803,6 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
 
     }
 
-
-            }            
-        }       
-        
-            return insertado;     
-        
-        }  
-    
     /**
      *
      * @param texto
@@ -843,22 +811,22 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
     public ArrayList<UsuarioBean> getListaPeticiones(Long id) {
         Connection connection = null;
         ArrayList<UsuarioBean> lista = new ArrayList<>();
-        
+
         try {
             connection = super.getConexionBBDD();
-            
+
             if (id != null) {
-                //sql = sql.concat(" AND up.idpeticionario = '" + texto + "'");   
+                //sql = sql.concat(" AND up.idpeticionario = '" + texto + "'");
                 sql = sql.concat(" and usu.id in (select idusuario from usuariospeticiones where idpeticionario = " + id + ")");
-            }           
+            }
             //select = select.concat(" ORDER BY usu.apellido1,usu.apellido2,usu.nombre");
 
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {
-                UsuarioBean peticion = getRegistroResulset(resulSet);                
+                UsuarioBean peticion = getRegistroResulset(resulSet);
                 lista.add(peticion);
-            }           
+            }
             statement.close();
             logger.debug(sql);
         } catch (SQLException e) {
@@ -871,7 +839,4 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         return lista;
     }
 
-        
-              
-    
 }
