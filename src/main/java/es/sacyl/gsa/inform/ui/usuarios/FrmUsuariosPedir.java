@@ -5,8 +5,6 @@ import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -60,7 +58,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     TextField correoUsuario = new ObjetosComunes().getMail("Correo Electrónico", "Correo del usuario");
     TextField correoPrivadoUsuario = new ObjetosComunes().getMail("Correo Electrónico Privado", "Correo privado del usuario");
     TextField telefonoUsuario = new ObjetosComunes().getTelefono();
-    TextField movilUsuario = new ObjetosComunes().getTelefono();
+    TextField movilUsuario = new ObjetosComunes().getMovil();
     ComboBox<CategoriaBean> categoriaUsuario = new CombosUi().getCategoriasUsuarios(null);
     ComboBox<GfhBean> gfhUsuario = new CombosUi().getGfhPorCodigoUsuarios(null);
     ComboBox<String> tipo = new ComboBox();
@@ -76,13 +74,11 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
                 = new ObjetosComunes().getAplicacionesPerfilesPorIdRadioButtonGroup(idJimena);
     TextField comentario = new TextField();
     Label peticionarioLabel = new Label();
+    Label usuarioLabel = new Label();
+    Label aplicacionesLabel = new Label();
     Accordion aplicacionesAccordion = new Accordion();
-
-    /* Campos para el Grid */
-    ComboBox<String> camposFiltro = new CombosUi().getStringCombo("Buscar por campo: ", null, ObjetosComunes.FiltroBusquedaUsuarios, "150px");
-
+    
     /* Componentes */
-    Grid<UsuarioBean> usuariosGrid = new Grid<>();
     UsuarioBean usuarioBean = new UsuarioBean();
     UsuarioBean solicitanteBean = new UsuarioBean();
     UsuarioPeticionBean peticionBean = new UsuarioPeticionBean();
@@ -165,24 +161,12 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
 
     @Override
     public void doGrid() {
-        usuariosGrid.addColumn(UsuarioBean::getId).setHeader("ID");
-        usuariosGrid.addColumn(UsuarioBean::getNombre).setHeader("Nombre");
-        usuariosGrid.addColumn(UsuarioBean::getApellido1).setHeader("Apellido 1");
-        usuariosGrid.addColumn(UsuarioBean::getApellido2).setHeader("Apellido 2");
-        usuariosGrid.addColumn(UsuarioBean::getDni).setHeader("NIF");
-        usuariosGrid.addColumn(UsuarioBean::getMail).setHeader("Correo electrónico");
-        usuariosGrid.addColumn(UsuarioBean::getTelefono).setHeader("Teléfono");
-        usuariosGrid.addColumn(UsuarioBean::getMovilUsuario).setHeader("Movil");
-        usuariosGrid.addColumn(UsuarioBean::getNombreCategoria).setHeader("Categoria");
-        usuariosGrid.addColumn(UsuarioBean::getNombreGfh).setHeader("GFH");
         
-        doActualizaGrid();
     }
 
     @Override
     public void doActualizaGrid() {
-        arrayListUsuarios = new UsuarioDao().getListaPeticiones(solicitanteBean.getId());
-        usuariosGrid.setItems(arrayListUsuarios);
+        
     }
 
     @Override
@@ -220,6 +204,8 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
 
     @Override
     public void doComponenesAtributos() {
+        //contenedorFormulario.setSizeFull();
+        //contenedorDerecha.setSizeFull();
         buscador.focus();
         buscador.setLabel("Texto de la búsqueda:");
         aplicacionesAccordion.setSizeFull();
@@ -230,26 +216,31 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         tipo.setLabel("Tipo");
         tipo.setPlaceholder("Alta o Baja");
         comentario.setWidthFull();
-        contenedorIzquierda.addComponentAtIndex(2, peticionarioLabel); contenedorIzquierda.setSizeFull();
+        usuarioLabel.setText("DATOS DEL USUARIO: ");  
+        contenedorFormulario.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("50px", 1),
+                new FormLayout.ResponsiveStep("50px", 2),
+                new FormLayout.ResponsiveStep("50px", 3));
+        aplicacionesLabel.setText("DATOS DEL ACCESO:");  
+        contenedorDerecha.setSpacing(true); 
+        contenedorDerecha.setMargin(true);
     }
 
     @Override
     public void doComponentesOrganizacion() {
-        contenedorIzquierda.add(peticionarioLabel);
-        contenedorFormulario.add(aplicacionesAccordion);
-        contenedorFormulario.setSizeFull();
-        contenedorBuscadores.add(camposFiltro, buscador);
-        contenedorDerecha.setSizeFull();
-        contenedorDerecha.add(usuariosGrid);
+        contenedorIzquierda.addComponentAtIndex(1, peticionarioLabel);
+        contenedorIzquierda.addComponentAtIndex(3, usuarioLabel);
+        contenedorFormulario.add(nifUsuario, nombreUsuario, apellido1Usuario, apellido2Usuario);
+        contenedorFormulario.add(correoUsuario,correoPrivadoUsuario,telefonoUsuario, movilUsuario);
+        contenedorFormulario.add(tipo,gfhUsuario);
+        contenedorFormulario.setColspan(gfhUsuario, 2);
+        contenedorFormulario.add(categoriaUsuario, 3);
+        contenedorDerecha.add(aplicacionesLabel);
+        contenedorDerecha.add(aplicacionesAccordion);      
     }
 
     @Override
     public void doCompentesEventos() {
-        usuariosGrid.addItemClickListener(event -> {
-            usuarioBean = event.getItem();
-            usuarioBinder.readBean(usuarioBean);
-        });
-
         nifUsuario.addBlurListener(event -> {
             if (!nifUsuario.getValue().isEmpty() && nifUsuario.getValue() != null) {
                 usuarioBean = new UsuarioDao().getUsuarioPersigo(nifUsuario.getValue());
@@ -277,19 +268,6 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
             perfil.setIdPerfil(event.getValue().getId());
             aplicacionesArrayList.add(perfil);
         });
-        
-//        buscador.addBlurListener(event -> {
-//            if (buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
-//                arrayListUsuarios = new UsuarioDao().getLista(null);
-//            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
-//                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), camposFiltro.getValue());
-//            } else if (buscador.getValue().isEmpty() && camposFiltro.getValue() != null) {
-//                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(null, camposFiltro.getValue());
-//            } else if (!buscador.getValue().isEmpty() && camposFiltro.getValue() == null) {
-//                arrayListUsuarios = new UsuarioDao().getUsuariosFiltro(buscador.getValue().trim(), null);
-//            }
-//            usuariosGrid.setItems(arrayListUsuarios);
-//        });
     }
 
     @Override
@@ -297,22 +275,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
 
     }
 
-    public void construirAccordion() {
-        FormLayout solicitanteLayout = new FormLayout();
-        solicitanteLayout.setResponsiveSteps(
-            new ResponsiveStep("25em", 1), 
-            new ResponsiveStep("32em", 2),
-            new ResponsiveStep("40em", 3));        
-        
-        FormLayout usuarioLayout = new FormLayout();      
-        usuarioLayout.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("50px", 1),
-                new FormLayout.ResponsiveStep("50px", 2),
-                new FormLayout.ResponsiveStep("50px", 3));
-        usuarioLayout.add(nifUsuario, nombreUsuario, apellido1Usuario, apellido2Usuario, correoUsuario, 
-                telefonoUsuario, movilUsuario, categoriaUsuario, gfhUsuario, tipo, correoPrivadoUsuario);
-        aplicacionesAccordion.add("Datos del Usuario", usuarioLayout);
-        
+    public void construirAccordion() {        
         VerticalLayout tipoCentroLayout = new VerticalLayout();
         tipoCentroLayout.add(tiposCentro);
         aplicacionesAccordion.add("Tipo Centro", tipoCentroLayout);
