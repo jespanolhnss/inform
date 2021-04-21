@@ -1,5 +1,6 @@
 package es.sacyl.gsa.inform.bean;
 
+import es.sacyl.gsa.inform.dao.ViajesDao;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -11,11 +12,17 @@ public class ViajeBean extends MasterBean implements Serializable {
 
     private LocalDateTime salida;
     private LocalDateTime llegada;
-
     private String matricula;
 
-    private ArrayList<ViajeCentroBean> listaCentros = new ArrayList<>();
+    /**
+     * Esto es una pequeña chapu para montar un falso tree en el grid de la
+     * pantalla el centro sólo se asigna valor en el método de seleccionar los
+     * hijos el viaje padre es el viaje que tiene varios centros
+     */
+    private CentroBean centro;
+    private ViajeBean viajePadre;
 
+    private ArrayList<ViajeCentroBean> listaCentros = new ArrayList<>();
     private ArrayList<UsuarioBean> listaTecnicos = new ArrayList<>();
 
     public ViajeBean() {
@@ -67,4 +74,56 @@ public class ViajeBean extends MasterBean implements Serializable {
         this.listaTecnicos = listaTecnicos;
     }
 
+    /**
+     *
+     *
+     * Estos métodos son lo que se usan para montar el falso tree
+     */
+    public CentroBean getCentro() {
+        return centro;
+    }
+
+    public void setCentro(CentroBean centro) {
+        this.centro = centro;
+    }
+
+    public String getCentroNombre() {
+        String nombre = "";
+        if (this.centro != null) {
+            if (this.centro.getNomcen() != null) {
+                nombre = this.centro.getNomcen();
+            }
+            /*
+            if (this.centro.getNomcenCorto() != null) {
+                nombre = this.centro.getNomcorto();
+            }
+             */
+        }
+        return nombre;
+    }
+
+    /**
+     *
+     * @return Para cada viaje crea una lista de viajes con centros con el viaje
+     * padre
+     */
+    public ArrayList<ViajeBean> getListraCentrosTree() {
+        return new ViajesDao().getListaViajesHijosTree(this);
+    }
+
+    public ViajeBean getViajePadre() {
+        return viajePadre;
+    }
+
+    public void setViajePadre(ViajeBean viajePadre) {
+        this.viajePadre = viajePadre;
+    }
+
+    public String getSalidaPadre() {
+        if (viajePadre != null && viajePadre.getSalidaString() != null) {
+            return viajePadre.getSalidaString();
+        } else {
+            return "";
+        }
+    }
 }
