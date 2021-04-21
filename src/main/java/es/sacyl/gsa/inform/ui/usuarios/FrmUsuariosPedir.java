@@ -12,6 +12,7 @@ import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToLongConverter;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.bean.AplicacionPerfilBean;
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
@@ -36,6 +37,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Set;
 
+@Route("usuarios")
 public final class FrmUsuariosPedir extends FrmMasterPantalla {
 
     private static final long serialVersionUID = 1L;

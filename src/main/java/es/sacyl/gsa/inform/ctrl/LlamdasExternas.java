@@ -5,6 +5,7 @@
  */
 package es.sacyl.gsa.inform.ctrl;
 
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.QueryParameters;
 import es.sacyl.gsa.inform.bean.GfhBean;
@@ -17,6 +18,7 @@ import es.sacyl.gsa.inform.dao.JimenaDao;
 import es.sacyl.gsa.inform.dao.PacienteDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaNueva;
+import es.sacyl.gsa.inform.ui.usuarios.FrmUsuariosPedir;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +70,10 @@ public final class LlamdasExternas {
             case "LOPDNUEVA":
                 doPantallaLopd();
                 break;
+                
+            case "PEDIRUSUARIO":
+                doPantallaPedirUsuario();
+                break;
         }
     }
 
@@ -112,6 +118,15 @@ public final class LlamdasExternas {
         frmLopdIncidenciaNueva.getComboSujeto().setReadOnly(Boolean.TRUE);
 
         contenedorFormularios.add(frmLopdIncidenciaNueva);
+    }
 
+    private void doPantallaPedirUsuario() {
+        contenedorFormularios.removeAll();
+        FrmUsuariosPedir pedirUsuario = new FrmUsuariosPedir();
+        if (usuarioBean.getSolicita().equals("S")) {
+            contenedorFormularios.add(pedirUsuario);            
+        } else {
+            contenedorFormularios.add(new H3("SOLO USUARIOS AUTORIZADOS PUEDEN PEDIR ACCESO"));
+        }        
     }
 }
