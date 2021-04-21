@@ -156,7 +156,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         } catch (LoginException ex) {
             Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if (usuario != null || usuario.getDni() == null) {
+        if (usuario != null || usuario.getDni() == null && !usuario.getDni().isEmpty()) {
             usuario = new UsuarioDao().getUsuarioDni(user, Boolean.TRUE);
             SesionCtrl.doCreaSesionUsuario(usuario);
         } else {

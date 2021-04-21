@@ -44,6 +44,7 @@ import es.sacyl.gsa.inform.dao.ParametroDao;
 import es.sacyl.gsa.inform.dao.ProvinciaDao;
 import es.sacyl.gsa.inform.dao.UbicacionDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
+import es.sacyl.gsa.inform.reports.recursos.ImpresorasExcel;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
@@ -51,7 +52,6 @@ import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.GridUi;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
 import es.sacyl.gsa.inform.ui.usuarios.FrmBuscaUsuario;
-import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -59,6 +59,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -690,6 +691,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
                     doActualizaGrid();
                 });
                 frmBuscaIp.open();
+            } else {
+                Notification.show(" Debes guardar los datos o recuperar un dato para poder seleccionar IP.");
             }
         }
         );
@@ -697,14 +700,17 @@ public final class FrmEquipos extends FrmMasterPantalla {
         /**
          * Para generar el siguiente numero de inventario
          */
-        ayudaInventario.addClickListener(evet -> {
+        ayudaInventario.addClickListener(evet
+                -> {
             inventario.setValue(new EquipoDao().getSiguienteInventario());
-        });
+        }
+        );
 
         /**
          * click en ayuda de buscar usuario
          */
-        ayudaUsuario.addClickListener(event -> {
+        ayudaUsuario.addClickListener(event
+                -> {
             FrmBuscaUsuario frmBuscaUsuario = new FrmBuscaUsuario();
             frmBuscaUsuario.addDialogCloseActionListener(event1 -> {
                 if (frmBuscaUsuario.getUsuarioBean() != null) {
@@ -722,11 +728,13 @@ public final class FrmEquipos extends FrmMasterPantalla {
             });
 
             frmBuscaUsuario.open();
-        });
+        }
+        );
         /**
          * Ventana para añadir aplicaciones el equipo tiene que ser cpu
          */
-        aplicacionButton.addClickListener(event -> {
+        aplicacionButton.addClickListener(event
+                -> {
             EquipoAplicacionBean equipoAplicacionBean = new EquipoAplicacionBean();
             equipoAplicacionBean.setEquipo(equipoBean);
             FrmEquipoAplicacion frmEquipoAplicacion = new FrmEquipoAplicacion("500px", equipoAplicacionBean);
@@ -739,13 +747,15 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 doActualizaGrid();
             });
             frmEquipoAplicacion.open();
-        });
+        }
+        );
 
         /**
          * Cuando hace clic en el botó de datos genéricos abre la ventana para
          * editar los campos
          */
-        datosGenericosButton.addClickListener(event -> {
+        datosGenericosButton.addClickListener(event
+                -> {
             FrmDatosGenerico frmDatosGenerico = new FrmDatosGenerico("500px", equipoBean);
             frmDatosGenerico.addDialogCloseActionListener(eventAyuda -> {
                 equipoBean.setDatosGenericoBeans(frmDatosGenerico.getDatosGenericoBeans());
@@ -756,35 +766,45 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 doActualizaGridDatosGenericos();
             });
             frmDatosGenerico.open();
-        });
+        }
+        );
 
         /**
          * Gestiona los clic en los tabs ocultando todos y mostrando el del
          * click
          */
-        tabs.addSelectedChangeListener(event -> {
+        tabs.addSelectedChangeListener(event
+                -> {
             tabsToPages.values().forEach(page -> page.setVisible(false));
             Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
             selectedPage.setVisible(true);
-        });
+        }
+        );
 
         /**
          *
          */
         etiquetaButton.addClickListener(event
                 -> {
-            imprimeEtiqueta(equipoBean);
-        });
+            try {
+                imprimeEtiqueta(equipoBean);
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(FrmEquipos.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        );
         etiquetaListaButton.addClickListener(event
                 -> {
             doImprimeListaEtiquetas();
-        });
+        }
+        );
 
         /**
          * Recupera el equipo de la tabla y si no existe lo intenta recuperar de
          * his
          */
-        inventario.addBlurListener(event -> {
+        inventario.addBlurListener(event
+                -> {
             ArrayList<DatoGenericoBean> datoGenericoBeansArrayList = new ArrayList<>();
             if (!inventario.getValue().isEmpty()) {
                 EquipoBean recuperado = new EquipoDao().getPorInventario(inventario.getValue());
@@ -808,12 +828,14 @@ public final class FrmEquipos extends FrmMasterPantalla {
                     }
                 }
             }
-        });
+        }
+        );
 
         /**
          *
          */
-        ip.addBlurListener(event -> {
+        ip.addBlurListener(event
+                -> {
             if (!ip.getValue().isEmpty()) {
                 if (IpCtrl.isExiste(ip.getValue()) == true) {
                     if (!ip.getValue().contains(",")) {
@@ -864,13 +886,15 @@ public final class FrmEquipos extends FrmMasterPantalla {
                     ip.focus();
                 }
             }
-        });
+        }
+        );
 
         /**
          * Si hay valor en el campo usuario habitual, verifica que exista y
          * recupera en nombre en el usuarioHabitual
          */
-        dni.addBlurListener(event -> {
+        dni.addBlurListener(event
+                -> {
             if (!dni.getValue().isEmpty()) {
                 usuarioHabitual = new UsuarioDao().getUsuarioDni(dni.getValue(), Boolean.FALSE);
                 if (usuarioHabitual == null) {
@@ -882,20 +906,24 @@ public final class FrmEquipos extends FrmMasterPantalla {
             } else {
                 nombreusuario.clear();
             }
-        });
+        }
+        );
         /**
          * Si el dni en blanco, borra el nombre del usuario
          */
-        dni.addValueChangeListener(event -> {
+        dni.addValueChangeListener(event
+                -> {
             if (dni.getValue().isEmpty()) {
                 nombreusuario.clear();
             }
-        });
+        }
+        );
 
         /**
          * Monta la url Si hay varias IP coje la primera
          */
-        wwwimage.addClickListener(event -> {
+        wwwimage.addClickListener(event
+                -> {
             String url = null;
             Page page = new Page(getUI().get());
             if (ip.getValue().contains(",")) {
@@ -904,6 +932,14 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 url = "http://" + ip.getValue();
             }
             page.open(url, "_blank");
+        }
+        );
+
+        /**
+         * Excel con la lista de impresoras elegidas
+         */
+        excelButton.addClickListener(event -> {
+            ImpresorasExcel impresorasExcel = new ImpresorasExcel();
         });
     }
 
@@ -914,7 +950,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 " Confirma la impresión ",
                 () -> {
 
-                    doImprimeEtiquetas();
+                    try {
+                        doImprimeEtiquetas();
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(FrmEquipos.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 });
         dialog.open();
     }
@@ -1054,7 +1094,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         }
     }
      */
-    public void doImprimeEtiquetas() {
+    public void doImprimeEtiquetas() throws IOException {
 
         equipoArrayList = new EquipoDao().getLista(buscador.getValue(), equipoTipoComboBuscador.getValue(), equipoMarcaComboBuscador.getValue(),
                 centroComboBuscador.getValue(),
@@ -1065,68 +1105,61 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     }
 
-    public void imprimeEtiqueta(EquipoBean equipoBean) {
+    public void imprimeEtiqueta(EquipoBean equipoBean) throws IOException {
         String inventario = "", ip = "", sn = "";
         String valores = new ParametroDao().getPorCodigo(ParametroBean.PRINT_ETIQUETAS).getValor();
         String ipPrinter = null;
         int puerto = 0;
-        try {
-            puerto = Integer.parseInt(valores.split(",")[1]);
-            ipPrinter = valores.split(",")[0];
-            if (equipoBean.getInventario() != null) {
-                inventario = equipoBean.getInventario().toString();
-            }
-            if (equipoBean.getIpsCadena() != null) {
-                ip = equipoBean.getIpsCadena();
-            }
-            if (equipoBean.getNumeroSerie() != null) {
-                sn = equipoBean.getNumeroSerie();
-            }
-
-            Socket clientSocket = new Socket(ipPrinter, puerto);
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            String inventarioEti = "";
-            if (inventario != null && !inventario.isEmpty() && inventario != "0") {
-                inventarioEti = "^A0N,25,25^BY2,2^FO50,35^BCN,50,Y^FD" + inventario + "^FS";
-            }
-            String ipEti = "";
-            if (ip != null && !ip.isEmpty()) {
-                ipEti = "^FO40,120^A0,30,40^FDIP: " + ip + "^FS ";
-            }
-            String snEti = "";
-            if (sn != null && !sn.isEmpty()) {
-                snEti = "^FO30,170^A0,30,25^FDN/S: " + sn + "^FS ";
-            }
-            String[] datos = new String[]{"^XA", "^FO0,0",
-                inventarioEti,
-                ipEti,
-                snEti,
-                "^FO60,220^A0,15,15^FH^FDGerencia de Asistencia Sanitaria de _B5vila^FS ",
-                "^FO6,50^A0B,15,20^FH^FDINFORM_B5TICA^FS ",
-                /*
-                "^FO50,50^ADN,40,20^FD" + inventario + "^FS",
-                "^FO50,75^ADN,40,20^FD" + ip + "^FS",
-                "^FO50,100^ADN,40,20^FD" + sn + "^FS",
-                "^FO50,75^ADN,40,20^CI10^FR^FD" + ip + "^FS",
-                "^FO50,125^ADN,40,20^CI10^FR^FD" + sn + "^FS",
-                 */
-                "^XZ"};
-            //"^BY1,2^FO50,100^BCN,50,N,Y,N^FR^FD88888888^FS\n",
-
-            for (String dato : datos) {
-                char[] d = dato.toCharArray();
-                for (int i = 0; i < d.length; i++) {
-                    out.write(d[i]);
-                    //    System.out.println(d[i]);
-                }
-            }
-            out.flush();
-            out.close();
-            clientSocket.close();
-        } catch (IOException e) {
-            LOGGER.error("Sin conexion con impresora" + ipPrinter + Utilidades.getStackTrace(e));
-            Notification.show("Error de conexion a la impresora: " + ipPrinter + ":" + puerto, 40000, Notification.Position.MIDDLE);
+        puerto = Integer.parseInt(valores.split(",")[1]);
+        ipPrinter = valores.split(",")[0];
+        if (equipoBean.getInventario() != null) {
+            inventario = equipoBean.getInventario().toString();
         }
+        if (equipoBean.getIpsCadena() != null) {
+            ip = equipoBean.getIpsCadena();
+        }
+        if (equipoBean.getNumeroSerie() != null) {
+            sn = equipoBean.getNumeroSerie();
+        }
+        Socket clientSocket = new Socket(ipPrinter, puerto);
+        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+        String inventarioEti = "";
+        if (inventario != null && !inventario.isEmpty() && inventario != "0") {
+            inventarioEti = "^A0N,25,25^BY2,2^FO50,35^BCN,50,Y^FD" + inventario + "^FS";
+        }
+        String ipEti = "";
+        if (ip != null && !ip.isEmpty()) {
+            ipEti = "^FO40,120^A0,30,40^FDIP: " + ip + "^FS ";
+        }
+        String snEti = "";
+        if (sn != null && !sn.isEmpty()) {
+            snEti = "^FO30,170^A0,30,25^FDN/S: " + sn + "^FS ";
+        }
+        String[] datos = new String[]{"^XA", "^FO0,0",
+            inventarioEti,
+            ipEti,
+            snEti,
+            "^FO60,220^A0,15,15^FH^FDGerencia de Asistencia Sanitaria de _B5vila^FS ",
+            "^FO6,50^A0B,15,20^FH^FDINFORM_B5TICA^FS ",
+            /*
+            "^FO50,50^ADN,40,20^FD" + inventario + "^FS",
+            "^FO50,75^ADN,40,20^FD" + ip + "^FS",
+            "^FO50,100^ADN,40,20^FD" + sn + "^FS",
+            "^FO50,75^ADN,40,20^CI10^FR^FD" + ip + "^FS",
+            "^FO50,125^ADN,40,20^CI10^FR^FD" + sn + "^FS",
+             */
+            "^XZ"};
+        //"^BY1,2^FO50,100^BCN,50,N,Y,N^FR^FD88888888^FS\n",
+        for (String dato : datos) {
+            char[] d = dato.toCharArray();
+            for (int i = 0; i < d.length; i++) {
+                out.write(d[i]);
+                //    System.out.println(d[i]);
+            }
+        }
+        out.flush();
+        out.close();
+        clientSocket.close();
     }
 
 }

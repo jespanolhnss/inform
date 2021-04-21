@@ -84,7 +84,7 @@ public class VlanDao extends ConexionDao implements Serializable, ConexionInterf
         if (id != null) {
             try {
                 connection = super.getConexionBBDD();
-                sql = sql.concat(" AND id='" + id + "'");
+                sql = sql.concat(" AND vlan.id='" + id + "'");
                 try (Statement statement = connection.createStatement()) {
                     ResultSet resulSet = statement.executeQuery(sql);
                     if (resulSet.next()) {
