@@ -25,7 +25,7 @@ public class AplicacionBean extends MasterBean implements Serializable {
 
     private ArrayList<EquipoAplicacionBean> listaEquipoBeans = new ArrayList<>();
 
-    private ArrayList<DatoGenericoBean> listaDatos = new ArrayList<>();
+    private ArrayList<DatoGenericoBean> listaDatosGenerico = new ArrayList<>();
 
     public AplicacionBean() {
         super();
@@ -103,12 +103,12 @@ public class AplicacionBean extends MasterBean implements Serializable {
         this.listaEquipoBeans = listaEquipoBeans;
     }
 
-    public ArrayList<DatoGenericoBean> getListaDatos() {
-        return listaDatos;
+    public ArrayList<DatoGenericoBean> getListaDatosGenerico() {
+        return listaDatosGenerico;
     }
 
-    public void setListaDatos(ArrayList<DatoGenericoBean> listaDatos) {
-        this.listaDatos = listaDatos;
+    public void setListaDatosGenerico(ArrayList<DatoGenericoBean> listaDatosGenerico) {
+        this.listaDatosGenerico = listaDatosGenerico;
     }
 
     public String toHtml() {

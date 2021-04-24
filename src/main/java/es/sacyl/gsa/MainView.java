@@ -31,11 +31,11 @@ import es.sacyl.gsa.inform.exceptiones.LoginException;
 import es.sacyl.gsa.inform.ui.Menu;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Ldap;
+import es.sacyl.gsa.inform.util.Utilidades;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * The main view contains a button and a click listener.
@@ -55,11 +55,33 @@ https://vaadin.com/forum/thread/17101015/webinar-introduccion-a-vaadin-flow-en-e
  */
 public class MainView extends VerticalLayout implements AttachNotifier, HasUrlParameter<String> {
 
+    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(MainView.class);
+
     private Location currentLocation = null;
 
     private HorizontalLayout contenedorMenu = new HorizontalLayout();
     private VerticalLayout contenedorFormularios = new VerticalLayout();
-    QueryParameters qm = null;
+    private QueryParameters qm = null;
+
+    static {
+
+        try {
+
+            Timer timerObj = new Timer();
+            TimerTask timerTaskObj = new TimerTask() {
+                ConexionDao conexionDao = new ConexionDao();
+
+                @Override
+                public void run() {
+                    conexionDao.isTestConexion();
+                }
+            };
+            timerObj.schedule(timerTaskObj, 0, 120000);
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        }
+
+    }
 
     public MainView() {
         //   this.getStyle().set("background-color", "#F2F2F2");
@@ -70,8 +92,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         contenedorFormularios.setSpacing(false);
         contenedorFormularios.setPadding(false);
 
-        doTimerDa0();
-
+        // doTimerDa0();
         System.out.println(System.getProperty("user.dir"));
         System.out.println(System.getProperty("catalina.base"));
         System.out.println(VaadinServlet.getCurrent().getServletInfo());
@@ -154,7 +175,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
             Ldap ldap = new Ldap();
             usuario = new Ldap().loginActiveDirectory(user, pass);
         } catch (LoginException ex) {
-            Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error(Utilidades.getStackTrace(ex));
         }
         if (usuario != null || usuario.getDni() == null && !usuario.getDni().isEmpty()) {
             usuario = new UsuarioDao().getUsuarioDni(user, Boolean.TRUE);
@@ -234,4 +255,5 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         };
         timerObj.schedule(timerTaskObj, 0, 120000);
     }
+
 }

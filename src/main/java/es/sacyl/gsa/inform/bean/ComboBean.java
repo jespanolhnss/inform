@@ -30,6 +30,9 @@ public class ComboBean implements Serializable {
     public final static String APPGESTIONUSUARIOS = "APPGESTIONUSUARIOS";
     public final static String CARGOSCENTROS = "CARGOSCENTROS";
 
+    public final static String TIPOAPLICACIONDATO = "TIPOAPLICACIONDATO";
+    public final static String TIPOAPLICACIONDATOAPLICACION = "Aplicación";
+
     public Long getId() {
         return id;
     }

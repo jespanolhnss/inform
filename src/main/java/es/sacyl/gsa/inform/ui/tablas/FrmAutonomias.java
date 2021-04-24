@@ -1,7 +1,6 @@
 package es.sacyl.gsa.inform.ui.tablas;
 
 import com.vaadin.flow.component.Html;
-import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
@@ -48,7 +47,7 @@ public final class FrmAutonomias extends FrmMasterPantalla {
         estadoRadio.setItems(ObjetosComunes.SINO);
         /**
          * Estos métodos tienen que ser todos para que se monte y se construya
-         * la pantaal. Deben formar parte de la clase master, pero no me
+         * la pantalla. Deben formar parte de la clase master, pero no me
          * funciona bien.
          */
         doComponentesOrganizacion();
@@ -137,18 +136,18 @@ public final class FrmAutonomias extends FrmMasterPantalla {
         autonomiaGrid.setPaginatorSize(25);
         autonomiaGrid.addColumn(AutonomiaBean::getCodigo).setAutoWidth(true).setHeader(new Html("<b>Código</b>"));
         autonomiaGrid.addColumn(AutonomiaBean::getNombre).setAutoWidth(true).setHeader(new Html("<b>Nombre</b>"));
-         autonomiaGrid.addColumn(AutonomiaBean::getEstado).setKey("estado").setAutoWidth(true).setHeader(new Html("<b>Estado</b>"));
-       autonomiaGrid.setClassName("error_row");
-         autonomiaGrid.setClassNameGenerator(auto -> {
+        autonomiaGrid.addColumn(AutonomiaBean::getEstado).setKey("estado").setAutoWidth(true).setHeader(new Html("<b>Estado</b>"));
+        autonomiaGrid.setClassName("error_row");
+        autonomiaGrid.setClassNameGenerator(auto -> {
             if (auto.getEstado() == 0) {
-            //    return "my-style-2";
-               return "error_row";
+                //    return "my-style-2";
+                return "error_row";
             } else {
-                 return "my-style-1";
+                return "my-style-1";
             }
-            
+
         });
-            doActualizaGrid();
+        doActualizaGrid();
     }
 
     @Override

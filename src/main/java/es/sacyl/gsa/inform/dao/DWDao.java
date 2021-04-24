@@ -1,6 +1,5 @@
 package es.sacyl.gsa.inform.dao;
 
-import es.sacyl.gsa.inform.bean.DWIndicador;
 import es.sacyl.gsa.inform.bean.DWIndicadorValor;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.sql.Connection;
@@ -9,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,65 +21,6 @@ public class DWDao extends ConexionDao {
     private static final long serialVersionUID = 1L;
 
     public DWDao() {
-        sql = " SELECT * FROM dw_indicadores WHERE 1=1 ";
-    }
-
-    /**
-     *
-     * @param rs
-     * @return
-     */
-    public DWIndicador getRegistroResulset(ResultSet rs) {
-        DWIndicador indicador = new DWIndicador();
-        try {
-            indicador.setCodigo(rs.getString("codigo"));
-            indicador.setNombre(rs.getString("nombre"));
-            indicador.setArea(rs.getString("area"));
-            indicador.setOrden(rs.getInt("orden"));
-            indicador.setVisible(rs.getString("visible"));
-            indicador.setCalculado(rs.getString("calculado"));
-            indicador.setItem(rs.getLong("item"));
-            indicador.setCodivarhis(rs.getString("codivarhis"));
-            indicador.setSql(rs.getString("sql"));
-            indicador.setDescricion(rs.getString("descripcion"));
-            //  System.out.println(indicador.getCodigo() + ":" + indicador.getCodivarhis());
-
-        } catch (SQLException e) {
-            LOGGER.error(Utilidades.getStackTrace(e));
-        }
-
-        return indicador;
-    }
-
-    /**
-     *
-     * @param area
-     * @return
-     *
-     */
-    public ArrayList<DWIndicador> getLista(String area) {
-        ArrayList<DWIndicador> lista = new ArrayList<>();
-        Connection connection = null;
-        try {
-            connection = super.getConexionBBDD();
-            sql = sql.concat(" AND area='" + area + "'");
-            LOGGER.debug(sql);
-            try (Statement statement = connection.createStatement()) {
-                ResultSet resulSet = statement.executeQuery(sql);
-                while (resulSet.next()) {
-                    lista.add(getRegistroResulset(resulSet));
-                }
-                statement.close();
-            }
-
-        } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
-        } catch (Exception e) {
-            LOGGER.error(Utilidades.getStackTrace(e));
-        } finally {
-            this.doCierraConexion(connection);
-        }
-        return lista;
     }
 
     /**

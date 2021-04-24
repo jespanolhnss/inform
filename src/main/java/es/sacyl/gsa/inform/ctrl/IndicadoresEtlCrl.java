@@ -5,6 +5,7 @@ import es.sacyl.gsa.inform.bean.DWIndicador;
 import es.sacyl.gsa.inform.bean.DWIndicadorHis;
 import es.sacyl.gsa.inform.bean.DWIndicadorValor;
 import es.sacyl.gsa.inform.dao.DWDao;
+import es.sacyl.gsa.inform.dao.DWIndicadorDao;
 import es.sacyl.gsa.inform.dao.HpHisClinicaDao;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public final class IndicadoresEtlCrl {
         } else if (norden < 0) {
             Notification.show("Varios cálculos para esas ");
         } else {
-            indicadoresLista = new DWDao().getLista(getAreaDW(tipo));
+            indicadoresLista = new DWIndicadorDao().getLista(getAreaDW(tipo));
             // doProcesa();
         }
     }

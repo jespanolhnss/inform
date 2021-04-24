@@ -27,6 +27,20 @@ public class DWIndicador {
         }
     };
 
+    public static ArrayList<String> DWINDICADORAREAACTIVIDAD = new ArrayList<String>() {
+        {
+            add("AMBULATORIA");
+            add("HOSPITALIZACION");
+            add("CONSULTAS");
+            add("URGENCIAS");
+            add("PARTOS");
+            add("LISTAESPERAQUI");
+            add("QUIROFANO");
+            add("PAPELERIA");
+            add("OFT");
+        }
+
+    };
     public static String AREACALCULOHOS = "HOS";
     public static String AREACALCULOCEX = "CEX";
     public static String AREACALCULOURG = "URG";
@@ -50,67 +64,11 @@ public class DWIndicador {
     public String visible;
     public String calculado;
     public String formula;
-    public Long item;
-    public String codivarhis;
+    public Integer item;
+    public Integer codivarhis;
     public String tablahis;
     public String sql;
     public String descricion;
-
-    public static ArrayList<String> getHOSAREASSIAE() {
-        return HOSPIAREASSIAE;
-    }
-
-    public static void setHOSAREASSIAE(ArrayList<String> HOSAREASSIAE) {
-        DWIndicador.HOSPIAREASSIAE = HOSAREASSIAE;
-    }
-
-    public static String getAREACALCULOHOS() {
-        return AREACALCULOHOS;
-    }
-
-    public static void setAREACALCULOHOS(String AREACALCULOHOS) {
-        DWIndicador.AREACALCULOHOS = AREACALCULOHOS;
-    }
-
-    public static String getAREACALCULOCEX() {
-        return AREACALCULOCEX;
-    }
-
-    public static void setAREACALCULOCEX(String AREACALCULOCEX) {
-        DWIndicador.AREACALCULOCEX = AREACALCULOCEX;
-    }
-
-    public static String getAREACALCULOURG() {
-        return AREACALCULOURG;
-    }
-
-    public static void setAREACALCULOURG(String AREACALCULOURG) {
-        DWIndicador.AREACALCULOURG = AREACALCULOURG;
-    }
-
-    public static String getAREACALCULOQUI() {
-        return AREACALCULOQUI;
-    }
-
-    public static void setAREACALCULOQUI(String AREACALCULOQUI) {
-        DWIndicador.AREACALCULOQUI = AREACALCULOQUI;
-    }
-
-    public static String getAREACALCULOHDIA() {
-        return AREACALCULOHDIA;
-    }
-
-    public static void setAREACALCULOHDIA(String AREACALCULOHDIA) {
-        DWIndicador.AREACALCULOHDIA = AREACALCULOHDIA;
-    }
-
-    public static ArrayList<String> getAREASCALCULO() {
-        return AREASCALCULO;
-    }
-
-    public static void setAREASCALCULO(ArrayList<String> AREASCALCULO) {
-        DWIndicador.AREASCALCULO = AREASCALCULO;
-    }
 
     public String getCodigo() {
         return codigo;
@@ -168,19 +126,19 @@ public class DWIndicador {
         this.formula = formula;
     }
 
-    public Long getItem() {
+    public Integer getItem() {
         return item;
     }
 
-    public void setItem(Long item) {
+    public void setItem(Integer item) {
         this.item = item;
     }
 
-    public String getCodivarhis() {
+    public Integer getCodivarhis() {
         return codivarhis;
     }
 
-    public void setCodivarhis(String codivarhis) {
+    public void setCodivarhis(Integer codivarhis) {
         this.codivarhis = codivarhis;
     }
 

@@ -51,7 +51,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     TextField correoSolicitante = new ObjetosComunes().getMail("Correo Electrónico", "Correo del solicitante");
     TextField movilSolicitante = new ObjetosComunes().getMovil();
     TextField telefonoSolicitante = new ObjetosComunes().getTelefono();
-    DatePicker fechaSolicitud = new ObjetosComunes().getDatePicker("Fecha Solicitud", "Fecha solicitud", LocalDate.now()); 
+    DatePicker fechaSolicitud = new ObjetosComunes().getDatePicker("Fecha Solicitud", "Fecha solicitud", LocalDate.now());
     TextField idUsuario = new TextField();
     TextField nombreUsuario = new ObjetosComunes().getTextField("Nombre", "teclea nombre", 25, "100px", "30px");
     TextField apellido1Usuario = new ObjetosComunes().getTextField("Apellido 1", "teclea primer apellido", 25, "100px", "30px");
@@ -70,16 +70,16 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     CheckboxGroup<CentroBean> centro = new ObjetosComunes().getCentrosCheckboxGroup();
     Long idGaleno = new Long(9);
     RadioButtonGroup<AplicacionPerfilBean> perfilesGaleno
-                = new ObjetosComunes().getAplicacionesPerfilesPorIdRadioButtonGroup(idGaleno);
+            = new ObjetosComunes().getAplicacionesPerfilesPorIdRadioButtonGroup(idGaleno);
     Long idJimena = new Long(8);
     RadioButtonGroup<AplicacionPerfilBean> perfilesJimena
-                = new ObjetosComunes().getAplicacionesPerfilesPorIdRadioButtonGroup(idJimena);
+            = new ObjetosComunes().getAplicacionesPerfilesPorIdRadioButtonGroup(idJimena);
     TextField comentario = new TextField();
     Label peticionarioLabel = new Label();
     Label usuarioLabel = new Label();
     Label aplicacionesLabel = new Label();
     Accordion aplicacionesAccordion = new Accordion();
-    
+
     /* Componentes */
     UsuarioBean usuarioBean = new UsuarioBean();
     UsuarioBean solicitanteBean = new UsuarioBean();
@@ -89,7 +89,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     Binder<UsuarioBean> solicitanteBinder = new Binder<>();
     ArrayList<UsuarioBean> arrayListUsuarios = new ArrayList<>();
     ArrayList<UsuarioPeticionAppBean> aplicacionesArrayList = new ArrayList<>();
-    
+
     public FrmUsuariosPedir() {
         super();
         setSizeFull();
@@ -102,31 +102,30 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         construirAccordion();
     }
 
-    
     @Override
-    public void doGrabar() {            
-            usuarioBinder.writeBeanIfValid(usuarioBean); 
-            String centrosString = "";
-            for (CentroBean cadena : centro.getValue()) {
-                if (centrosString.length() > 1) {
-                    centrosString = centrosString.concat(",");
-                }
-                centrosString = centrosString.concat(cadena.getId().toString());
-            }            
-            peticionBean.setCentros(centrosString);
-            peticionBean.setComentario(comentario.getValue());
-            peticionBean.setTipo(tipo.getValue());
-            if ((new UsuarioDao().doGrabaDatos(usuarioBean) == true) && 
-                    (new UsuarioDao().doGrabaPeticion(usuarioBean, peticionBean) == true) && 
-                    (new UsuarioDao().doGrabaPeticionApp(peticionBean, aplicacionesArrayList))) {
-                (new Notification(FrmMasterConstantes.AVISODATOALMACENADO, 4000, Notification.Position.MIDDLE)).open();
-                doActualizaGrid();
-                doLimpiar();
-            } else {
-                (new Notification(FrmMasterConstantes.AVISODATOERRORBBDD, 4000, Notification.Position.MIDDLE)).open();
-            }           
+    public void doGrabar() {
+        usuarioBinder.writeBeanIfValid(usuarioBean);
+        String centrosString = "";
+        for (CentroBean cadena : centro.getValue()) {
+            if (centrosString.length() > 1) {
+                centrosString = centrosString.concat(",");
+            }
+            centrosString = centrosString.concat(cadena.getId().toString());
+        }
+        peticionBean.setCentros(centrosString);
+        peticionBean.setComentario(comentario.getValue());
+        peticionBean.setTipo(tipo.getValue());
+        if ((new UsuarioDao().doGrabaDatos(usuarioBean) == true)
+                && (new UsuarioDao().doGrabaPeticion(usuarioBean, peticionBean) == true)
+                && (new UsuarioDao().doGrabaPeticionApp(peticionBean, aplicacionesArrayList))) {
+            (new Notification(FrmMasterConstantes.AVISODATOALMACENADO, 4000, Notification.Position.MIDDLE)).open();
+            doActualizaGrid();
+            doLimpiar();
+        } else {
+            (new Notification(FrmMasterConstantes.AVISODATOERRORBBDD, 4000, Notification.Position.MIDDLE)).open();
+        }
     }
-    
+
     @Override
     public void doCancelar() {
         this.removeAll();
@@ -134,7 +133,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     }
 
     @Override
-    public void doBorrar() { 
+    public void doBorrar() {
         final ConfirmDialog dialog = new ConfirmDialog(
                 FrmMasterConstantes.AVISOCONFIRMACIONACCION,
                 FrmMasterConstantes.AVISOCONFIRMACIONACCIONSEGURO,
@@ -157,18 +156,18 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
 
     @Override
     public void doLimpiar() {
-        usuarioBinder.readBean(null); 
+        usuarioBinder.readBean(null);
         perfilesGaleno.removeAll();
     }
 
     @Override
     public void doGrid() {
-        
+
     }
 
     @Override
     public void doActualizaGrid() {
-        
+
     }
 
     @Override
@@ -190,7 +189,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         usuarioBinder.forField(gfhUsuario).bind(UsuarioBean::getGfh, UsuarioBean::setGfh);
         usuarioBinder.forField(tipo).bind(UsuarioBean::getTipo, UsuarioBean::setTipo);
         usuarioBinder.forField(comentario).bind(UsuarioBean::getComentario, UsuarioBean::setComentario);
-        
+
         solicitanteBinder.forField(idSolicitante)
                 .withConverter(new StringToLongConverter("Introducir un Long"))
                 .bind(UsuarioBean::getId, UsuarioBean::setId);
@@ -213,18 +212,18 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         aplicacionesAccordion.setSizeFull();
         aplicacionesAccordion.close();
         idUsuario.setValue("0");
-        centro.setVisible(false);  
+        centro.setVisible(false);
         tipo.setItems("Alta", "Baja");
         tipo.setLabel("Tipo");
         tipo.setPlaceholder("Alta o Baja");
         comentario.setWidthFull();
-        usuarioLabel.setText("DATOS DEL USUARIO: ");  
+        usuarioLabel.setText("DATOS DEL USUARIO: ");
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
                 new FormLayout.ResponsiveStep("50px", 2),
                 new FormLayout.ResponsiveStep("50px", 3));
-        aplicacionesLabel.setText("DATOS DEL ACCESO:");  
-        contenedorDerecha.setSpacing(true); 
+        aplicacionesLabel.setText("DATOS DEL ACCESO:");
+        contenedorDerecha.setSpacing(true);
         contenedorDerecha.setMargin(true);
     }
 
@@ -233,12 +232,12 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         contenedorIzquierda.addComponentAtIndex(1, peticionarioLabel);
         contenedorIzquierda.addComponentAtIndex(3, usuarioLabel);
         contenedorFormulario.add(nifUsuario, nombreUsuario, apellido1Usuario, apellido2Usuario);
-        contenedorFormulario.add(correoUsuario,correoPrivadoUsuario,telefonoUsuario, movilUsuario);
-        contenedorFormulario.add(tipo,gfhUsuario);
+        contenedorFormulario.add(correoUsuario, correoPrivadoUsuario, telefonoUsuario, movilUsuario);
+        contenedorFormulario.add(tipo, gfhUsuario);
         contenedorFormulario.setColspan(gfhUsuario, 2);
         contenedorFormulario.add(categoriaUsuario, 3);
         contenedorDerecha.add(aplicacionesLabel);
-        contenedorDerecha.add(aplicacionesAccordion);      
+        contenedorDerecha.add(aplicacionesAccordion);
     }
 
     @Override
@@ -247,23 +246,23 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
             if (!nifUsuario.getValue().isEmpty() && nifUsuario.getValue() != null) {
                 usuarioBean = new UsuarioDao().getUsuarioPersigo(nifUsuario.getValue());
                 if (usuarioBean.getDni() != null) {
-                    usuarioBinder.readBean(usuarioBean); 
+                    usuarioBinder.readBean(usuarioBean);
                     categoriaUsuario.setValue(usuarioBean.getCategoria());
                 }
-            } 
+            }
         });
 
-        tiposCentro.addValueChangeListener(event -> {            
+        tiposCentro.addValueChangeListener(event -> {
             doCargaCentros(tiposCentro.getSelectedItems());
         });
-        
+
         perfilesGaleno.addValueChangeListener(event -> {
             UsuarioPeticionAppBean perfil = new UsuarioPeticionAppBean();
             perfil.setIdAplicacion(idGaleno);
             perfil.setIdPerfil(event.getValue().getId());
             aplicacionesArrayList.add(perfil);
         });
-        
+
         perfilesJimena.addValueChangeListener(event -> {
             UsuarioPeticionAppBean perfil = new UsuarioPeticionAppBean();
             perfil.setIdAplicacion(idJimena);
@@ -277,7 +276,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
 
     }
 
-    public void construirAccordion() {        
+    public void construirAccordion() {
         VerticalLayout tipoCentroLayout = new VerticalLayout();
         tipoCentroLayout.add(tiposCentro);
         aplicacionesAccordion.add("Tipo Centro", tipoCentroLayout);
@@ -293,7 +292,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         VerticalLayout jimenaLayout = new VerticalLayout();
         jimenaLayout.add(perfilesJimena);
         aplicacionesAccordion.add("Jimena", jimenaLayout);
-        
+
         VerticalLayout comentarioLayout = new VerticalLayout();
         comentarioLayout.add(comentario);
         aplicacionesAccordion.add("Comentario", comentarioLayout);
@@ -306,7 +305,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
                     new CentroDao().getLista(null, AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO,
                             null, null, ct, null, ConexionDao.BBDD_ACTIVOSI));
         }
-        
+
         centro.setVisible(true);
         centro.setItems(alc);
     }
@@ -319,11 +318,11 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         apellido2Solicitante.setValue(solicitanteBean.getApellido2());
         correoSolicitante.setValue(solicitanteBean.getMail());
         telefonoSolicitante.setValue(solicitanteBean.getTelefono());
-        
-        String filiacionSolicitante = "SOLICITANTE: " + solicitanteBean.getNombre() + " " + 
-                solicitanteBean.getApellido1() + " " + 
-                solicitanteBean.getApellido2();
+
+        String filiacionSolicitante = "SOLICITANTE: " + solicitanteBean.getNombre() + " "
+                + solicitanteBean.getApellido1() + " "
+                + solicitanteBean.getApellido2();
         peticionarioLabel.setText(filiacionSolicitante);
-        peticionBean.setIdpeticionario(solicitanteBean.getId());        
+        peticionBean.setIdpeticionario(solicitanteBean.getId());
     }
 }

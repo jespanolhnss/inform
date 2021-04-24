@@ -18,11 +18,12 @@ import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.ctrl.SesionCtrl;
 import es.sacyl.gsa.inform.dao.ParametroDao;
 import es.sacyl.gsa.inform.ui.covid.FrmTarjetasCribado;
-import es.sacyl.gsa.inform.ui.indicadores.FrmIndicadores;
+import es.sacyl.gsa.inform.ui.indicadores.FrmIndicadoresCalcular;
+import es.sacyl.gsa.inform.ui.indicadores.FrmIndicadoresDefinir;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaGestionar;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaNueva;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdTipos;
-import es.sacyl.gsa.inform.ui.recursos.FrmAplicaciones;
+import es.sacyl.gsa.inform.ui.recursos.FrmAplicacion;
 import es.sacyl.gsa.inform.ui.recursos.FrmEquipos;
 import es.sacyl.gsa.inform.ui.recursos.FrmIp;
 import es.sacyl.gsa.inform.ui.recursos.FrmVlan;
@@ -50,6 +51,8 @@ import java.time.LocalDateTime;
 /**
  *
  * @author 06551256M
+ *
+ * https://vaadin.com/directory/component/hybridmenu/links
  */
 public class Menu extends MenuBar {
 
@@ -87,10 +90,15 @@ public class Menu extends MenuBar {
         if (usuarioBean.tieneLaFuncionalidad(INDICADORES)) {
             MenuItem indicadores = this.addItem(INDICADORES);
             SubMenu indicadoresSubmenu = indicadores.getSubMenu();
+            indicadoresSubmenu.addItem("Definición  ", e -> {
+                this.contenedorFormularios.removeAll();
+                this.contenedorFormularios.add(new FrmIndicadoresDefinir());
+            });
             indicadoresSubmenu.addItem("ETL His ", e -> {
                 this.contenedorFormularios.removeAll();
-                this.contenedorFormularios.add(new FrmIndicadores());
+                this.contenedorFormularios.add(new FrmIndicadoresCalcular());
             });
+
         }
         if (usuarioBean.tieneLaFuncionalidad(LOPD)) {
             MenuItem lopd = this.addItem(LOPD);
@@ -116,7 +124,7 @@ public class Menu extends MenuBar {
             SubMenu recursosSubMenu = recursos.getSubMenu();
             recursosSubMenu.addItem("Aplicaciones", e -> {
                 this.contenedorFormularios.removeAll();
-                this.contenedorFormularios.add(new FrmAplicaciones());
+                this.contenedorFormularios.add(new FrmAplicacion());
             });
 
             recursosSubMenu.addItem("Equipos", e -> {
@@ -276,17 +284,9 @@ public class Menu extends MenuBar {
                 }
         );
 
+        this.contenedorFormularios.removeAll();
+        this.contenedorFormularios.add(new ViewPortada());
 
-        /*
-        this.addItem(
-                "Salir", e -> {
-                    this.removeAll();
-                    SesionCtrl.doDestruyeSesionUsuario();
-                    Page page = new Page(getUI().get());
-                    page.open("http://localhost:8080/inform");
-                }
-        );
-         */
     }
 
     public VerticalLayout getContenedorFormularios() {

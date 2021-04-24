@@ -753,7 +753,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
          */
         datosGenericosButton.addClickListener(event
                 -> {
-            FrmDatosGenerico frmDatosGenerico = new FrmDatosGenerico("500px", equipoBean);
+            FrmEquipoDatosGenerico frmDatosGenerico = new FrmEquipoDatosGenerico("500px", equipoBean);
             frmDatosGenerico.addDialogCloseActionListener(eventAyuda -> {
                 equipoBean.setDatosGenericoBeans(frmDatosGenerico.getDatosGenericoBeans());
                 doActualizaGridDatosGenericos();

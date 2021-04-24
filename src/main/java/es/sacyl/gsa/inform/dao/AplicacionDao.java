@@ -31,8 +31,8 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
                 + " ,ap. descripcion as aplicaciondescripcion,ap.gfh as aplicaciongfh"
                 + " ,ap.fechaInstalacion aplicacionfechaInstalacion,   ap.estado as aplicacionestado"
                 + " ,ap. usucambio as aplicacionusucambio,ap. fechacambio as aplicacionfechacambio "
-                + " ,gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + " ,gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + ", gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
                 + " ,prvee.id as proveedorid, prvee.nombre as proveedornombre"
                 + " ,prvee.direccion as proveedordirecion,prvee.codpostal as proveedorcodpostal"
                 + " ,prvee.telefonos as proveedortelfoonos,prvee.mail as proveedormail"
@@ -93,7 +93,7 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
             // lista de perfiles
             aplicacionesBean.setListaPerfiles(new AplicacionPerfilDao().getLista(null, aplicacionesBean));
             // lista equipos
-            //  aplicacionesBean.setListaEquipoBeans(new EquipoAplicacionDao().getLista(null, null, aplicacionesBean));
+            // aplicacionesBean.setListaEquipoBeans(new EquipoAplicacionDao().getLista(null, null, aplicacionesBean));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         }

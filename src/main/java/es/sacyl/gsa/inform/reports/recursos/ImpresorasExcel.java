@@ -68,6 +68,7 @@ public class ImpresorasExcel {
             Row row = hoja1.createRow(rowNum++);
             colNum = 0;
             row.createCell(colNum++).setCellValue(rowNum);
+
             Cell dateOfBirthCell = row.createCell(colNum++);
             dateOfBirthCell.setCellValue(LocalDate.now());
             dateOfBirthCell.setCellStyle(dateCellStyle);

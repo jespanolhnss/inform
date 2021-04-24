@@ -183,6 +183,17 @@ public class ConexionDao implements Serializable {
                         }
                     }
                 }
+            } else if (tabla.substring(0,2).toLowerCase().equals("dw")  || tabla.toLowerCase().equals("combos")) {
+             sql = " select SECUENCIAIDS.nextval as id from dual ";
+                try (Statement statement = connection.createStatement()) {
+                    ResultSet resulSet = statement.executeQuery(sql);
+                    if (resulSet.next()) {
+                        id = resulSet.getLong("id");
+                        if (id.equals(new Long(0))) {
+                            id = new Long(1);
+                        }
+                    }
+                }
             } else {
                 LOGGER.error("No hay secuencia para la tabla " + tabla + " Se recupera el siguiente id ");
                 sql = " SELECT max(id) +1  as id FROM  " + tabla;
