@@ -8,6 +8,7 @@ import java.util.ArrayList;
  */
 public class DWIndicador {
 
+    /*
     public static ArrayList<String> HOSPIAREASSIAE = new ArrayList<String>() {
         {
             add("PSQAGUDOS");
@@ -26,7 +27,8 @@ public class DWIndicador {
             add("QUEMADOS");
         }
     };
-
+     */
+ /*
     public static ArrayList<String> DWINDICADORAREAACTIVIDAD = new ArrayList<String>() {
         {
             add("AMBULATORIA");
@@ -41,6 +43,18 @@ public class DWIndicador {
         }
 
     };
+     */
+ /*
+    public static ArrayList<String> DWINDICADORTIPO = new ArrayList<String>() {
+        {
+            add("RECURSOS");
+            add("ACTIVIDAD");
+            add("CALIDAD");
+            add("ECONÓMICOS");
+        }
+
+    };
+     */
     public static String AREACALCULOHOS = "HOS";
     public static String AREACALCULOCEX = "CEX";
     public static String AREACALCULOURG = "URG";
@@ -68,7 +82,8 @@ public class DWIndicador {
     public Integer codivarhis;
     public String tablahis;
     public String sql;
-    public String descricion;
+    public String descripcion;
+    public String tipo;
 
     public String getCodigo() {
         return codigo;
@@ -158,12 +173,20 @@ public class DWIndicador {
         this.sql = sql;
     }
 
-    public String getDescricion() {
-        return descricion;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public void setDescricion(String descricion) {
-        this.descricion = descricion;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
 }

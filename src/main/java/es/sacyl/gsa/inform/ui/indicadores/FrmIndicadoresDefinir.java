@@ -5,7 +5,6 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -14,6 +13,7 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
+import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.DWIndicador;
 import es.sacyl.gsa.inform.dao.DWIndicadorDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
@@ -33,14 +33,18 @@ import org.vaadin.klaudeta.PaginatedGrid;
  */
 public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
 
-    public ComboBox<String> areaBuscador = new CombosUi().getStringCombo("Área activiadad", null, DWIndicador.DWINDICADORAREAACTIVIDAD, null);
+    public ComboBox<String> areaBuscador = new CombosUi().getCombodeTabla("Área Actividad", null, ComboBean.DWAREASINDICADORES, 60);
+    public ComboBox<String> tipoBuscador = new CombosUi().getCombodeTabla("Tipo indicador", null, ComboBean.DWTIPOINDICADOR, 60);
 
     public TextField codigo = new ObjetosComunes().getTextField("Código");
     public TextField nombre = new ObjetosComunes().getTextField("Nombre");
-    public ComboBox<String> area = new CombosUi().getStringCombo("Área activiadad", null, DWIndicador.DWINDICADORAREAACTIVIDAD, null);
+    public ComboBox<String> area = new CombosUi().getCombodeTabla("Área Actividad", null, ComboBean.DWAREASINDICADORES, 60);
+    public ComboBox<String> tipo = new CombosUi().getCombodeTabla("Tipo indicador", null, ComboBean.DWTIPOINDICADOR, 60);
     public IntegerField orden = new ObjetosComunes().getIntegerField("Orden");
-    public RadioButtonGroup<String> visible = new ObjetosComunes().getSNRadio("Calculado");
-    public RadioButtonGroup<String> calculado = new ObjetosComunes().getSNRadio("Calculado");
+    public ComboBox<String> visible = new CombosUi().getSiNoCombo("Visible");
+    //  public RadioButtonGroup<String> visible = new ObjetosComunes().getSNRadio("Visible");
+    public ComboBox<String> calculado = new CombosUi().getSiNoCombo("Calculado");
+    //   public RadioButtonGroup<String> calculado = new ObjetosComunes().getSNRadio("Calculado");
     public TextField formula = new ObjetosComunes().getTextField("Fórmula");
 
     public IntegerField item = new ObjetosComunes().getIntegerField("Item jimena catálogo");
@@ -49,7 +53,7 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
     public TextField tablahis = new ObjetosComunes().getTextField("Tabla his (est_servi)");
 
     public TextArea sql = new ObjetosComunes().getTextArea("sql");
-    public TextArea descricion = new ObjetosComunes().getTextArea("descricion");
+    public TextArea descripcion = new ObjetosComunes().getTextArea("Descripción");
 
     public DWIndicador dwindicador = new DWIndicador();
     public PaginatedGrid<DWIndicador> dwindicadorGrid = new PaginatedGrid<>();
@@ -69,9 +73,9 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
         super.doControlBotones(obj);
         if (obj == null) {
             codigo.setEnabled(true);
+            codigo.setReadOnly(false);
             codigo.focus();
         } else {
-
             codigo.setReadOnly(true);
             nombre.focus();
         }
@@ -136,13 +140,13 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
         dwindicadorGrid.setPaginatorSize(25);
         dwindicadorGrid.addColumn(DWIndicador::getCodigo).setAutoWidth(true).setHeader(new Html("<b>Código</b>"));
         dwindicadorGrid.addColumn(DWIndicador::getNombre).setAutoWidth(true).setHeader(new Html("<b>Nombre</b>"));
-        dwindicadorGrid.addColumn(DWIndicador::getArea).setKey("Area").setAutoWidth(true).setHeader(new Html("<b>Estado</b>"));
-
+        dwindicadorGrid.addColumn(DWIndicador::getArea).setKey("Area").setAutoWidth(true).setHeader(new Html("<b>Área</b>"));
+        doActualizaGrid();
     }
 
     @Override
     public void doActualizaGrid() {
-        dwindicadorArray = new DWIndicadorDao().getLista(areaBuscador.getValue(), buscador.getValue());
+        dwindicadorArray = new DWIndicadorDao().getLista(areaBuscador.getValue(), buscador.getValue(), tipoBuscador.getValue());
         dwindicadorGrid.setItems(dwindicadorArray);
     }
 
@@ -168,6 +172,7 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
                 .bind(DWIndicador::getArea, DWIndicador::setArea);
 
+// falta tipo para cuando este el campo en la tabla
         dwindicadorBinder.forField(orden)
                 .bind(DWIndicador::getOrden, DWIndicador::setOrden);
 
@@ -178,9 +183,8 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
                 .bind(DWIndicador::getVisible, DWIndicador::setVisible);
 
         dwindicadorBinder.forField(formula)
-                .asRequired()
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 200))
+                        FrmMensajes.AVISODATOABLIGATORIO, 0, 200))
                 .bind(DWIndicador::getFormula, DWIndicador::setFormula);
 
         dwindicadorBinder.forField(item)
@@ -200,8 +204,7 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
                         FrmMensajes.AVISODATOABLIGATORIO, 0, 500))
                 .bind(DWIndicador::getSql, DWIndicador::setSql);
 
-        dwindicadorBinder.forField(descricion)
-                .asRequired()
+        dwindicadorBinder.forField(descripcion)
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 0, 3000))
                 .bind(DWIndicador::getSql, DWIndicador::setSql);
@@ -211,6 +214,7 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
     @Override
     public void doComponenesAtributos() {
         titulo.setText("Definición de indicadores ");
+        buscador.setLabel("Dato a buscar");
     }
 
     @Override
@@ -223,16 +227,22 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
                 new FormLayout.ResponsiveStep("50px", 5),
                 new FormLayout.ResponsiveStep("50px", 6));
         contenedorFormulario.add(codigo);
-        contenedorFormulario.add(nombre, 4);
-        contenedorFormulario.add(area);
+        contenedorFormulario.add(nombre, 5);
 
-        contenedorFormulario.add(orden, visible, calculado, item, codivarhis, tablahis);
+        contenedorFormulario.add(area, 2);
+        contenedorFormulario.add(tipo, 2);
+        contenedorFormulario.add(orden);
+        contenedorFormulario.add(visible);
+
+        contenedorFormulario.add(calculado, item, codivarhis);
+        contenedorFormulario.add(tablahis, 3);
+
         contenedorFormulario.add(formula, 6);
         contenedorFormulario.add(sql, 6);
-        contenedorFormulario.add(descricion, 6);
+        contenedorFormulario.add(descripcion, 6);
 
         contenedorBuscadores.removeAll();
-        contenedorBuscadores.add(buscador, areaBuscador);
+        contenedorBuscadores.add(buscador, areaBuscador, tipoBuscador);
         contenedorDerecha.add(dwindicadorGrid);
     }
 
@@ -261,6 +271,10 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
         });
 
         areaBuscador.addValueChangeListener(event -> {
+            doActualizaGrid();
+        });
+
+        tipoBuscador.addValueChangeListener(event -> {
             doActualizaGrid();
         });
     }

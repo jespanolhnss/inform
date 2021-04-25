@@ -141,6 +141,17 @@ public class UsuarioBean extends MasterBean implements Serializable {
         return nombre;
     }
 
+    public String getNombreAp1_Ap2_() {
+
+        return getNombreAp1_() + "." + apellido2.substring(0, 1);
+    }
+
+    public String getNombreAp1_() {
+        String nombres[] = nombre.split(" ");
+
+        return nombres[0] + "." + apellido1.substring(0, 1);
+    }
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }

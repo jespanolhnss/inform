@@ -20,6 +20,7 @@ import es.sacyl.gsa.inform.dao.ParametroDao;
 import es.sacyl.gsa.inform.ui.covid.FrmTarjetasCribado;
 import es.sacyl.gsa.inform.ui.indicadores.FrmIndicadoresCalcular;
 import es.sacyl.gsa.inform.ui.indicadores.FrmIndicadoresDefinir;
+import es.sacyl.gsa.inform.ui.indicadores.FrmIndicadoresRecursos;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaGestionar;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaNueva;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdTipos;
@@ -93,6 +94,10 @@ public class Menu extends MenuBar {
             indicadoresSubmenu.addItem("Definición  ", e -> {
                 this.contenedorFormularios.removeAll();
                 this.contenedorFormularios.add(new FrmIndicadoresDefinir());
+            });
+            indicadoresSubmenu.addItem("Recursos editar  ", e -> {
+                this.contenedorFormularios.removeAll();
+                this.contenedorFormularios.add(new FrmIndicadoresRecursos());
             });
             indicadoresSubmenu.addItem("ETL His ", e -> {
                 this.contenedorFormularios.removeAll();

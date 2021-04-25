@@ -43,7 +43,7 @@ public class DWIndicadorDao extends ConexionDao implements ConexionInterface<DWI
             indicador.setItem(rs.getInt("item"));
             indicador.setCodivarhis(rs.getInt("codivarhis"));
             indicador.setSql(rs.getString("sql"));
-            indicador.setDescricion(rs.getString("descripcion"));
+            indicador.setDescripcion(rs.getString("descripcion"));
             //  System.out.println(indicador.getCodigo() + ":" + indicador.getCodivarhis());
 
         } catch (SQLException e) {
@@ -61,7 +61,7 @@ public class DWIndicadorDao extends ConexionDao implements ConexionInterface<DWI
      */
     @Override
     public ArrayList<DWIndicador> getLista(String area) {
-        return getLista(area, null);
+        return getLista(area, null, null);
     }
 
     /**
@@ -70,7 +70,7 @@ public class DWIndicadorDao extends ConexionDao implements ConexionInterface<DWI
      * @param cadena
      * @return
      */
-    public ArrayList<DWIndicador> getLista(String area, String cadena) {
+    public ArrayList<DWIndicador> getLista(String area, String cadena, String tipo) {
         ArrayList<DWIndicador> lista = new ArrayList<>();
         Connection connection = null;
         try {
@@ -79,8 +79,15 @@ public class DWIndicadorDao extends ConexionDao implements ConexionInterface<DWI
                 sql = sql.concat(" AND area='" + area + "'");
             }
             if (cadena != null) {
-                sql = sql.concat(" AND nombre LIKE '%" + cadena + "%'");
+                sql = sql.concat(" AND  (UPPER(nombre) LIKE '%" + cadena.toUpperCase() + "%' "
+                        + "  or UPPER(codigo) LIKE '%" + cadena.toUpperCase() + "%')");
             }
+            /*
+            if (tipo != null) {
+                sql = sql.concat(" AND tipo LIKE '%" + tipo + "%'");
+            }
+             */
+
             LOGGER.debug(sql);
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
@@ -192,8 +199,8 @@ public class DWIndicadorDao extends ConexionDao implements ConexionInterface<DWI
             } else {
                 statement.setNull(11, Types.NVARCHAR);
             }
-            if (dWIndicador.getDescricion() != null) {
-                statement.setString(12, dWIndicador.getDescricion());
+            if (dWIndicador.getDescripcion() != null) {
+                statement.setString(12, dWIndicador.getDescripcion());
             } else {
                 statement.setNull(12, Types.NCHAR);
             }
@@ -231,41 +238,42 @@ public class DWIndicadorDao extends ConexionDao implements ConexionInterface<DWI
                 statement.setNull(4, Types.CHAR);
             }
             if (dWIndicador.getCalculado() != null) {
-                statement.setString(6, dWIndicador.getCalculado());
+                statement.setString(5, dWIndicador.getCalculado());
             } else {
-                statement.setNull(6, Types.CHAR);
+                statement.setNull(5, Types.CHAR);
             }
+            //    + ",formula=?,item=?,codivarhis=?,tablahis=?,sql=?,descripcion=? "
             if (dWIndicador.getFormula() != null) {
-                statement.setString(7, dWIndicador.getFormula());
+                statement.setString(6, dWIndicador.getFormula());
             } else {
-                statement.setNull(7, Types.NCHAR);
+                statement.setNull(6, Types.NCHAR);
             }
             if (dWIndicador.getItem() != null) {
-                statement.setLong(8, dWIndicador.getItem());
+                statement.setLong(7, dWIndicador.getItem());
             } else {
-                statement.setNull(8, Types.BIGINT);
+                statement.setNull(7, Types.BIGINT);
             }
             if (dWIndicador.getCodivarhis() != null) {
-                statement.setInt(9, dWIndicador.getCodivarhis());
+                statement.setInt(8, dWIndicador.getCodivarhis());
+            } else {
+                statement.setNull(8, Types.NCHAR);
+            }
+            if (dWIndicador.getTablahis() != null) {
+                statement.setString(9, dWIndicador.getTablahis());
             } else {
                 statement.setNull(9, Types.NCHAR);
             }
-            if (dWIndicador.getTablahis() != null) {
-                statement.setString(10, dWIndicador.getTablahis());
-            } else {
-                statement.setNull(10, Types.NCHAR);
-            }
             if (dWIndicador.getSql() != null) {
-                statement.setString(11, dWIndicador.getSql());
+                statement.setString(10, dWIndicador.getSql());
             } else {
-                statement.setNull(11, Types.NVARCHAR);
+                statement.setNull(10, Types.NVARCHAR);
             }
-            if (dWIndicador.getDescricion() != null) {
-                statement.setString(12, dWIndicador.getDescricion());
+            if (dWIndicador.getDescripcion() != null) {
+                statement.setString(11, dWIndicador.getDescripcion());
             } else {
-                statement.setNull(12, Types.NCHAR);
+                statement.setNull(11, Types.NCHAR);
             }
-            statement.setString(13, dWIndicador.getCodigo());
+            statement.setString(12, dWIndicador.getCodigo());
 
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();

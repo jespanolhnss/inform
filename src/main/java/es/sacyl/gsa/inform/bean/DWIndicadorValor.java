@@ -4,9 +4,8 @@ package es.sacyl.gsa.inform.bean;
  *
  * @author 06551256M
  */
-public class DWIndicadorValor {
+public class DWIndicadorValor extends MasterBean {
 
-    public Long id;
     public Integer ano;
     public Integer mes;
     public String servicio;
@@ -18,14 +17,10 @@ public class DWIndicadorValor {
     public String dimension2;
     public String dimension3;
     public String dimension4;
-    public Double valor;
+    public Integer valor;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public DWIndicadorValor() {
+        super();
     }
 
     public Integer getAno() {
@@ -72,15 +67,23 @@ public class DWIndicadorValor {
         return indicador;
     }
 
+    public String getIndicadorNombre() {
+        if (indicador != null && indicador.getNombre() != null) {
+            return indicador.getNombre();
+        } else {
+            return "";
+        }
+    }
+
     public void setIndicador(DWIndicador indicador) {
         this.indicador = indicador;
     }
 
-    public Double getValor() {
+    public Integer getValor() {
         return valor;
     }
 
-    public void setValor(Double valor) {
+    public void setValor(Integer valor) {
         this.valor = valor;
     }
 
