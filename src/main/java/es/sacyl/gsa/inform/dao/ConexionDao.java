@@ -183,8 +183,8 @@ public class ConexionDao implements Serializable {
                         }
                     }
                 }
-            } else if (tabla.substring(0,2).toLowerCase().equals("dw")  || tabla.toLowerCase().equals("combos")) {
-             sql = " select SECUENCIAIDS.nextval as id from dual ";
+            } else if (tabla.substring(0, 2).toLowerCase().equals("dw") || tabla.toLowerCase().equals("combos")) {
+                sql = " select SECUENCIAIDS.nextval as id from dual ";
                 try (Statement statement = connection.createStatement()) {
                     ResultSet resulSet = statement.executeQuery(sql);
                     if (resulSet.next()) {
@@ -195,7 +195,7 @@ public class ConexionDao implements Serializable {
                     }
                 }
             } else {
-                LOGGER.error("No hay secuencia para la tabla " + tabla + " Se recupera el siguiente id ");
+                LOGGER.debug("No hay secuencia para la tabla " + tabla + " Se recupera el siguiente id ");
                 sql = " SELECT max(id) +1  as id FROM  " + tabla;
                 try (Statement statement = connection.createStatement()) {
                     ResultSet resulSet = statement.executeQuery(sql);
@@ -262,7 +262,7 @@ public class ConexionDao implements Serializable {
     public Boolean existeSecuencia(String tabla) {
         Connection connection = null;
         Boolean existe = false;
-        String secuencia = "SEC_ID_" + tabla;
+        String secuencia = "SEC_ID_" + tabla.toUpperCase();
         try {
             connection = this.getConexionBBDD();
             //  sql = " SELECT max(id) +1  as id FROM  " + tabla;

@@ -156,7 +156,7 @@ public class DWDao extends ConexionDao {
         Connection connection = null;
         try {
             connection = super.getConexionBBDD();
-            sql = " SELECT * FROM tabla ";
+            sql = " SELECT * FROM " + tabla;
             if (ano != null) {
                 sql = sql.concat(" AND ano='" + ano + "'");
             }

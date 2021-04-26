@@ -40,7 +40,7 @@ public class DWIndicadorDao extends ConexionDao implements ConexionInterface<DWI
             indicador.setOrden(rs.getInt("orden"));
             indicador.setVisible(rs.getString("visible"));
             indicador.setCalculado(rs.getString("calculado"));
-            indicador.setItem(rs.getInt("item"));
+            indicador.setItem(rs.getLong("item"));
             indicador.setCodivarhis(rs.getInt("codivarhis"));
             indicador.setSql(rs.getString("sql"));
             indicador.setDescripcion(rs.getString("descripcion"));

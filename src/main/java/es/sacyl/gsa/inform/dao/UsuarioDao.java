@@ -221,7 +221,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             //    while (iterator.hasNext()) {
             for (String funmenu : usuario.getFucionalidadesMap().keySet()) {
                 FuncionalidadBean fun = usuario.getFucionalidadesMap().get(funmenu);
-                Long id = this.getSiguienteId("us_funcionalidad");
+                Long id = this.getSiguienteId("US_FUNCIONALIDAD");
                 sql = " INSERT INTO us_funcionalidad "
                         + " (id,idusuario,idfuncionalidad,permitida,estado,fechacambio,usucambio) "
                         + " VALUES (?,?,?,?,?,?,?)";

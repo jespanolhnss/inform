@@ -621,7 +621,8 @@ public class ViajesDao extends ConexionDao implements Serializable {
                         + " VALUES (?,?,?,?,?)  ";
                 PreparedStatement statement = connection.prepareStatement(sql);
 
-                viajeCentroBean.setId(super.getSiguienteId("viajescentros"));
+                viajeCentroBean.setId(super.getSiguienteId("VIAJESCENTROS"));
+
                 statement.setLong(1, viajeCentroBean.getId());
                 if (viajeCentroBean.getIdViaje() != null) {
                     statement.setLong(2, viajeCentroBean.getIdViaje());

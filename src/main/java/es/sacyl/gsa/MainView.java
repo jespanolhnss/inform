@@ -7,6 +7,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
@@ -175,6 +176,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
             Ldap ldap = new Ldap();
             usuario = new Ldap().loginActiveDirectory(user, pass);
         } catch (LoginException ex) {
+            Notification.show(ex.getMessage());
             LOGGER.error(Utilidades.getStackTrace(ex));
         }
         if (usuario != null || usuario.getDni() == null && !usuario.getDni().isEmpty()) {
@@ -190,15 +192,21 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
      *
      */
     public void doLogin() {
+        this.removeAll();
         LoginForm componentLogin = new LoginForm();
         componentLogin.setForgotPasswordButtonVisible(false);
         componentLogin.setI18n(createEspanolI18n());
         componentLogin.addLoginListener(e -> {
-            UsuarioBean usuario = authenticate(e.getUsername(), e.getPassword());
-            if (usuario != null) {
-                this.domuestraMenu(usuario);
-            } else {
-                componentLogin.setError(true);
+            try {
+                UsuarioBean usuario = authenticate(e.getUsername(), e.getPassword());
+                if (usuario != null) {
+                    this.domuestraMenu(usuario);
+                } else {
+
+                }
+            } catch (Exception es) {
+                Notification.show("Error de conexión....");
+                doLogin();
             }
         });
         this.add(componentLogin);

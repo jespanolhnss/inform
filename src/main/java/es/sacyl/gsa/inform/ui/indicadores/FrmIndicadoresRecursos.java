@@ -18,22 +18,27 @@ import org.vaadin.klaudeta.PaginatedGrid;
 /**
  *
  * @author 06551256M
+ *
+ * Formulario para registrar los valores de los indicadores de recursos tabla
+ * DW_RECU_INDICADORES
+ *
+ *
  */
-public class FrmIndicadoresRecursos extends FrmMasterPantalla {
+public final class FrmIndicadoresRecursos extends FrmMasterPantalla {
 
-    private IntegerField anobuscador = new ObjetosComunes().getIntegerField("Año");
-    private IntegerField mesbuscador = new ObjetosComunes().getIntegerField("Mes");
-    private ComboBox<DWIndicador> indicadorBuscador = new CombosUi().getIndicadoresCombo(null, "RECURSOS");
+    private final IntegerField anobuscador = new ObjetosComunes().getIntegerField("Año");
+    private final IntegerField mesbuscador = new ObjetosComunes().getIntegerField("Mes");
+    private final ComboBox<DWIndicador> indicadorBuscador = new CombosUi().getIndicadoresCombo(null, "RECURSOS");
 
-    private IntegerField ano = new ObjetosComunes().getIntegerField("Año");
-    private IntegerField mes = new ObjetosComunes().getIntegerField("Mes");
+    private final IntegerField ano = new ObjetosComunes().getIntegerField("Año");
+    private final IntegerField mes = new ObjetosComunes().getIntegerField("Mes");
 
-    private ComboBox<DWIndicador> indicador = new CombosUi().getIndicadoresCombo(null, "RECURSOS");
+    private final ComboBox<DWIndicador> indicador = new CombosUi().getIndicadoresCombo(null, "RECURSOS");
 
-    private TextField dimension1 = new ObjetosComunes().getTextField("Dimension 1");
-    private TextField dimension2 = new ObjetosComunes().getTextField("Dimension 2");
+    private final TextField dimension1 = new ObjetosComunes().getTextField("Dimension 1");
+    private final TextField dimension2 = new ObjetosComunes().getTextField("Dimension 2");
 
-    private IntegerField valor = new ObjetosComunes().getIntegerField("Valor");
+    private final IntegerField valor = new ObjetosComunes().getIntegerField("Valor");
 
     private DWIndicadorValor dwindicadorValor = new DWIndicadorValor();
     public PaginatedGrid<DWIndicadorValor> dwindicadorValorGrid = new PaginatedGrid<>();
@@ -130,6 +135,12 @@ public class FrmIndicadoresRecursos extends FrmMasterPantalla {
 
     @Override
     public void doCompentesEventos() {
+        dwindicadorValorGrid.addItemClickListener(event -> {
+            dwindicadorValor = event.getItem();
+            dwindicadorValorBinder.readBean(dwindicadorValor);
+            doControlBotones(dwindicadorValor);
+
+        });
     }
 
 }

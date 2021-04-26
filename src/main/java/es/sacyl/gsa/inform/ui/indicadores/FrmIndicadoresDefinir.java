@@ -12,6 +12,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
+import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.DWIndicador;
@@ -47,7 +48,7 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
     //   public RadioButtonGroup<String> calculado = new ObjetosComunes().getSNRadio("Calculado");
     public TextField formula = new ObjetosComunes().getTextField("Fórmula");
 
-    public IntegerField item = new ObjetosComunes().getIntegerField("Item jimena catálogo");
+    public TextField item = new ObjetosComunes().getTextField("Item jimena catálogo");
 
     public TextField codivarhis = new ObjetosComunes().getTextField("Codivarhis ");
     public TextField tablahis = new ObjetosComunes().getTextField("Tabla his (est_servi)");
@@ -188,6 +189,7 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
                 .bind(DWIndicador::getFormula, DWIndicador::setFormula);
 
         dwindicadorBinder.forField(item)
+                .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(DWIndicador::getItem, DWIndicador::setItem);
 
         dwindicadorBinder.forField(codivarhis)

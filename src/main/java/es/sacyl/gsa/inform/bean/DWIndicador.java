@@ -78,7 +78,7 @@ public class DWIndicador {
     public String visible;
     public String calculado;
     public String formula;
-    public Integer item;
+    public Long item;
     public Integer codivarhis;
     public String tablahis;
     public String sql;
@@ -141,11 +141,11 @@ public class DWIndicador {
         this.formula = formula;
     }
 
-    public Integer getItem() {
+    public Long getItem() {
         return item;
     }
 
-    public void setItem(Integer item) {
+    public void setItem(Long item) {
         this.item = item;
     }
 
