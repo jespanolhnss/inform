@@ -1,13 +1,18 @@
 package es.sacyl.gsa.inform.ui.usuarios;
 
 import com.vaadin.flow.component.accordion.Accordion;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -27,6 +32,7 @@ import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
 import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
+import es.sacyl.gsa.inform.reports.usuarios.UsuariosExcel;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterConstantes;
@@ -74,7 +80,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     Long idJimena = new Long(8);
     RadioButtonGroup<AplicacionPerfilBean> perfilesJimena
                 = new ObjetosComunes().getAplicacionesPerfilesPorIdRadioButtonGroup(idJimena);
-    TextField comentario = new TextField();
+    TextField comentario = new TextField("Comentario");
     Label peticionarioLabel = new Label();
     Label usuarioLabel = new Label();
     Label aplicacionesLabel = new Label();
@@ -89,6 +95,9 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     Binder<UsuarioBean> solicitanteBinder = new Binder<>();
     ArrayList<UsuarioBean> arrayListUsuarios = new ArrayList<>();
     ArrayList<UsuarioPeticionAppBean> aplicacionesArrayList = new ArrayList<>();
+    
+    Icon icon = new Icon(VaadinIcon.OFFICE);
+    private final Button excelBoton = new ObjetosComunes().getBoton("Excel", ButtonVariant.LUMO_LARGE, icon);
     
     public FrmUsuariosPedir() {
         super();
@@ -217,7 +226,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         tipo.setItems("Alta", "Baja");
         tipo.setLabel("Tipo");
         tipo.setPlaceholder("Alta o Baja");
-        comentario.setWidthFull();
+        //comentario.setSizeFull();
         usuarioLabel.setText("DATOS DEL USUARIO: ");  
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
@@ -237,8 +246,10 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         contenedorFormulario.add(tipo,gfhUsuario);
         contenedorFormulario.setColspan(gfhUsuario, 2);
         contenedorFormulario.add(categoriaUsuario, 3);
+        contenedorFormulario.add(comentario, 3);
         contenedorDerecha.add(aplicacionesLabel);
-        contenedorDerecha.add(aplicacionesAccordion);      
+        contenedorDerecha.add(aplicacionesAccordion);   
+        //contenedorDerecha.add(excelBoton);
     }
 
     @Override
@@ -249,7 +260,13 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
                 if (usuarioBean.getDni() != null) {
                     usuarioBinder.readBean(usuarioBean); 
                     categoriaUsuario.setValue(usuarioBean.getCategoria());
-                }
+                } else { 
+                    usuarioBean = new UsuarioDao().getUsuarioNuestro(nifUsuario.getValue());
+                    if (usuarioBean.getDni() != null) {
+                        usuarioBinder.readBean(usuarioBean);
+                        categoriaUsuario.setValue(usuarioBean.getCategoria());
+                    }
+                } 
             } 
         });
 
@@ -270,6 +287,13 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
             perfil.setIdPerfil(event.getValue().getId());
             aplicacionesArrayList.add(perfil);
         });
+        
+        excelBoton.addClickListener(event -> {
+            UsuariosExcel ue = new UsuariosExcel();
+            Page page = new Page(getUI().get());
+            String url = ue.getUrlDelExcel();
+            page.open(url, "_blank");
+        });
     }
 
     @Override
@@ -278,12 +302,8 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     }
 
     public void construirAccordion() {        
-        VerticalLayout tipoCentroLayout = new VerticalLayout();
-        tipoCentroLayout.add(tiposCentro);
-        aplicacionesAccordion.add("Tipo Centro", tipoCentroLayout);
-
         VerticalLayout centrosLayout = new VerticalLayout();
-        centrosLayout.add(centro);
+        centrosLayout.add(tiposCentro, centro);
         aplicacionesAccordion.add("Centros", centrosLayout);
 
         VerticalLayout galenoLayout = new VerticalLayout();
@@ -293,10 +313,6 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         VerticalLayout jimenaLayout = new VerticalLayout();
         jimenaLayout.add(perfilesJimena);
         aplicacionesAccordion.add("Jimena", jimenaLayout);
-        
-        VerticalLayout comentarioLayout = new VerticalLayout();
-        comentarioLayout.add(comentario);
-        aplicacionesAccordion.add("Comentario", comentarioLayout);
     }
 
     private void doCargaCentros(Set<CentroTipoBean> c) {
@@ -326,4 +342,6 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         peticionarioLabel.setText(filiacionSolicitante);
         peticionBean.setIdpeticionario(solicitanteBean.getId());        
     }
+
+    
 }

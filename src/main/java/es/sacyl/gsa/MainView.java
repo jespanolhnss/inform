@@ -152,7 +152,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         UsuarioBean usuario = null;
         try {
             Ldap ldap = new Ldap();
-            usuario = new Ldap().loginActiveDirectory(user, pass);
+            usuario = ldap.loginActiveDirectory(user, pass);
         } catch (LoginException ex) {
             Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
         }
