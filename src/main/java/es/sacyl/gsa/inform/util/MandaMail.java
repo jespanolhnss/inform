@@ -64,7 +64,7 @@ public class MandaMail {
 
             session = Session.getDefaultInstance(properties);
             String[] destinatarios = new String[1];
-            if (destinatario.indexOf(",") != -1) {
+            if (destinatario != null && destinatario.indexOf(",") != -1) {
                 destinatarios = destinatario.split(",");
             } else {
                 destinatarios[0] = destinatario;

@@ -22,6 +22,10 @@ import org.vaadin.klaudeta.PaginatedGrid;
  * Formulario para registrar los valores de los indicadores de recursos tabla
  * DW_RECU_INDICADORES
  *
+ * Estos indicadores cambian poco en el tiempo. Por cada cambio se debe añadir
+ * una fila con el año mes e indicador que ha cambiado. La seleccion de estos
+ * datos se hace tomando el valor mas próximo a la fecha del estudio.
+ *
  *
  */
 public final class FrmIndicadoresRecursos extends FrmMasterPantalla {

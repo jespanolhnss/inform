@@ -93,6 +93,8 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + ",usu.solicita as usuariosolicita"
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
+                + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
                 + ",usue.id as usueid,usue.dni as usuedni,usue.apellido1 as usueapellido1"
                 + ",usue.apellido2 as usueapellido2,usue.nombre as usuenombre"
                 + ",usue.estado as usueestado,usue.usucambio as usueusucambio"
@@ -105,6 +107,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + " LEFT JOIN usuarios usu ON usu.id=e.usucambio"
                 + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
                 + " LEFT JOIN usuarios usue ON usue.id=e.usuario"
+                + " LEFT JOIN gfh gfh ON usu.idgfh = gfh.id"
                 + " WHERE  1=1 ";
 
         sql = " SELECT  e.id as equipoid,e.tipo as equipotipo, e.inventario as  equipoinventario,e.marca as   equipomarca"
@@ -128,6 +131,8 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + ",usu.solicita as usuariosolicita"
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
+                + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
                 + ",usue.id as usueid,usue.dni as usuedni,usue.apellido1 as usueapellido1"
                 + ",usue.apellido2 as usueapellido2,usue.nombre as usuenombre"
                 + ",usue.estado as usueestado,usue.usucambio as usueusucambio"
@@ -158,6 +163,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + " LEFT JOIN ubicaciones u ON u.id=e.ubicacion"
                 + " LEFT JOIN usuarios usu ON usu.id=e.usucambio"
                 + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
+                + " LEFT JOIN gfh gfh ON usu.idgfh = gfh.id"
                 + " LEFT JOIN usuarios usue ON usue.id=e.usuario"
                 + " LEFT JOIN centros c ON c.id=e.centro "
                 + " LEFT JOIN nivelesatencion n ON n.id = c.NIVATENCION  "

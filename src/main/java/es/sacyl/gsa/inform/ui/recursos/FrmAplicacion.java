@@ -280,7 +280,7 @@ public final class FrmAplicacion extends FrmMasterPantalla {
 
     @Override
     public void doActualizaGrid() {
-        aplicacionesLista = new AplicacionDao().getLista(buscador.getValue(), gfhcomboBuscador.getValue(), proveedorComboBuscador.getValue(), null);
+        aplicacionesLista = new AplicacionDao().getLista(buscador.getValue(), gfhcomboBuscador.getValue(), proveedorComboBuscador.getValue(), null, false);
         aplicacionesGrid.setItems(aplicacionesLista);
     }
 
@@ -368,6 +368,10 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         botonLimpiar.setText("");
         botonBorrar.setText("");
         botonCancelar.setText("");
+
+        proveedorComboBuscador.setValue(null);
+        gfhcomboBuscador.setValue(null);
+
         page1.setWidthFull();
         page2.setWidthFull();
         page3.setWidthFull();
@@ -442,6 +446,7 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         });
         aplicacionesGrid.addItemClickListener(event -> {
             aplicacionBean = event.getItem();
+            aplicacionBean.setListaPerfiles(new AplicacionPerfilDao().getLista(null, aplicacionBean));
             aplicacionBean.setListaEquipoBeans(new EquipoAplicacionDao().getLista(null, null, aplicacionBean));
             aplicacionesBinder.readBean(event.getItem());
             doControlBotones(aplicacionBean);
@@ -478,6 +483,7 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         });
 
         datosGenericosButton.addClickListener(event -> {
+            /*
             FrmAplicacionDatoGenerico frmAplicacionDatoGenerico = new FrmAplicacionDatoGenerico(aplicacionBean);
             frmAplicacionDatoGenerico.addDialogCloseActionListener(event1 -> {
                 aplicacionBean.setListaDatosGenerico(frmAplicacionDatoGenerico.getDatoGenericoBeanArray());
@@ -491,8 +497,15 @@ public final class FrmAplicacion extends FrmMasterPantalla {
                 page1.setVisible(true);
             });
             frmAplicacionDatoGenerico.open();
-
+             */
+            doVentanaDatoGenerico(null);
         });
+
+        datoGenericoGrid.addItemClickListener(event -> {
+            DatoGenericoBean datoGenericoBean = event.getItem();
+            doVentanaDatoGenerico(datoGenericoBean);
+        }
+        );
 
         /**
          * Gestiona los clic en los tabs ocultando todos y mostrando el del
@@ -520,10 +533,31 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         });
     }
 
+    public void doVentanaDatoGenerico(DatoGenericoBean datoGenericoBean) {
+        FrmAplicacionDatoGenerico frmAplicacionDatoGenerico = new FrmAplicacionDatoGenerico(aplicacionBean, datoGenericoBean);
+        frmAplicacionDatoGenerico.addDialogCloseActionListener(event1 -> {
+            aplicacionBean.setListaDatosGenerico(frmAplicacionDatoGenerico.getDatoGenericoBeanArray());
+            doActualizaGridDatos();
+            page1.setVisible(true);
+        });
+
+        frmAplicacionDatoGenerico.addDetachListener(event1 -> {
+            aplicacionBean.setListaDatosGenerico(frmAplicacionDatoGenerico.getDatoGenericoBeanArray());
+            doActualizaGridDatos();
+            page1.setVisible(true);
+        });
+        frmAplicacionDatoGenerico.open();
+    }
+
     public void doVentanaPerfil(AplicacionPerfilBean aplicacionPerfilBean) {
         FrmAplicacionPerfiles frmAplicacionesPerfiles = new FrmAplicacionPerfiles("500px", aplicacionPerfilBean);
 
         frmAplicacionesPerfiles.addDialogCloseActionListener(event -> {
+            doActualizaGrid();
+            doActualizaGridPerfiles();
+        });
+        frmAplicacionesPerfiles.addDetachListener(event -> {
+            doActualizaGrid();
             doActualizaGridPerfiles();
         });
         frmAplicacionesPerfiles.open();

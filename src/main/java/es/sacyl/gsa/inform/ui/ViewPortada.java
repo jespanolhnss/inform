@@ -41,7 +41,7 @@ public class ViewPortada extends VerticalLayout {
     public void doCajaInformaticos() {
 
         Grid<UsuarioBean> informaticosGrid = new Grid<>();
-        informaticosGrid.setWidth("250px");
+        informaticosGrid.setWidth("230px");
         informaticosGrid.addColumn(UsuarioBean::getNombreAp1_Ap2_).setAutoWidth(true);
         informaticosGrid.addColumn(UsuarioBean::getTelefono).setAutoWidth(true);
         ArrayList<UsuarioBean> listaUsuarios = new UsuarioDao().getInformaticos();

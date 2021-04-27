@@ -65,7 +65,7 @@ public class CombosUi {
     public ComboBox<AplicacionBean> getAplicacionCombo(AplicacionBean valor, String cadena, GfhBean gfhBean, ProveedorBean proveedorBean) {
         ComboBox<AplicacionBean> combo;
         combo = new ComboBox<>("Aplicaciones");
-        combo.setItems(new AplicacionDao().getLista(cadena, gfhBean, proveedorBean, ConexionDao.BBDD_ACTIVOSI));
+        combo.setItems(new AplicacionDao().getLista(cadena, gfhBean, proveedorBean, ConexionDao.BBDD_ACTIVOSI, false));
         combo.setItemLabelGenerator(AplicacionBean::getNombre);
         if (valor != null) {
             combo.setValue(valor);

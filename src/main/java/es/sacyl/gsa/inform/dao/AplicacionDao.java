@@ -50,6 +50,8 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
                 + ",usu.solicita as usuariosolicita"
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
+                + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
                 + " FROM aplicaciones ap "
                 + " LEFT  JOIN gfh  ON gfh.id=ap.gfh"
                 + " LEFT  JOIN proveedores prvee ON  prvee.id=ap.proveedor"
@@ -58,15 +60,16 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
                 + " LEFT  JOIN CAUTONOM a ON a.codigo=p.CODAUTO  "
                 + " LEFT JOIN usuarios usu ON usu.id=ap.usucambio"
                 + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
+                + " LEFT JOIN gfh gfh ON usu.idgfh = gfh.id"
                 + " WHERE  1=1 ";
     }
 
     @Override
     public AplicacionBean getRegistroResulset(ResultSet rs) {
-        return getRegistroResulset(rs, null, null);
+        return getRegistroResulset(rs, null, null, null);
     }
 
-    public static AplicacionBean getRegistroResulset(ResultSet rs, GfhBean gfhBean, ProveedorBean proveedorBean) {
+    public static AplicacionBean getRegistroResulset(ResultSet rs, GfhBean gfhBean, ProveedorBean proveedorBean, Boolean conPerfiles) {
         AplicacionBean aplicacionesBean = new AplicacionBean();
         try {
             aplicacionesBean.setId(rs.getLong("aplicacionid"));
@@ -91,7 +94,9 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
             // aplicacionesBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("aplicacionusucambio")));
             aplicacionesBean.setUsucambio(new UsuarioDao().getRegistroResulset(rs));
             // lista de perfiles
-            aplicacionesBean.setListaPerfiles(new AplicacionPerfilDao().getLista(null, aplicacionesBean));
+            if (conPerfiles != null && conPerfiles == true) {
+                aplicacionesBean.setListaPerfiles(new AplicacionPerfilDao().getLista(null, aplicacionesBean));
+            }
             // lista equipos
             // aplicacionesBean.setListaEquipoBeans(new EquipoAplicacionDao().getLista(null, null, aplicacionesBean));
         } catch (SQLException e) {
@@ -119,7 +124,7 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
-                    aplicacionesBean = getRegistroResulset(resulSet, null, null);
+                    aplicacionesBean = getRegistroResulset(resulSet, null, null, true);
                 }
                 statement.close();
             }
@@ -289,6 +294,7 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
+
             sql = " UPDATE   aplicaciones  SET estado=?,usucambio=? ,fechacambio=? "
                     + " WHERE id=?  ";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -321,7 +327,7 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
      * @param estado
      * @return
      */
-    public ArrayList<AplicacionBean> getLista(String texto, GfhBean gfhBean, ProveedorBean proveedorBean, Integer estado) {
+    public ArrayList<AplicacionBean> getLista(String texto, GfhBean gfhBean, ProveedorBean proveedorBean, Integer estado, Boolean conPerfiles) {
         Connection connection = null;
         ArrayList<AplicacionBean> lista = new ArrayList<>();
         try {
@@ -340,11 +346,11 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
                 sql = sql.concat(" AND ap.estado=" + estado);
             }
 
-            sql = sql.concat(" ORDER BY ap.descripcion  ");
+            sql = sql.concat(" ORDER BY ap.nombre  ");
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {
-                lista.add(getRegistroResulset(resulSet, gfhBean, proveedorBean));
+                lista.add(getRegistroResulset(resulSet, gfhBean, proveedorBean, conPerfiles));
             }
             statement.close();
             LOGGER.debug(sql);
@@ -360,7 +366,7 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
 
     @Override
     public ArrayList<AplicacionBean> getLista(String texto) {
-        return getLista(texto, null, null, null);
+        return getLista(texto, null, null, null, null);
     }
 
 }

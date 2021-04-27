@@ -10,6 +10,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.flow.data.validator.StringLengthValidator;
 import es.sacyl.gsa.inform.bean.AplicacionBean;
 import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.DatoGenericoBean;
@@ -43,10 +44,20 @@ public final class FrmAplicacionDatoGenerico extends FrmMasterVentana {
     private final PaginatedGrid<DatoGenericoBean> datoGenericoGrid = new PaginatedGrid<>();
     private ArrayList<DatoGenericoBean> datoGenericoBeanArray = new ArrayList<>();
 
-    public FrmAplicacionDatoGenerico(AplicacionBean aplicacionBeanParam) {
+    public FrmAplicacionDatoGenerico(AplicacionBean aplicacionBeanParam, DatoGenericoBean datoGenericoBean) {
         super();
         this.aplicacionBean = aplicacionBeanParam;
-        this.datoGenericoBean.setIdDatoAplicacion(aplicacionBean.getId());
+        if (datoGenericoBean != null) {
+            this.datoGenericoBean = datoGenericoBean;
+
+        } else {
+            this.datoGenericoBean.setIdDatoAplicacion(aplicacionBean.getId());
+        }
+        doVentana();
+        datoGenericoBinder.readBean(datoGenericoBean);
+    }
+
+    public void doVentana() {
         doComponentesOrganizacion();
         doGrid();
         doComponenesAtributos();
@@ -153,8 +164,9 @@ public final class FrmAplicacionDatoGenerico extends FrmMasterVentana {
 
         datoGenericoBinder.forField(valor)
                 .asRequired()
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 50))
                 .bind(DatoGenericoBean::getValor, DatoGenericoBean::setValor);
-
     }
 
     @Override

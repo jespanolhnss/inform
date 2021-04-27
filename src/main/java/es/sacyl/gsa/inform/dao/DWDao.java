@@ -54,7 +54,7 @@ public class DWDao extends ConexionDao {
             connection = super.getConexionBBDD();
             switch (tabla) {
                 case "DW_HOS_INDICADORES":
-                    sql = " SELECT id FROM " + tabla + " WHERE anyo=" + dWIndicadorValor.ano + " "
+                    sql = " SELECT id FROM " + tabla + " WHERE ano=" + dWIndicadorValor.ano + " "
                             + " AND  mes=" + dWIndicadorValor.getMes() + " "
                             + " AND  indicador='" + dWIndicadorValor.indicador.getCodigo() + "'"
                             + " AND  servicio='" + dWIndicadorValor.getServicio() + "'"
@@ -93,7 +93,7 @@ public class DWDao extends ConexionDao {
         switch (tabla) {
             case "DW_HOS_INDICADORES":
                 dWIndicadorValor.setId(this.getSiguienteId(tabla));
-                sql = " INSERT INTO  DW_HOS_INDICADORES  (id,anyo,mes,centro,servicio,area,indicador,valor) "
+                sql = " INSERT INTO  DW_HOS_INDICADORES  (id,ano,mes,centro,servicio,area,indicador,valor) "
                         + " VALUES (?,?,?,?,?,?,?,?)  ";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setLong(1, dWIndicadorValor.getId());
