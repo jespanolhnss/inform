@@ -107,7 +107,7 @@ public class ObjetosComunes {
         if (label != null) {
             radioGroup.setLabel(label);
         }
-        radioGroup.setItems("S", "N");
+        radioGroup.setItems(SINO);
         return radioGroup;
     }
 

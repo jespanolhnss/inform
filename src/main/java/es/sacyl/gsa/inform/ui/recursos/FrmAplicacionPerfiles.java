@@ -31,7 +31,7 @@ import org.vaadin.klaudeta.PaginatedGrid;
  *
  * @author 06551256M
  */
-public final class FrmAplicacionesPerfiles extends FrmMasterVentana {
+public final class FrmAplicacionPerfiles extends FrmMasterVentana {
 
     private ComboBox<AplicacionBean> aplicacionCombo = new CombosUi().getAplicacionCombo(null, null, null, null);
     private final TextField id = new ObjetosComunes().getTextField("Id");
@@ -46,7 +46,7 @@ public final class FrmAplicacionesPerfiles extends FrmMasterVentana {
     private final PaginatedGrid<AplicacionPerfilBean> aplicacionPerfilGrid = new PaginatedGrid<>();
     private ArrayList<AplicacionPerfilBean> aplicacionPerfilLista = new ArrayList<>();
 
-    public FrmAplicacionesPerfiles(String ancho, AplicacionPerfilBean aplicacionPerfilBean) {
+    public FrmAplicacionPerfiles(String ancho, AplicacionPerfilBean aplicacionPerfilBean) {
         super(ancho);
         this.aplicacionPerfilBean = aplicacionPerfilBean;
         aplicacionCombo.setValue(aplicacionPerfilBean.getAplicacion());

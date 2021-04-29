@@ -24,6 +24,9 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
     private static final long serialVersionUID = 1L;
 
     // id,nombreperfil,idaplicaciones,codigoapp,estado,usucambio.fechacambio
+    /**
+     *
+     */
     public AplicacionPerfilDao() {
         super();
         sql = " SELECT appp.id as appperfileid,appp.nombreperfil as appperfilnombreperfil "
@@ -47,19 +50,33 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
                 + ",usu.solicita as usuariosolicita"
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
+                + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
                 + " FROM aplicacionesPerfiles  appp "
                 + " JOIN aplicaciones ap ON ap.id=appp.idaplicaciones "
                 + " LEFT  JOIN gfh ON gfh.id=ap.gfh"
                 + " LEFT JOIN usuarios usu ON usu.id=appp.usucambio"
                 + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
+                + " LEFT JOIN gfh gfh ON usu.idgfh = gfh.id"
                 + " WHERE 1=1 ";
     }
 
+    /**
+     *
+     * @param rs
+     * @return
+     */
     @Override
     public AplicacionPerfilBean getRegistroResulset(ResultSet rs) {
         return getRegistroResulset(rs, null);
     }
 
+    /**
+     *
+     * @param rs
+     * @param aplicacionBean
+     * @return
+     */
     public static AplicacionPerfilBean getRegistroResulset(ResultSet rs, AplicacionBean aplicacionBean) {
         AplicacionPerfilBean aplicacionPerfilBean = new AplicacionPerfilBean();
         try {
@@ -68,7 +85,7 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
             if (aplicacionBean != null) {
                 aplicacionPerfilBean.setAplicacion(aplicacionBean);
             } else {
-                aplicacionPerfilBean.setAplicacion(AplicacionDao.getRegistroResulset(rs, null, null));
+                aplicacionPerfilBean.setAplicacion(AplicacionDao.getRegistroResulset(rs, null, null, null));
             }
             aplicacionPerfilBean.setCodigo(rs.getString("appperfilcodigo"));
             aplicacionPerfilBean.setEstado(rs.getInt("appperfilestado"));
@@ -81,6 +98,11 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
         return aplicacionPerfilBean;
     }
 
+    /**
+     *
+     * @param codigo
+     * @return
+     */
     @Override
     public AplicacionPerfilBean getPorCodigo(String codigo) {
         if (Utilidades.isNumeric(codigo)) {
@@ -90,6 +112,11 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
         return null;
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     @Override
     public AplicacionPerfilBean getPorId(Long id) {
         Connection connection = null;
@@ -115,6 +142,11 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
         return aplicacionPerfilBean;
     }
 
+    /**
+     *
+     * @param aplicacionPerfilBean
+     * @return
+     */
     @Override
     public boolean doGrabaDatos(AplicacionPerfilBean aplicacionPerfilBean) {
         boolean actualizado = false;
@@ -127,6 +159,11 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
         return actualizado;
     }
 
+    /**
+     *
+     * @param aplicacionPerfilBean
+     * @return
+     */
     @Override
     public boolean doInsertaDatos(AplicacionPerfilBean aplicacionPerfilBean) {
         Connection connection = null;
@@ -178,6 +215,11 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
         return insertadoBoolean;
     }
 
+    /**
+     *
+     * @param aplicacionPerfilBean
+     * @return
+     */
     @Override
     public boolean doActualizaDatos(AplicacionPerfilBean aplicacionPerfilBean) {
         Connection connection = null;
@@ -223,21 +265,28 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
         return insertadoBoolean;
     }
 
+    /**
+     *
+     * @param aplicacionPerfiBean
+     * @return
+     */
     @Override
     public boolean doBorraDatos(AplicacionPerfilBean aplicacionPerfiBean) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
+            /*
             sql = " UPDATE   aplicacionesperfiles  SET estado=?,usucambio=?, fechacambio=? "
                     + " WHERE  id=? ";
+             */
+            sql = " DELETE FROM aplicacionesperfiles  WHERE  id=?";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, aplicacionPerfiBean.getEstado());
-            statement.setLong(2, aplicacionPerfiBean.getUsucambio().getId());
-            statement.setLong(3, Utilidades.getFechaLong(aplicacionPerfiBean.getFechacambio()));
-            statement.setLong(4, aplicacionPerfiBean.getId());
+            statement.setLong(1, aplicacionPerfiBean.getId());
+
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
+            insertadoBoolean = true;
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
@@ -249,11 +298,22 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
         return insertadoBoolean;
     }
 
+    /**
+     *
+     * @param texto
+     * @return
+     */
     @Override
     public ArrayList<AplicacionPerfilBean> getLista(String texto) {
         return getLista(texto, null);
     }
 
+    /**
+     *
+     * @param texto
+     * @param aplicacionBean
+     * @return
+     */
     public ArrayList<AplicacionPerfilBean> getLista(String texto, AplicacionBean aplicacionBean) {
         Connection connection = null;
         ArrayList<AplicacionPerfilBean> lista = new ArrayList<>();

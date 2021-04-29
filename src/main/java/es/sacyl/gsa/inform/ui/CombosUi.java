@@ -7,6 +7,7 @@ import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
 import es.sacyl.gsa.inform.bean.ComboBean;
+import es.sacyl.gsa.inform.bean.DWIndicador;
 import es.sacyl.gsa.inform.bean.GerenciaBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.LocalidadBean;
@@ -27,6 +28,7 @@ import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.CentroTipoDao;
 import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
+import es.sacyl.gsa.inform.dao.DWIndicadorDao;
 import es.sacyl.gsa.inform.dao.GerenciaDao;
 import es.sacyl.gsa.inform.dao.GfhDao;
 import es.sacyl.gsa.inform.dao.JimenaDao;
@@ -47,6 +49,13 @@ import java.util.ArrayList;
  */
 public class CombosUi {
 
+    public static ArrayList<String> SINO = new ArrayList<String>() {
+        {
+            add("S");
+            add("N");
+        }
+    };
+
     /**
      *
      * @param valor
@@ -56,7 +65,7 @@ public class CombosUi {
     public ComboBox<AplicacionBean> getAplicacionCombo(AplicacionBean valor, String cadena, GfhBean gfhBean, ProveedorBean proveedorBean) {
         ComboBox<AplicacionBean> combo;
         combo = new ComboBox<>("Aplicaciones");
-        combo.setItems(new AplicacionDao().getLista(cadena, gfhBean, proveedorBean, ConexionDao.BBDD_ACTIVOSI));
+        combo.setItems(new AplicacionDao().getLista(cadena, gfhBean, proveedorBean, ConexionDao.BBDD_ACTIVOSI, false));
         combo.setItemLabelGenerator(AplicacionBean::getNombre);
         if (valor != null) {
             combo.setValue(valor);
@@ -191,6 +200,11 @@ public class CombosUi {
         return combo;
     }
 
+    /**
+     *
+     * @param valor
+     * @return
+     */
     public ComboBox<UsuarioBean> getInformaticosCombo(UsuarioBean valor) {
         ComboBox<UsuarioBean> combo;
         combo = new ComboBox<>("Técnicos");
@@ -200,6 +214,23 @@ public class CombosUi {
             combo.setValue(valor);
         }
         combo.setWidth("450px");
+        combo.setClearButtonVisible(true);
+        return combo;
+    }
+
+    /**
+     *
+     * @param area
+     * @param tipo
+     * @return
+     */
+    public ComboBox<DWIndicador> getIndicadoresCombo(String area, String tipo) {
+        ComboBox<DWIndicador> combo;
+        combo = new ComboBox<>("Indicadores");
+        combo.setItems(new DWIndicadorDao().getLista(area, null, tipo));
+        combo.setItemLabelGenerator(DWIndicador::getNombre);
+        combo.setWidth("200");
+        combo.setClearButtonVisible(true);
         return combo;
     }
 
@@ -330,6 +361,18 @@ public class CombosUi {
         if (ancho != null) {
             combo.setWidth(ancho);
         }
+        combo.setClearButtonVisible(true);
+        return combo;
+    }
+
+    public ComboBox<String> getSiNoCombo(String label) {
+        ComboBox<String> combo = new ComboBox<>();
+        if (label != null) {
+            combo.setLabel(label);
+        }
+        combo.setItems(SINO);
+
+        combo.setClearButtonVisible(true);
         return combo;
     }
 

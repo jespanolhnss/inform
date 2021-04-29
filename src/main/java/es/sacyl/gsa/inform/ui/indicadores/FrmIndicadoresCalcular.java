@@ -13,14 +13,14 @@ import java.time.LocalDate;
  *
  * @author 06551256M
  */
-public class FrmIndicadores extends FrmMasterPantalla {
+public class FrmIndicadoresCalcular extends FrmMasterPantalla {
 
     private DatePicker desde = new ObjetosComunes().getDatePicker("Desde", null, LocalDate.now());
     private DatePicker hasta = new ObjetosComunes().getDatePicker("Desde", null, LocalDate.now());
 
     RadioButtonGroup<String> areaCalucloradioGroup = new RadioButtonGroup<>();
 
-    public FrmIndicadores() {
+    public FrmIndicadoresCalcular() {
         doComponentesOrganizacion();
         doGrid();
         doComponenesAtributos();

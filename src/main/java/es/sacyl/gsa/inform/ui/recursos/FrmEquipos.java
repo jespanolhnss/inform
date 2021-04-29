@@ -570,16 +570,6 @@ public final class FrmEquipos extends FrmMasterPantalla {
         });
 
         /**
-         * Cuando se cambia el valor en el combo de tipo de equipo se actualiza
-         * la lista de valores del grid
-         *
-         */
-        equipoTipoComboBuscador.addValueChangeListener(evetn -> {
-            doGrid();
-
-        });
-
-        /**
          * Si cambia el valor del combo de tipo de equipo, actualiza el combo de
          * marcas.
          *
@@ -599,6 +589,13 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         equipoTipoComboBuscador.addValueChangeListener(event -> {
             equipoMarcaComboBuscador.setItems(new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPOMARCA, event.getValue(), 100));
+            doActualizaGrid();
+        });
+
+        /**
+         * Cuando cambia la marca
+         */
+        equipoMarcaComboBuscador.addValueChangeListener(event -> {
             doActualizaGrid();
         });
         /**
@@ -756,7 +753,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
          */
         datosGenericosButton.addClickListener(event
                 -> {
-            FrmDatosGenerico frmDatosGenerico = new FrmDatosGenerico("500px", equipoBean);
+            FrmEquipoDatosGenerico frmDatosGenerico = new FrmEquipoDatosGenerico("500px", equipoBean);
             frmDatosGenerico.addDialogCloseActionListener(eventAyuda -> {
                 equipoBean.setDatosGenericoBeans(frmDatosGenerico.getDatosGenericoBeans());
                 doActualizaGridDatosGenericos();

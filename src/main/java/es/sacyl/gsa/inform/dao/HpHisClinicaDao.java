@@ -135,7 +135,7 @@ public class HpHisClinicaDao {
             if (indicadorValor.getServicio() != null) {
                 indicadorValor.setServicio(indicadorValor.getServicio().trim());
             }
-            indicadorValor.setValor(rs.getDouble("valor"));
+            indicadorValor.setValor(rs.getInt("valor"));
             indicadorValor.setCodivar(rs.getString("codivar"));
             if (indicadorValor.getCodivar() != null) {
                 indicadorValor.setCodivar(indicadorValor.getCodivar().trim());

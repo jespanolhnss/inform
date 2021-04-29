@@ -13,7 +13,7 @@ public class DWIndicadorHis {
     Integer mes;
     Integer anyo;
     String codivar;
-    Double valor;
+    Integer valor;
     Integer norden;
     LocalDate fecha_desde;
     LocalDate fecha_hasta;
@@ -58,11 +58,11 @@ public class DWIndicadorHis {
         this.codivar = codivar;
     }
 
-    public Double getValor() {
+    public Integer getValor() {
         return valor;
     }
 
-    public void setValor(Double valor) {
+    public void setValor(Integer valor) {
         this.valor = valor;
     }
 

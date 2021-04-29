@@ -137,10 +137,12 @@ public final class FrmLopdIncidenciaGestionar extends FrmMasterPantalla implemen
             if (new LopdIncidenciaDao().actualizaRespuesta(lopdIncidenciaBean) == true) {
                 (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                 if (lopdIncidenciaBean.getResuelta() == Boolean.TRUE) {
-                    new MandaMail().sendEmail(lopdIncidenciaBean.getUsuarioRegistra().getMail(),
-                            LopdIncidenciaBean.MAIL_ASUNTO_RESUELTA,
-                            LopdIncidenciaBean.MAIL_CONTENIDO_CABECERA + lopdIncidenciaBean.getHtmlContenidoSolicitud() + "\n\n"
-                            + lopdIncidenciaBean.getHtmlContenidoSolución());
+                    if (lopdIncidenciaBean.getUsuarioRegistra().getMail() != null && !lopdIncidenciaBean.getUsuarioRegistra().getMail().isEmpty()) {
+                        new MandaMail().sendEmail(lopdIncidenciaBean.getUsuarioRegistra().getMail(),
+                                LopdIncidenciaBean.MAIL_ASUNTO_RESUELTA,
+                                LopdIncidenciaBean.MAIL_CONTENIDO_CABECERA + lopdIncidenciaBean.getHtmlContenidoSolicitud() + "\n\n"
+                                + lopdIncidenciaBean.getHtmlContenidoSolución());
+                    }
                 }
                 doActualizaGrid();
                 doLimpiar();

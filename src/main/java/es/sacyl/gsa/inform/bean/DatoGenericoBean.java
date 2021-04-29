@@ -11,6 +11,7 @@ public class DatoGenericoBean extends MasterBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long idDatoEqipo;
+    private Long idDatoAplicacion;
     private String tipoDato;
     private String valor;
 
@@ -40,6 +41,14 @@ public class DatoGenericoBean extends MasterBean implements Serializable {
 
     public void setValor(String valor) {
         this.valor = valor;
+    }
+
+    public Long getIdDatoAplicacion() {
+        return idDatoAplicacion;
+    }
+
+    public void setIdDatoAplicacion(Long idDatoAplicacion) {
+        this.idDatoAplicacion = idDatoAplicacion;
     }
 
 }

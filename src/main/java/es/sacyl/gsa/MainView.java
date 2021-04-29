@@ -7,6 +7,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
@@ -31,11 +32,11 @@ import es.sacyl.gsa.inform.exceptiones.LoginException;
 import es.sacyl.gsa.inform.ui.Menu;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Ldap;
+import es.sacyl.gsa.inform.util.Utilidades;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * The main view contains a button and a click listener.
@@ -55,11 +56,33 @@ https://vaadin.com/forum/thread/17101015/webinar-introduccion-a-vaadin-flow-en-e
  */
 public class MainView extends VerticalLayout implements AttachNotifier, HasUrlParameter<String> {
 
+    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(MainView.class);
+
     private Location currentLocation = null;
 
     private HorizontalLayout contenedorMenu = new HorizontalLayout();
     private VerticalLayout contenedorFormularios = new VerticalLayout();
-    QueryParameters qm = null;
+    private QueryParameters qm = null;
+
+    static {
+
+        try {
+
+            Timer timerObj = new Timer();
+            TimerTask timerTaskObj = new TimerTask() {
+                ConexionDao conexionDao = new ConexionDao();
+
+                @Override
+                public void run() {
+                    conexionDao.isTestConexion();
+                }
+            };
+            timerObj.schedule(timerTaskObj, 0, 120000);
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        }
+
+    }
 
     public MainView() {
         //   this.getStyle().set("background-color", "#F2F2F2");
@@ -70,8 +93,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         contenedorFormularios.setSpacing(false);
         contenedorFormularios.setPadding(false);
 
-        doTimerDa0();
-
+        // doTimerDa0();
         System.out.println(System.getProperty("user.dir"));
         System.out.println(System.getProperty("catalina.base"));
         System.out.println(VaadinServlet.getCurrent().getServletInfo());
@@ -154,7 +176,8 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
             Ldap ldap = new Ldap();
             usuario = ldap.loginActiveDirectory(user, pass);
         } catch (LoginException ex) {
-            Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+            Notification.show(ex.getMessage());
+            LOGGER.error(Utilidades.getStackTrace(ex));
         }
         if (usuario != null || usuario.getDni() == null && !usuario.getDni().isEmpty()) {
             usuario = new UsuarioDao().getUsuarioDni(user, Boolean.TRUE);
@@ -169,15 +192,21 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
      *
      */
     public void doLogin() {
+        this.removeAll();
         LoginForm componentLogin = new LoginForm();
         componentLogin.setForgotPasswordButtonVisible(false);
         componentLogin.setI18n(createEspanolI18n());
         componentLogin.addLoginListener(e -> {
-            UsuarioBean usuario = authenticate(e.getUsername(), e.getPassword());
-            if (usuario != null) {
-                this.domuestraMenu(usuario);
-            } else {
-                componentLogin.setError(true);
+            try {
+                UsuarioBean usuario = authenticate(e.getUsername(), e.getPassword());
+                if (usuario != null) {
+                    this.domuestraMenu(usuario);
+                } else {
+
+                }
+            } catch (Exception es) {
+                Notification.show("Error de conexión....");
+                doLogin();
             }
         });
         this.add(componentLogin);
@@ -234,4 +263,5 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         };
         timerObj.schedule(timerTaskObj, 0, 120000);
     }
+
 }

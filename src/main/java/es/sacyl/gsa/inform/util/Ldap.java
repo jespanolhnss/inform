@@ -1,6 +1,5 @@
 package es.sacyl.gsa.inform.util;
 
-import com.vaadin.flow.component.notification.Notification;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.exceptiones.LoginException;
 import java.util.Hashtable;
@@ -140,7 +139,7 @@ public class Ldap {
 
             logger.error("Error de autentificacion", e);
 
-            new Notification("ldap.loginActiveDirectory : Error de autentificacion");
+            // new Notification("ldap.loginActiveDirectory : Error de autentificacion");
             // true);
             throw new LoginException("Error de autentificacion", e);
 
@@ -148,8 +147,7 @@ public class Ldap {
 
             logger.error("LDAP no funciona NamingException", e);
 
-            Notification.show("ldap.loginActiveDirectory : . Error de NamingException ");
-
+            //  Notification.show("ldap.loginActiveDirectory : . Error de NamingException ");
             throw new LoginException("Active Directory no funciona", e);
 
         } catch (Exception e) {

@@ -52,8 +52,11 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 + ",usu.solicita as usuariosolicita"
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
+                + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
                 + " FROM usuarios usu  "
                 + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
+                + " LEFT JOIN gfh gfh ON usu.idgfh = gfh.id"
                 + " WHERE 1=1";
 
     }
@@ -81,8 +84,10 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             usuario.setNombre(resulSet.getString("usuarionombre"));
             usuario.setMail(resulSet.getString("usuariomail"));
             usuario.setTelefono(resulSet.getString("usuariotelefon"));
-            usuario.setCategoria(new CategoriaDao().getPorId(resulSet.getLong("usuarioidcategoria")));
-            usuario.setGfh(new GfhDao().getPorId(resulSet.getLong("usuarioidgfh")));
+            usuario.setCategoria(CategoriaDao.getRegistroResulset(resulSet));
+            //  usuario.setCategoria(new CategoriaDao().getPorId(resulSet.getLong("usuarioidcategoria")));
+            //     usuario.setGfh(new GfhDao().getPorId(resulSet.getLong("usuarioidgfh")));
+            usuario.setGfh(new GfhDao().getRegistroResulset(resulSet));
             usuario.setEstado(resulSet.getInt("usuarioestado"));
             usuario.setCorreoPrivadoUsuario(resulSet.getString("usuariomailprivado"));
             usuario.setMovilUsuario(resulSet.getString("usuariomovil"));
@@ -221,7 +226,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             //    while (iterator.hasNext()) {
             for (String funmenu : usuario.getFucionalidadesMap().keySet()) {
                 FuncionalidadBean fun = usuario.getFucionalidadesMap().get(funmenu);
-                Long id = this.getSiguienteId("us_funcionalidad");
+                Long id = this.getSiguienteId("US_FUNCIONALIDAD");
                 sql = " INSERT INTO us_funcionalidad "
                         + " (id,idusuario,idfuncionalidad,permitida,estado,fechacambio,usucambio) "
                         + " VALUES (?,?,?,?,?,?,?)";
@@ -438,12 +443,12 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             } else {
                 statement.setNull(7, Types.CHAR);
             }
-            if (usuarioBean.getIdCategoria() != null) {
+            if (usuarioBean.getCategoria() != null && usuarioBean.getCategoria().getId() != null && !usuarioBean.getCategoria().getId().equals(new Long(0))) {
                 statement.setLong(8, usuarioBean.getIdCategoria());
             } else {
                 statement.setNull(8, Types.INTEGER);
             }
-            if (usuarioBean.getIdGfh() != null) {
+            if (usuarioBean.getGfh() != null && usuarioBean.getGfh().getId() != null && !usuarioBean.getGfh().getId().equals(new Long(0))) {
                 statement.setLong(9, usuarioBean.getIdGfh());
             } else {
                 statement.setNull(9, Types.INTEGER);

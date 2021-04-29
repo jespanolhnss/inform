@@ -39,9 +39,12 @@ public class FuncionalidadDAO extends ConexionDao implements ConexionInterface<F
                 + " ,usu.solicita as usuariosolicita"
                 + " ,uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + " ,uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
+                + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
                 + " FROM  funcionalidad  func "
                 + "    LEFT JOIN usuarios usu ON usu.id=func.usucambio "
                 + "    LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
+                + " LEFT JOIN gfh gfh ON usu.idgfh = gfh.id"
                 + " WHERE 1=1 ";
     }
 

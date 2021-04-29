@@ -23,65 +23,6 @@ public class DWDao extends ConexionDao {
     private static final long serialVersionUID = 1L;
 
     public DWDao() {
-        sql = " SELECT * FROM dw_indicadores WHERE 1=1 ";
-    }
-
-    /**
-     *
-     * @param rs
-     * @return
-     */
-    public DWIndicador getRegistroResulset(ResultSet rs) {
-        DWIndicador indicador = new DWIndicador();
-        try {
-            indicador.setCodigo(rs.getString("codigo"));
-            indicador.setNombre(rs.getString("nombre"));
-            indicador.setArea(rs.getString("area"));
-            indicador.setOrden(rs.getInt("orden"));
-            indicador.setVisible(rs.getString("visible"));
-            indicador.setCalculado(rs.getString("calculado"));
-            indicador.setItem(rs.getLong("item"));
-            indicador.setCodivarhis(rs.getString("codivarhis"));
-            indicador.setSql(rs.getString("sql"));
-            indicador.setDescricion(rs.getString("descripcion"));
-            //  System.out.println(indicador.getCodigo() + ":" + indicador.getCodivarhis());
-
-        } catch (SQLException e) {
-            LOGGER.error(Utilidades.getStackTrace(e));
-        }
-
-        return indicador;
-    }
-
-    /**
-     *
-     * @param area
-     * @return
-     *
-     */
-    public ArrayList<DWIndicador> getLista(String area) {
-        ArrayList<DWIndicador> lista = new ArrayList<>();
-        Connection connection = null;
-        try {
-            connection = super.getConexionBBDD();
-            sql = sql.concat(" AND area='" + area + "'");
-            LOGGER.debug(sql);
-            try (Statement statement = connection.createStatement()) {
-                ResultSet resulSet = statement.executeQuery(sql);
-                while (resulSet.next()) {
-                    lista.add(getRegistroResulset(resulSet));
-                }
-                statement.close();
-            }
-
-        } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
-        } catch (Exception e) {
-            LOGGER.error(Utilidades.getStackTrace(e));
-        } finally {
-            this.doCierraConexion(connection);
-        }
-        return lista;
     }
 
     /**
@@ -100,6 +41,12 @@ public class DWDao extends ConexionDao {
         return true;
     }
 
+    /**
+     *
+     * @param dWIndicadorValor
+     * @param tabla
+     * @return
+     */
     public Long existeIndicadorTabla(DWIndicadorValor dWIndicadorValor, String tabla) {
         Long id = null;
         Connection connection = null;
@@ -107,7 +54,7 @@ public class DWDao extends ConexionDao {
             connection = super.getConexionBBDD();
             switch (tabla) {
                 case "DW_HOS_INDICADORES":
-                    sql = " SELECT id FROM " + tabla + " WHERE anyo=" + dWIndicadorValor.ano + " "
+                    sql = " SELECT id FROM " + tabla + " WHERE ano=" + dWIndicadorValor.ano + " "
                             + " AND  mes=" + dWIndicadorValor.getMes() + " "
                             + " AND  indicador='" + dWIndicadorValor.indicador.getCodigo() + "'"
                             + " AND  servicio='" + dWIndicadorValor.getServicio() + "'"
@@ -133,6 +80,12 @@ public class DWDao extends ConexionDao {
         return id;
     }
 
+    /**
+     *
+     * @param dWIndicadorValor
+     * @param tabla
+     * @return
+     */
     public Boolean doInserta(DWIndicadorValor dWIndicadorValor, String tabla) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
@@ -140,7 +93,7 @@ public class DWDao extends ConexionDao {
         switch (tabla) {
             case "DW_HOS_INDICADORES":
                 dWIndicadorValor.setId(this.getSiguienteId(tabla));
-                sql = " INSERT INTO  DW_HOS_INDICADORES  (id,anyo,mes,centro,servicio,area,indicador,valor) "
+                sql = " INSERT INTO  DW_HOS_INDICADORES  (id,ano,mes,centro,servicio,area,indicador,valor) "
                         + " VALUES (?,?,?,?,?,?,?,?)  ";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setLong(1, dWIndicadorValor.getId());
@@ -197,4 +150,67 @@ public class DWDao extends ConexionDao {
 
         return insertadoBoolean;
     }
+
+    public ArrayList<DWIndicadorValor> getLista(Integer ano, Integer mes, DWIndicador dWIndicador, String tabla) {
+        ArrayList<DWIndicadorValor> lista = new ArrayList<>();
+        Connection connection = null;
+        try {
+            connection = super.getConexionBBDD();
+            sql = " SELECT * FROM " + tabla;
+            if (ano != null) {
+                sql = sql.concat(" AND ano='" + ano + "'");
+            }
+            if (mes != null) {
+                sql = sql.concat(" AND mes='" + mes + "'");
+            }
+            if (dWIndicador != null) {
+                sql = sql.concat(" AND indicador ='" + dWIndicador.getCodigo() + "'");
+            }
+            LOGGER.debug(sql);
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sql);
+                while (resulSet.next()) {
+                    lista.add(getRegistroResulset(resulSet));
+                }
+                statement.close();
+            }
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+
+    public DWIndicadorValor getRegistroResulset(ResultSet rs) {
+        DWIndicadorValor indicador = new DWIndicadorValor();
+        try {
+            indicador.setId(rs.getLong("id"));
+            indicador.setAno(rs.getInt("ano"));
+            indicador.setMes(rs.getInt("mes"));
+            indicador.setIndicador(new DWIndicadorDao().getPorCodigo(rs.getString("codigo")));
+            indicador.setValor(rs.getInt("valor"));
+
+            try {
+                int orden = rs.findColumn("dimension1");
+                indicador.setDimension1(rs.getString("dimension1"));
+            } catch (SQLException e) {
+
+            }
+
+            try {
+                int orden = rs.findColumn("dimension2");
+                indicador.setDimension1(rs.getString("dimension2"));
+            } catch (SQLException e) {
+
+            }
+        } catch (SQLException e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        }
+
+        return indicador;
+    }
+
 }

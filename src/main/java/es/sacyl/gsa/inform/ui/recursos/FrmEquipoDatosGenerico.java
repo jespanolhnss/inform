@@ -18,7 +18,7 @@ import java.util.ArrayList;
  *
  * @author 06551256M
  */
-public final class FrmDatosGenerico extends FrmMasterVentana {
+public final class FrmEquipoDatosGenerico extends FrmMasterVentana {
 
     private final Button datosGenericosButton = new ObjetosComunes().getBoton("Dat", null, VaadinIcon.TABLE.create());
 
@@ -33,7 +33,7 @@ public final class FrmDatosGenerico extends FrmMasterVentana {
      * @param ancho
      * @param equipoBean
      */
-    public FrmDatosGenerico(String ancho, EquipoBean equipoBean) {
+    public FrmEquipoDatosGenerico(String ancho, EquipoBean equipoBean) {
         super(ancho);
         this.equipoBean = equipoBean;
         if (equipoBean == null) {

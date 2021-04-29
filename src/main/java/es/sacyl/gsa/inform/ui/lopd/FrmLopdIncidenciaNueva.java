@@ -455,9 +455,14 @@ public final class FrmLopdIncidenciaNueva extends FrmMasterPantalla {
             if (!numerohc.isEmpty()) {
                 paciente = new PacienteDao().getPacienteNhc(numerohc.getValue());
                 if (paciente == null) {
-                    Notification.show(FrmMensajes.PACIENTENOEXISTENHC + numerohc.getValue());
-                    numerohc.clear();
-                    numerohc.focus();
+                    paciente = new JimenaDao().getPaciente(numerohc.getValue());
+                    if (paciente != null) {
+                        new PacienteDao().insertaPaciente(paciente);
+                    } else {
+                        Notification.show(FrmMensajes.PACIENTENOEXISTENHC + numerohc.getValue());
+                        numerohc.clear();
+                        numerohc.focus();
+                    }
                 } else {
                     pacienteBinder.readBean(paciente);
                     descriDocu.focus();
