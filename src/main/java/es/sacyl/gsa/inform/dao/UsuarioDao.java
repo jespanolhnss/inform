@@ -672,7 +672,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
 
         try {
             connection = super.getConexionBBDD();
-            String select = " select nif,ape1,ape2,nombre,mail FROM usuariospersigo where nif = '" + value + "'";
+            String select = " select nif,ape1,ape2,nombre,mail,tel1 FROM usuariospersigo where nif = '" + value + "'";
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(select);
                 while (resulSet.next()) {
@@ -681,6 +681,40 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                     usuario.setApellido2(resulSet.getString("ape2"));
                     usuario.setNombre(resulSet.getString("nombre"));
                     usuario.setMail(resulSet.getString("mail"));
+                    usuario.setTelefono(resulSet.getString("tel1"));
+                }
+            }
+            logger.debug(select);
+        } catch (SQLException e) {
+            logger.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return usuario;
+    }
+    
+    public UsuarioBean getUsuarioNuestro(String value) {
+
+        Connection connection = null;
+        UsuarioBean usuario = new UsuarioBean();
+
+        try {
+            connection = super.getConexionBBDD();
+            String select;
+            select = " select dni,apellido1,apellido2,nombre,mail,telefono,movil,mailprivado FROM usuarios where dni = '" + value + "'";
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(select);
+                while (resulSet.next()) {
+                    usuario.setDni(resulSet.getString("dni"));
+                    usuario.setApellido1(resulSet.getString("apellido1"));
+                    usuario.setApellido2(resulSet.getString("apellido2"));
+                    usuario.setNombre(resulSet.getString("nombre"));
+                    usuario.setMail(resulSet.getString("mail"));
+                    usuario.setTelefono(resulSet.getString("telefono"));
+                    usuario.setMovilUsuario(resulSet.getString("movil"));
+                    usuario.setCorreoPrivadoUsuario(resulSet.getString("mailprivado"));
                 }
             }
             logger.debug(select);

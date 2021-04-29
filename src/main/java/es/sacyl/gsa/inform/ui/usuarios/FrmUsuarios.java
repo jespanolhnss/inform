@@ -61,7 +61,7 @@ public final class FrmUsuarios extends FrmMasterPantalla {
     private final Binder<UsuarioBean> usuarioBinder = new Binder<>();
     private final PaginatedGrid<UsuarioBean> usuarioGrid = new GridUi().getUsuarioGrid();
     private ArrayList<UsuarioBean> usuarioBeansArrayList = new ArrayList<>();
-
+    
     public FrmUsuarios() {
         super();
         doComponentesOrganizacion();
@@ -308,5 +308,4 @@ public final class FrmUsuarios extends FrmMasterPantalla {
             doActualizaGrid();
         });
     }
-
 }
