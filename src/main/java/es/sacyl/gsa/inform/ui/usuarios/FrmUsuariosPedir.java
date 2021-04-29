@@ -271,17 +271,13 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
                     categoriaUsuario.setValue(usuarioBean.getCategoria());
 
                 }
-            }
-
-                } else { 
+            }  else { 
                     usuarioBean = new UsuarioDao().getUsuarioNuestro(nifUsuario.getValue());
                     if (usuarioBean.getDni() != null) {
                         usuarioBinder.readBean(usuarioBean);
                         categoriaUsuario.setValue(usuarioBean.getCategoria());
                     }
                 } 
-            } 
-
         });
 
         tiposCentro.addValueChangeListener(event -> {
