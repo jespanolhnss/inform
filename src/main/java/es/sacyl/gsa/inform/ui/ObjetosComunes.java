@@ -21,12 +21,14 @@ import es.sacyl.gsa.inform.bean.AplicacionPerfilBean;
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
+import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.dao.AplicacionDao;
 import es.sacyl.gsa.inform.dao.AplicacionPerfilDao;
 import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.CentroTipoDao;
+import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.GfhDao;
 import es.sacyl.gsa.inform.dao.JimenaDao;
@@ -94,6 +96,22 @@ public class ObjetosComunes {
         radioGroup.setLabel("Activo");
         radioGroup.setItems("S", "N");
         radioGroup.setValue("S");
+        return radioGroup;
+    }
+
+    public RadioButtonGroup<String> getTiposIndicadores() {
+        RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
+        radioGroup.setLabel("Tipos de indicadore ");
+        radioGroup.setItems(new ComboDao().getListaGruposRama(ComboBean.DWTIPOINDICADOR, 25));
+
+        return radioGroup;
+    }
+
+    public RadioButtonGroup<String> getAreasIndicadores() {
+        RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
+        radioGroup.setLabel("Área de actvidad ");
+        radioGroup.setItems(new ComboDao().getListaGruposRama(ComboBean.DWAREASINDICADORES, 25));
+
         return radioGroup;
     }
 
@@ -435,6 +453,34 @@ public class ObjetosComunes {
             campo.setLabel(label);
         }
         campo.setClearButtonVisible(true);
+        return campo;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public IntegerField getMes() {
+        IntegerField campo = getIntegerField(null);
+        campo.setLabel("Mes");
+        campo.setClearButtonVisible(true);
+        campo.setWidth("50px");
+        campo.setMaxWidth("75px");
+        campo.setMinWidth("75px");
+        campo.setMin(1);
+        campo.setMax(12);
+        return campo;
+    }
+
+    public IntegerField getAno() {
+        IntegerField campo = getIntegerField(null);
+        campo.setLabel("Año");
+        campo.setClearButtonVisible(true);
+        campo.setWidth("100px");
+        campo.setMaxWidth("100px");
+        campo.setMinWidth("100px");
+        campo.setMin(2000);
+        campo.setMax(LocalDate.now().getYear() + 2);
         return campo;
     }
 

@@ -21,6 +21,7 @@ import es.sacyl.gsa.inform.ui.covid.FrmTarjetasCribado;
 import es.sacyl.gsa.inform.ui.indicadores.FrmIndicadoresCalcular;
 import es.sacyl.gsa.inform.ui.indicadores.FrmIndicadoresDefinir;
 import es.sacyl.gsa.inform.ui.indicadores.FrmIndicadoresRecursos;
+import es.sacyl.gsa.inform.ui.indicadores.ViewIndicadoresSalidas;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaGestionar;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaNueva;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdTipos;
@@ -103,7 +104,10 @@ public class Menu extends MenuBar {
                 this.contenedorFormularios.removeAll();
                 this.contenedorFormularios.add(new FrmIndicadoresCalcular());
             });
-
+            indicadoresSubmenu.addItem("Consultar  ", e -> {
+                this.contenedorFormularios.removeAll();
+                this.contenedorFormularios.add(new ViewIndicadoresSalidas());
+            });
         }
         if (usuarioBean.tieneLaFuncionalidad(LOPD)) {
             MenuItem lopd = this.addItem(LOPD);

@@ -9,7 +9,7 @@ public class DWIndicadorValor extends MasterBean {
     public Integer ano;
     public Integer mes;
     public String servicio;
-    public String areahosp;
+
     public String centro;
     public DWIndicador indicador;
     public Integer codivarHis;
@@ -45,14 +45,6 @@ public class DWIndicadorValor extends MasterBean {
 
     public void setServicio(String servicio) {
         this.servicio = servicio;
-    }
-
-    public String getAreahosp() {
-        return areahosp;
-    }
-
-    public void setAreahosp(String areahosp) {
-        this.areahosp = areahosp;
     }
 
     public String getCentro() {
@@ -125,6 +117,11 @@ public class DWIndicadorValor extends MasterBean {
 
     public void setDimension4(String dimension4) {
         this.dimension4 = dimension4;
+    }
+
+    @Override
+    public String toString() {
+        return "DWIndicadorValor{" + "ano=" + ano + ", mes=" + mes + ", servicio=" + servicio + ", centro=" + centro + ", indicador=" + indicador + ", codivarHis=" + codivarHis + ", dimension1=" + dimension1 + ", dimension2=" + dimension2 + ", dimension3=" + dimension3 + ", dimension4=" + dimension4 + ", valor=" + valor + '}';
     }
 
 }

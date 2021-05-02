@@ -64,6 +64,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
     private VerticalLayout contenedorFormularios = new VerticalLayout();
     private QueryParameters qm = null;
 
+    /*
     static {
 
         try {
@@ -74,7 +75,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
 
                 @Override
                 public void run() {
-                    conexionDao.isTestConexion();
+                     conexionDao.isTestConexion();
                 }
             };
             timerObj.schedule(timerTaskObj, 0, 120000);
@@ -83,7 +84,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         }
 
     }
-
+     */
     public MainView() {
         //   this.getStyle().set("background-color", "#F2F2F2");
         Image image = new Image("icons/fondo.jpg", "Imagen");
@@ -92,6 +93,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         contenedorFormularios.setMargin(false);
         contenedorFormularios.setSpacing(false);
         contenedorFormularios.setPadding(false);
+        contenedorFormularios.setSizeFull();
 
         // doTimerDa0();
         System.out.println(System.getProperty("user.dir"));

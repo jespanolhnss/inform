@@ -6,6 +6,7 @@ import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
+import es.sacyl.gsa.inform.bean.UbicacionBean;
 import es.sacyl.gsa.inform.ctrl.IpCtrl;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
@@ -30,6 +31,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
 
     public EquipoDao() {
         super();
+        /*
         sql = " SELECT  e.id as equipoid,e.tipo as equipotipo, e.inventario as  equipoinventario,e.marca as   equipomarca"
                 + " ,e.modelo as  equipomodelo"
                 + " ,e.numeroserie as   equiponumeroserie, e.centro   equipocentro,  e.ubicacion  equipoubicacion  "
@@ -109,7 +111,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + " LEFT JOIN usuarios usue ON usue.id=e.usuario"
                 + " LEFT JOIN gfh gfh ON usu.idgfh = gfh.id"
                 + " WHERE  1=1 ";
-
+         */
         sql = " SELECT  e.id as equipoid,e.tipo as equipotipo, e.inventario as  equipoinventario,e.marca as   equipomarca"
                 + " ,e.modelo as  equipomodelo"
                 + " ,e.numeroserie as   equiponumeroserie, e.centro   equipocentro,  e.ubicacion  equipoubicacion  "
@@ -184,11 +186,11 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      */
     @Override
     public EquipoBean getRegistroResulset(ResultSet rs) {
-        return getRegistroResulset(rs, null, null, null, null, null);
+        return getRegistroResulset(rs, null, null, null, null, null, null);
     }
 
     public EquipoBean getRegistroResulset(ResultSet rs, Boolean conAplicaciones, Boolean conIps, AplicacionBean aplicacionBean) {
-        return getRegistroResulset(rs, null, null, conAplicaciones, conIps, aplicacionBean);
+        return getRegistroResulset(rs, null, null, conAplicaciones, conIps, aplicacionBean, null);
     }
 
     /**
@@ -198,7 +200,8 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      * @param servicio
      * @return
      */
-    public static EquipoBean getRegistroResulset(ResultSet rs, CentroBean centro, GfhBean servicio, Boolean conAplicaciones, Boolean conIps, AplicacionBean aplicacionBean) {
+    public static EquipoBean getRegistroResulset(ResultSet rs, CentroBean centro, GfhBean servicio,
+            Boolean conAplicaciones, Boolean conIps, AplicacionBean aplicacionBean, Boolean conUbicacion) {
         EquipoBean equipoBean = new EquipoBean();
         try {
             equipoBean.setId(rs.getLong("equipoid"));
@@ -218,7 +221,6 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 equipoBean.setCentro(centro);
             }
 
-            equipoBean.setUbicacion(new UbicacionDao().getPorId(rs.getLong("equipoubicacion")));
             //  equipoBean.setUbicacion(new UbicacionDao().getRegistroResulset(rs, equipoBean.getCentro()));
             if (servicio == null) {
                 //     equipoBean.setServicio(new GfhDao().getPorId(rs.getLong("equiposervicio")));
@@ -238,6 +240,14 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             equipoBean.setFechacambio(Utilidades.getFechaLocalDate(rs.getLong("equipofechacambio")));
             //   equipoBean.setUsucambio(new UsuarioDao().getPorId(rs.getLong("equipousucambio")));
             equipoBean.setUsucambio(new UsuarioDao().getRegistroResulset(rs));
+
+            // para no sobrecargar los sql
+            if (conUbicacion != null && conUbicacion == true) {
+                equipoBean.setUbicacion(new UbicacionDao().getPorId(rs.getLong("equipoubicacion")));
+            } else {
+                // guarda solo el id de la ubicacion
+                equipoBean.setUbicacion(new UbicacionBean(rs.getLong("equipoubicacion")));
+            }
 // actualiza ip
 
             if (conIps == true) {
@@ -263,7 +273,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
-                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null);
+                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null, true);
                 }
                 statement.close();
             }
@@ -307,7 +317,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
-                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null);
+                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null, true);
                 }
                 statement.close();
             }
@@ -331,7 +341,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
-                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null);
+                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null, true);
                 }
                 statement.close();
             }
@@ -461,8 +471,9 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             connection = super.getConexionBBDD();
 
             sql = sql = "UPDATE     equipos  SET "
-                    + "tipo=?, inventario=?,  marca=?,  modelo=?,  numeroserie=?,  centro=?,  ubicacion=?, servicio=?,   comentario=? "
-                    + " , fechacambio=?, usucambio=? ,mac=? , usuario=? WHERE id=?";
+                    + "tipo=?, inventario=?,  marca=?,  modelo=?,  numeroserie=?,  centro=?,  ubicacion=?, servicio=?"
+                    + ",   comentario=? "
+                    + " , fechacambio=?, usucambio=? ,mac=? , usuario=?, estado=? WHERE id=?";
             PreparedStatement statement = connection.prepareStatement(sql);
             if (equipoBean.getTipo() == null) {
                 statement.setNull(1, Types.VARCHAR);
@@ -531,7 +542,8 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 statement.setNull(13, Types.INTEGER);
             }
 
-            statement.setLong(14, equipoBean.getId());
+            statement.setInt(14, equipoBean.getEstado());
+            statement.setLong(15, equipoBean.getId());
 
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
@@ -634,7 +646,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {
-                lista.add(getRegistroResulset(resulSet, centro, servicio, true, true, aplicacionBean));
+                lista.add(getRegistroResulset(resulSet, centro, servicio, true, true, aplicacionBean, false));
             }
             statement.close();
             LOGGER.debug(sql);

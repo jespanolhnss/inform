@@ -11,6 +11,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.page.Page;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
@@ -106,6 +107,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final TextField nombredominio = new ObjetosComunes().getTextField("Nombre");
     private final TextField dni = new ObjetosComunes().getDni();
     private final TextField nombreusuario = new ObjetosComunes().getTextField("Nombre Usuario habitual");
+    private final RadioButtonGroup<String> estado = new ObjetosComunes().getEstadoRadio();
 
     private final ComboBox<CentroBean> centroCombo = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPOCENTROSALUD, null, null);
     private final ComboBox<UbicacionBean> ubicacionCombo = new CombosUi().getUbicacionCombo(null, centroCombo.getValue(), null, null);
@@ -446,12 +448,17 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 .withNullRepresentation("")
                 .bind(EquipoBean::getComentario, EquipoBean::setComentario);
 
+        equipoBinder.forField(estado)
+                .withNullRepresentation("")
+                .bind(EquipoBean::getEstadoString, EquipoBean::setEstado);
+
         equipoBinder.forField(centroCombo)
                 .asRequired()
                 .bind(EquipoBean::getCentro, EquipoBean::setCentro);
 
         equipoBinder.forField(ubicacionCombo)
                 .bind(EquipoBean::getUbicacion, EquipoBean::setUbicacion);
+
     }
 
     @Override
@@ -553,7 +560,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorFormulario.add(dni, ayudaUsuario);
         contenedorFormulario.add(nombreusuario, 4);
 
-        contenedorFormulario.add(comentario, 6);
+        contenedorFormulario.add(comentario, 4);
+        contenedorFormulario.add(estado, 2);
 
     }
 
@@ -956,16 +964,20 @@ public final class FrmEquipos extends FrmMasterPantalla {
         dialog.open();
     }
 
-    public void doActualizaDatosBotones(EquipoBean equipoBean) {
+    public void doActualizaDatosBotones(EquipoBean equipoBeanParam) {
 
         // actualiza lista de ips
         // actualiza datos usuarios
         if (this.equipoBean != null) {
-            this.equipoBean = equipoBean;
-            equipoBinder.readBean(equipoBean);
+            this.equipoBean = equipoBeanParam;
+            Long id = this.equipoBean.getUbicacion().getId();
+            equipoBean.setUbicacion(new UbicacionDao().getPorId(id));
+            equipoBinder.readBean(this.equipoBean);
+            equipoBean.setListaIps(new IpDao().getLista(null, null, equipoBean, null, null));
             ip.setValue(equipoBean.getIpsCadena());
             // Estos datos sólo los carga cuando hace clic en el grid
             equipoBean.setDatosGenericoBeans(new EquipoDao().getListaDatosGenericos(equipoBean));
+
             doControlBotones(equipoBean);
             doActualizaGridAplicacion();
             doActualizaGridDatosGenericos();

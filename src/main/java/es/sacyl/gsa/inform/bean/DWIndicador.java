@@ -71,19 +71,25 @@ public class DWIndicador {
         }
     };
 
-    public String codigo;
-    public String nombre;
-    public String area;
-    public Integer orden;
-    public String visible;
-    public String calculado;
-    public String formula;
-    public Long item;
-    public Integer codivarhis;
-    public String tablahis;
-    public String sql;
-    public String descripcion;
-    public String tipo;
+    public static String TIPORECURSOS = "RECURSOS";
+
+    private String codigo;
+    private String nombre;
+    private String area;
+    private Integer orden;
+    private String visible;
+    private String calculado;
+    private String formula;
+    private Long item;
+    private Integer codivarhis;
+    private String tablahis;
+    private String sql;
+    private String descripcion;
+    private String tipo;
+
+    public DWIndicador() {
+
+    }
 
     public String getCodigo() {
         return codigo;

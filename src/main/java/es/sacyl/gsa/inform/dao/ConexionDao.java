@@ -127,7 +127,6 @@ public class ConexionDao implements Serializable {
      */
     public Connection getConexionBBDD() {
         try {
-
             if (dataSource == null) {
                 ctx = new InitialContext();
                 if (ctx == null) {
@@ -142,7 +141,6 @@ public class ConexionDao implements Serializable {
                     }
                 }
             } else {
-
                 return dataSource.getConnection();
             }
         } catch (Exception e) {
@@ -170,7 +168,6 @@ public class ConexionDao implements Serializable {
         Connection connection = null;
         Long id = new Long(1);
         try {
-
             connection = this.getConexionBBDD();
             if (existeSecuencia(tabla) == true) {
                 sql = " select SEC_ID_" + tabla + ".nextval as id from dual ";
@@ -182,6 +179,7 @@ public class ConexionDao implements Serializable {
                             id = new Long(1);
                         }
                     }
+                    statement.close();
                 }
             } else if (tabla.substring(0, 2).toLowerCase().equals("dw") || tabla.toLowerCase().equals("combos")) {
                 sql = " select SECUENCIAIDS.nextval as id from dual ";
@@ -193,6 +191,7 @@ public class ConexionDao implements Serializable {
                             id = new Long(1);
                         }
                     }
+                    statement.close();
                 }
             } else {
                 LOGGER.debug("No hay secuencia para la tabla " + tabla + " Se recupera el siguiente id ");
@@ -205,12 +204,12 @@ public class ConexionDao implements Serializable {
                             id = new Long(1);
                         }
                     }
+                    statement.close();
                 }
             }
             LOGGER.debug(sql);
         } catch (SQLException e) {
             LOGGER.error(sql + Utilidades.getStackTrace(e));
-
         } catch (Exception e) {
             LOGGER.error(Utilidades.getStackTrace(e));
         } finally {

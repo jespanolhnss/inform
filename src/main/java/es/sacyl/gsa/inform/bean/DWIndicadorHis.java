@@ -10,6 +10,7 @@ public class DWIndicadorHis {
 
     String servicio;
     String cod_enferme;
+    String maes_sev;
     Integer mes;
     Integer anyo;
     String codivar;
@@ -32,6 +33,14 @@ public class DWIndicadorHis {
 
     public void setCod_enferme(String cod_enferme) {
         this.cod_enferme = cod_enferme;
+    }
+
+    public void setMaes_sev(String maes_sev) {
+        this.maes_sev = maes_sev;
+    }
+
+    public String getMaes_sev() {
+        return maes_sev;
     }
 
     public Integer getMes() {

@@ -97,13 +97,16 @@ public class HpHisClinicaDao {
     public ArrayList<DWIndicadorHis> getListaEst_Servi(Integer norden) {
         Connection conn = this.conecta();
         ArrayList<DWIndicadorHis> lista = new ArrayList<>();
-        String sql = " SELECT * FROM est_servi WHERE norden=? ";
+        //  String sql = " SELECT * FROM est_servi WHERE norden=? ";
+        String sql = " SELECT  e.*,s.maes_serv  FROM  est_servi e JOIN  servicios s ON s.codserv=e.servicio "
+                + " WHERE norden=?";
         if (conn != null) {
             try {
                 try (PreparedStatement statement = conn.prepareStatement(sql)) {
                     statement.setInt(1, norden);
                     ResultSet resulSet = statement.executeQuery();
-                    logger.debug(" SELECT * FROM est_servi WHERE norden= " + norden.toString());
+                    logger.debug(" SELECT  e.*,s.maes_serv  FROM  est_servi e JOIN  servicios s ON s.codserv=e.servicio "
+                            + " WHERE norden=" + norden.toString());
                     while (resulSet.next()) {
                         lista.add(getResultSetDWIndicadorValor(resulSet));
                     }
@@ -132,6 +135,7 @@ public class HpHisClinicaDao {
             indicadorValor.setAnyo(rs.getInt("anyo"));
             indicadorValor.setMes(rs.getInt("mes"));
             indicadorValor.setServicio(rs.getString("servicio"));
+            indicadorValor.setMaes_sev(rs.getString("maes_serv"));
             if (indicadorValor.getServicio() != null) {
                 indicadorValor.setServicio(indicadorValor.getServicio().trim());
             }

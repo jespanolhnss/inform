@@ -16,15 +16,31 @@ import org.apache.logging.log4j.Logger;
  *
  * @author 06551256M
  *
+ * Carga los datos del periodo de estudio en la tabla DW_HOS_INDICADORES
+ *
+ * Para realiar el proceso debe existir el mismo cálculo en HIS
+ *
+ * Transformaciones de datos.
+ *
+ * El indicador hphis.est_servi.codivar a DW_indicador segun los valores
+ * definidos en la tabla dw_indicadores
+ *
+ * Calcula el area SIAE a partir del servicio hphis.est_servi.servicio a partir
+ * de las definiciones funcionales
+ *
+ * Código oficial del servicio a paritr de hphis.servicio.maes_serv
+ *
+ *
+ *
  *
  */
 public final class IndicadoresEtlCrl {
 
     private static final Logger logger = LogManager.getLogger(IndicadoresEtlCrl.class);
 
-    private LocalDate desde;
-    private LocalDate hasta;
-    private String tipo;
+    private final LocalDate desde;
+    private final LocalDate hasta;
+    private final String tipo;
     private ArrayList<DWIndicador> indicadoresLista = new ArrayList<>();
     private int norden = 0;
 
@@ -32,10 +48,8 @@ public final class IndicadoresEtlCrl {
      *
      * @param desde
      * @param hasta
-     * @param tipo es el tipo de ára his HOS CEX QUI URG LEQ HDIA que se va a
-     * procesar
-     *
-     * Tiene que existir en his un cálculo único para ese intervalo de fechas
+     * @param tipo tipo de area de actividad HIS que se va a calcula
+     * @param info
      */
     public IndicadoresEtlCrl(LocalDate desde, LocalDate hasta, String tipo) {
         this.desde = desde;
@@ -49,14 +63,14 @@ public final class IndicadoresEtlCrl {
             Notification.show("Varios cálculos para esas ");
         } else {
             indicadoresLista = new DWIndicadorDao().getLista(getAreaDW(tipo));
-            // doProcesa();
         }
     }
 
     /**
      *
      * @param tipo
-     * @return En función del área de cáculo recupera el área paa dw_indicadores
+     * @return En función del área de cáculo de his recupera el área para
+     * dw_indicadores
      */
     public String getAreaDW(String tipo) {
         String area = "";
@@ -81,7 +95,8 @@ public final class IndicadoresEtlCrl {
     }
 
     /**
-     * para cada área de his HOS CEX QUI URG LEQ HDIA método diferente
+     * Para cada área de his HOS CEX QUI URG LEQ HDIA método diferente de
+     * cálculo
      */
     public void doProcesa() {
         if (tipo.equals(DWIndicador.AREACALCULOCEX)) {
@@ -114,6 +129,7 @@ public final class IndicadoresEtlCrl {
      */
     public void doProcesaHospitalizacion() {
         // procesa los datos de la tabla est_servi
+
         ArrayList<DWIndicadorHis> lista = new HpHisClinicaDao().getListaEst_Servi(norden);
         lista.forEach(indHis -> {
             DWIndicadorValor indicadorDw = new DWIndicadorValor();
@@ -123,15 +139,17 @@ public final class IndicadoresEtlCrl {
             indicadorDw.setIndicador(getCodIndicadorDW(indHis.getCodivar()));
             // ha econtrado un indicador HOSP?????? asociado al codivarhis
             if (indicadorDw.getIndicador() != null) {
-                // busca el área de hospitalizacion
-                indicadorDw.setAreahosp(getAreaHospitalizacionSiae(indHis.getServicio()));
-                // recodifica servicio
-                indicadorDw.setServicio(getRecodificaServHis(indHis.getServicio()));
+                // busca el área de hospitalizacion a partir del servicio
+                indicadorDw.setDimension1(getAreaHospitalizacionSiae(indHis.getServicio().trim()));
+                // el servicio DW lo saca de maes_serv
+                indicadorDw.setServicio(indHis.getMaes_sev().trim());
                 if (indicadorDw.getValor() != 0) {
+
                     new DWDao().doGrabaDatos(indicadorDw, "DW_HOS_INDICADORES");
                 }
             }
         });
+
     }
 
     /**
@@ -143,13 +161,12 @@ public final class IndicadoresEtlCrl {
     public DWIndicador getCodIndicadorDW(String codivarhis) {
         DWIndicador dWIndicador = null;
         for (DWIndicador indi : indicadoresLista) {
-            //   System.out.println(indi.getCodivarhis() + "-" + codivarhis);
-            if (codivarhis != null && indi.getCodivarhis() != null && indi.getCodivarhis().equals(codivarhis)) {
+            if (codivarhis != null && indi.getCodivarhis() != null && indi.getCodivarhis().equals(Integer.parseInt(codivarhis))) {
                 dWIndicador = indi;
             }
         }
         if (dWIndicador == null) {
-            logger.debug("Código indicador no encontrado para codigohis=" + codivarhis);
+            logger.debug("Código indicador no encontrado en DW_INDICADORES para hphis.est_setv.codivar=" + codivarhis);
         }
         return dWIndicador;
     }
@@ -179,9 +196,11 @@ public final class IndicadoresEtlCrl {
      *
      * PSQAGUDOS PSQ
      *
-     * cronicos HPDS
+     * PSQCRONICOS HPDS
      *
      * PALIATIVOS HPCP
+     *
+     * PSQDESINTO HPSQ
      *
      *
      */
@@ -240,52 +259,24 @@ public final class IndicadoresEtlCrl {
                 cadena = "PEDIATRIA";
                 break;
             case "PSQ":
-                cadena = "PEDIATRIA";
+                cadena = "PSQAGUDOS";
+                break;
+            case "HPDS":
+                cadena = "PSQCRONICOS";
+                break;
+            case "HPSQ":
+                cadena = "PSQDESINTO";
                 break;
             case "UCI":
                 cadena = "INTENSIVA";
                 break;
             case "HPCP":
-                cadena = "INTENSIVA";
-                break;
-
-        }
-        return cadena;
-    }
-
-    /**
-     *
-     * @param servicio
-     * @return
-     *
-     * Para cada servicio HIS recodifica según la tabla oficia el servicio que
-     * va a insertar en al bbdd DW
-     */
-    public String getRecodificaServHis(String servicio) {
-        String cadena = "";
-        switch (servicio) {
-
-            case "HEMA":
-                cadena = "HEM";
-                break;
-
-            case "CG":
-                cadena = "CGD";
-                break;
-
-            case "MAT":
-                cadena = "OBS";
-                break;
-
-            case "HPCP":
-                cadena = "MIR";
-                break;
-            case "UCI":
-                cadena = "MIV";
+                cadena = "PALIATIVOS";
                 break;
             default:
-                cadena = servicio;
-
+                logger.debug("Sin definir area SIAE para el Servicio his:" + servicio);
+                cadena = "SINDEFINIR";
+                break;
         }
         return cadena;
     }
