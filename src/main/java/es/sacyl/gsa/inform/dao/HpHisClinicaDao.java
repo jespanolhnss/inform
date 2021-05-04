@@ -1,6 +1,7 @@
 package es.sacyl.gsa.inform.dao;
 
 import es.sacyl.gsa.inform.bean.DWIndicadorHis;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.sql.Connection;
@@ -151,4 +152,84 @@ public class HpHisClinicaDao {
         return indicadorValor;
     }
 
+    public ArrayList<DatoGenericoBean> getUrgenciasFecha(LocalDate fecha) {
+        ArrayList<DatoGenericoBean> lista = new ArrayList<>();
+        Connection conn = this.conecta();
+        int contador = 0;
+        int norden = 0;
+        String sql = " select count(*) as casos  from sub_ficus ";
+        if (conn != null) {
+            try {
+                try (PreparedStatement statement = conn.prepareStatement(sql)) {
+                    ResultSet resulSet = statement.executeQuery();
+                    DatoGenericoBean dt = new DatoGenericoBean();
+                    dt.setTipoDato("En urgencias");
+                    if (resulSet.next()) {
+                        dt.setValorInt(resulSet.getInt("casos"));
+                    } else {
+                        dt.setValorInt(0);
+                    }
+                    lista.add(dt);
+                    statement.close();
+                    logger.debug(sql);
+                }
+                sql = " SELECT count(*) as casos FROM alta_urg WHERE motivo_alta=6 AND  data_alta=? ";
+                try (PreparedStatement statement = conn.prepareStatement(sql)) {
+                    statement.setDate(1, java.sql.Date.valueOf(fecha));
+                    ResultSet resulSet = statement.executeQuery();
+                    DatoGenericoBean dt = new DatoGenericoBean();
+                    dt.setTipoDato("Domicilio");
+                    if (resulSet.next()) {
+                        dt.setValorInt(resulSet.getInt("casos"));
+                    } else {
+                        dt.setValorInt(0);
+                    }
+                    lista.add(dt);
+                    statement.close();
+                    logger.debug(sql);
+                }
+                sql = " SELECT count(*) as casos FROM alta_urg WHERE motivo_alta=1 AND  data_alta=? ";
+                try (PreparedStatement statement = conn.prepareStatement(sql)) {
+                    statement.setDate(1, java.sql.Date.valueOf(fecha));
+                    ResultSet resulSet = statement.executeQuery();
+                    DatoGenericoBean dt = new DatoGenericoBean();
+                    dt.setTipoDato("Ingreso");
+                    if (resulSet.next()) {
+                        dt.setValorInt(resulSet.getInt("casos"));
+                    } else {
+                        dt.setValorInt(0);
+                    }
+                    lista.add(dt);
+                    statement.close();
+                    logger.debug(sql);
+                }
+                sql = " SELECT count(*) as casos FROM alta_urg WHERE motivo_alta!=1 and motivo_alta!=6  AND  data_alta=? ";
+                try (PreparedStatement statement = conn.prepareStatement(sql)) {
+                    statement.setDate(1, java.sql.Date.valueOf(fecha));
+                    ResultSet resulSet = statement.executeQuery();
+                    DatoGenericoBean dt = new DatoGenericoBean();
+                    dt.setTipoDato("Otros");
+                    if (resulSet.next()) {
+                        dt.setValorInt(resulSet.getInt("casos"));
+                    } else {
+                        dt.setValorInt(0);
+                    }
+                    lista.add(dt);
+                    statement.close();
+                    logger.debug(sql);
+                }
+            } catch (SQLException e) {
+                logger.error(sql + Utilidades.getStackTrace(e));
+            } catch (Exception e) {
+                logger.error(Utilidades.getStackTrace(e));
+            } finally {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    logger.error(Utilidades.getStackTrace(e));
+                }
+            }
+        }
+        return lista;
+    }
 }

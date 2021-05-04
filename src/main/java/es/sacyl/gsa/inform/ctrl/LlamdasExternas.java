@@ -17,7 +17,7 @@ import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.dao.JimenaDao;
 import es.sacyl.gsa.inform.dao.PacienteDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
-import es.sacyl.gsa.inform.ui.indicadores.ViewIndicadoresSalidas;
+import es.sacyl.gsa.inform.ui.indicadores.ViewIndicadores;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaNueva;
 import es.sacyl.gsa.inform.ui.usuarios.FrmUsuariosPedir;
 import java.time.LocalDateTime;
@@ -137,6 +137,6 @@ public final class LlamdasExternas {
 
     public void doPantallaIndicadores() {
         contenedorFormularios.removeAll();
-        contenedorFormularios.add(new ViewIndicadoresSalidas());
+        contenedorFormularios.add(new ViewIndicadores());
     }
 }

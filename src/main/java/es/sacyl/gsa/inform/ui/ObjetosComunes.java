@@ -1,5 +1,6 @@
 package es.sacyl.gsa.inform.ui;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
@@ -8,8 +9,11 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -585,4 +589,25 @@ public class ObjetosComunes {
         return campo;
     }
 
+    public Component getCaja() {
+        FlexLayout caja = new FlexLayout();
+        caja.addClassName("card");
+        caja.setAlignItems(FlexComponent.Alignment.CENTER);
+        caja.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        caja.setWidth("50%");
+        caja.setHeight("400px");
+        return caja;
+    }
+
+    public Component getCaja(String titulo) {
+        Span card1Label = new Span(titulo);
+        FlexLayout card = new FlexLayout(card1Label);
+        card.addClassName("card");
+        card.setAlignItems(FlexComponent.Alignment.CENTER);
+        card.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        card.setWidth("100%");
+        card.setHeight("200px");
+        return card;
+
+    }
 }

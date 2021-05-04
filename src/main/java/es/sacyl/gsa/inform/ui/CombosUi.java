@@ -42,6 +42,7 @@ import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.dao.VlanDao;
 import es.sacyl.gsa.inform.dao.ZonaDao;
 import java.util.ArrayList;
+import org.joda.time.LocalDate;
 
 /**
  *
@@ -373,6 +374,26 @@ public class CombosUi {
         combo.setItems(SINO);
 
         combo.setClearButtonVisible(true);
+        return combo;
+    }
+
+    /**
+     *
+     * @param desde
+     * @param hasta
+     * @return
+     */
+    public ComboBox<Integer> getAnoCombo(Integer desde, Integer hasta) {
+        ComboBox<Integer> combo = new ComboBox<>();
+        ArrayList<Integer> lista = new ArrayList<>();
+        for (Integer i = desde; i <= hasta; i++) {
+            lista.add(i);
+        }
+        combo.setItems(lista);
+        combo.setValue(LocalDate.now().getYear());
+        combo.setLabel("Año");
+        combo.setItems(LocalDate.now().getYear());
+        //  combo.setClearButtonVisible(true);
         return combo;
     }
 

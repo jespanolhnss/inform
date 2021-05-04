@@ -2,6 +2,7 @@ package es.sacyl.gsa.inform.dao;
 
 import es.sacyl.gsa.inform.bean.DWIndicador;
 import es.sacyl.gsa.inform.bean.DWIndicadorValorAno;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -169,5 +170,50 @@ public class DWQuerysDao extends ConexionDao {
         }
         return indicador;
 
+    }
+
+    /**
+     *
+     * @param tipo
+     * @return
+     */
+    public ArrayList<DatoGenericoBean> getUgenciasUltimos30dias(String tipo) {
+        Connection connection = null;
+        ArrayList<DatoGenericoBean> lista = new ArrayList<>();
+        switch (tipo) {
+            case "COVID":
+                sql = "  SELECT * FROM ( "
+                        + " SELECT mes||':'||dia as fecha, total_covid as total "
+                        + " FROM dw_urg_covid ORDER BY ano desc, mes desc, dia desc"
+                        + ") WHERE ROWNUM<=30";
+                break;
+            case "NOCOVID":
+                sql = "  SELECT * FROM ( "
+                        + " SELECT mes||':'||dia as fecha, generales as total "
+                        + " FROM dw_urg_covid ORDER BY ano desc, mes desc, dia desc"
+                        + ") WHERE ROWNUM<=30";
+                break;
+        }
+        try {
+            connection = super.getConexionBBDD();
+            LOGGER.debug(sql);
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sql);
+                while (resulSet.next()) {
+                    DatoGenericoBean dato = new DatoGenericoBean();
+                    dato.setTipoDato(resulSet.getString("fecha"));
+                    dato.setValorInt(resulSet.getInt("total"));
+                    lista.add(dato);
+                }
+                statement.close();
+            }
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
     }
 }
