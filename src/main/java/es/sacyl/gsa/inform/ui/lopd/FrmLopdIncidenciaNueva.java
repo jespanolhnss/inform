@@ -94,6 +94,10 @@ public final class FrmLopdIncidenciaNueva extends FrmMasterPantalla {
         doCompentesEventos();
         doGrid();
         lopdIncidenciaBinder.readBean(lopdIncidenciaBean);
+        if (lopdIncidenciaBean != null && lopdIncidenciaBean.getPaciente() != null) {
+            paciente = lopdIncidenciaBean.getPaciente();
+        }
+
         usuRegistraBinder.readBean(lopdIncidenciaBean.getUsuarioRegistra());
         pacienteBinder.readBean(lopdIncidenciaBean.getPaciente());
     }
