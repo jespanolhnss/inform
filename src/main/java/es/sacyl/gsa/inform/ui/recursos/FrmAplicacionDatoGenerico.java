@@ -165,7 +165,7 @@ public final class FrmAplicacionDatoGenerico extends FrmMasterVentana {
         datoGenericoBinder.forField(valor)
                 .asRequired()
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 50))
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 100))
                 .bind(DatoGenericoBean::getValor, DatoGenericoBean::setValor);
     }
 
