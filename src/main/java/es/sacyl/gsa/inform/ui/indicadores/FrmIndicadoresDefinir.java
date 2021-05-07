@@ -74,10 +74,10 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
         super.doControlBotones(obj);
         if (obj == null) {
             codigo.setEnabled(true);
-            codigo.setReadOnly(false);
             codigo.focus();
         } else {
-            codigo.setReadOnly(true);
+            codigo.setEnabled(false);
+
             nombre.focus();
         }
     }
@@ -142,6 +142,7 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
         dwindicadorGrid.addColumn(DWIndicador::getCodigo).setAutoWidth(true).setHeader(new Html("<b>Código</b>"));
         dwindicadorGrid.addColumn(DWIndicador::getNombre).setAutoWidth(true).setHeader(new Html("<b>Nombre</b>"));
         dwindicadorGrid.addColumn(DWIndicador::getArea).setKey("Area").setAutoWidth(true).setHeader(new Html("<b>Área</b>"));
+        dwindicadorGrid.addColumn(DWIndicador::getTipo).setKey("Tipo").setAutoWidth(true).setHeader(new Html("<b>Tipo</b>"));
         doActualizaGrid();
     }
 
@@ -168,48 +169,64 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
                 .bind(DWIndicador::getNombre, DWIndicador::setNombre);
 
         dwindicadorBinder.forField(area)
+                .withNullRepresentation("")
                 .asRequired()
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
                 .bind(DWIndicador::getArea, DWIndicador::setArea);
 
-// falta tipo para cuando este el campo en la tabla
+        dwindicadorBinder.forField(tipo)
+                .withNullRepresentation("")
+                .asRequired()
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                .bind(DWIndicador::getTipo, DWIndicador::setTipo);
+
         dwindicadorBinder.forField(orden)
+                .withNullRepresentation(0)
                 .bind(DWIndicador::getOrden, DWIndicador::setOrden);
 
         dwindicadorBinder.forField(calculado)
+                .withNullRepresentation("")
                 .bind(DWIndicador::getCalculado, DWIndicador::setCalculado);
 
         dwindicadorBinder.forField(visible)
+                .withNullRepresentation("")
                 .bind(DWIndicador::getVisible, DWIndicador::setVisible);
 
         dwindicadorBinder.forField(formula)
+                .withNullRepresentation("")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 0, 200))
                 .bind(DWIndicador::getFormula, DWIndicador::setFormula);
 
         dwindicadorBinder.forField(item)
+                .withNullRepresentation("")
                 .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(DWIndicador::getItem, DWIndicador::setItem);
 
         dwindicadorBinder.forField(codivarhis)
+                .withNullRepresentation("")
                 .withConverter(new StringToIntegerConverter(FrmMasterConstantes.AVISONUMERO))
                 .bind(DWIndicador::getCodivarhis, DWIndicador::setCodivarhis);
 
         dwindicadorBinder.forField(tablahis)
+                .withNullRepresentation("")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 0, 50))
                 .bind(DWIndicador::getTablahis, DWIndicador::setTablahis);
 
         dwindicadorBinder.forField(sql)
+                .withNullRepresentation("")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 0, 500))
                 .bind(DWIndicador::getSql, DWIndicador::setSql);
 
         dwindicadorBinder.forField(descripcion)
+                .withNullRepresentation("")
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 0, 3000))
-                .bind(DWIndicador::getSql, DWIndicador::setSql);
+                .bind(DWIndicador::getDescripcion, DWIndicador::setDescripcion);
 
     }
 
@@ -276,6 +293,9 @@ public final class FrmIndicadoresDefinir extends FrmMasterPantalla {
             doActualizaGrid();
         });
 
+        /**
+         * Cambia el combo del tipo de indicador
+         */
         tipoBuscador.addValueChangeListener(event -> {
             doActualizaGrid();
         });

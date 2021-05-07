@@ -92,6 +92,7 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         contenedorFormularios.setMargin(false);
         contenedorFormularios.setSpacing(false);
         contenedorFormularios.setPadding(false);
+        contenedorFormularios.setSizeFull();
 
         // doTimerDa0();
         System.out.println(System.getProperty("user.dir"));

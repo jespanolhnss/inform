@@ -2,6 +2,7 @@ package es.sacyl.gsa.inform.ui.indicadores;
 
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import es.sacyl.gsa.inform.bean.DWIndicador;
 import es.sacyl.gsa.inform.ctrl.IndicadoresEtlCrl;
@@ -13,14 +14,17 @@ import java.time.LocalDate;
  *
  * @author 06551256M
  */
-public class FrmIndicadoresCalcular extends FrmMasterPantalla {
+public final class FrmIndicadoresCalcular extends FrmMasterPantalla {
 
-    private DatePicker desde = new ObjetosComunes().getDatePicker("Desde", null, LocalDate.now());
-    private DatePicker hasta = new ObjetosComunes().getDatePicker("Desde", null, LocalDate.now());
+    private final DatePicker desde = new ObjetosComunes().getDatePicker("Desde", null, LocalDate.now());
+    private final DatePicker hasta = new ObjetosComunes().getDatePicker("Desde", null, LocalDate.now());
 
-    RadioButtonGroup<String> areaCalucloradioGroup = new RadioButtonGroup<>();
+    private final RadioButtonGroup<String> areaCalucloradioGroup = new RadioButtonGroup<>();
+
+    private final ProgressBar progressBar = new ProgressBar();
 
     public FrmIndicadoresCalcular() {
+        super();
         doComponentesOrganizacion();
         doGrid();
         doComponenesAtributos();
@@ -32,10 +36,12 @@ public class FrmIndicadoresCalcular extends FrmMasterPantalla {
     public void doGrabar() {
         // calcular
         if (desde.getValue().isBefore(hasta.getValue())) {
+            progressBar.setVisible(true);
             IndicadoresEtlCrl indicadoresEtlCrl = new IndicadoresEtlCrl(desde.getValue(), hasta.getValue(), areaCalucloradioGroup.getValue());
             indicadoresEtlCrl.doProcesa();
+            progressBar.setVisible(false);
         } else {
-            Notification.show(" Desde debe ser antes que hasta");
+            Notification.show(" Desde debe ser UNA  que hasta");
 
         }
     }
@@ -70,18 +76,27 @@ public class FrmIndicadoresCalcular extends FrmMasterPantalla {
 
     @Override
     public void doComponenesAtributos() {
-        contenedorIzquierda.setWidth("640px");
-        contenedorFormulario.setWidth("640px");
+        //  contenedorIzquierda.setWidth("640px");
+        // contenedorFormulario.setWidth("640px");
         areaCalucloradioGroup.setLabel("Área");
         areaCalucloradioGroup.setItems(DWIndicador.AREASCALCULO);
         areaCalucloradioGroup.setValue("HOS");
         botonGrabar.setText("Calcular");
+
+        progressBar.setIndeterminate(true);
+        progressBar.setVisible(false);
+
     }
 
     @Override
     public void doComponentesOrganizacion() {
+        titulo.setText("Carga de indicadores de HP-HIS  a DW ");
         contenedorFormulario.removeAll();
         contenedorFormulario.add(desde, hasta, areaCalucloradioGroup);
+
+        contenedorDerecha.removeAll();
+        contenedorDerecha.add(progressBar);
+
     }
 
     @Override

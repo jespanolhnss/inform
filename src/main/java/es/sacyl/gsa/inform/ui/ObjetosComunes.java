@@ -1,5 +1,6 @@
 package es.sacyl.gsa.inform.ui;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
@@ -8,8 +9,11 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -21,12 +25,14 @@ import es.sacyl.gsa.inform.bean.AplicacionPerfilBean;
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
+import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.dao.AplicacionDao;
 import es.sacyl.gsa.inform.dao.AplicacionPerfilDao;
 import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.CentroTipoDao;
+import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.GfhDao;
 import es.sacyl.gsa.inform.dao.JimenaDao;
@@ -94,6 +100,22 @@ public class ObjetosComunes {
         radioGroup.setLabel("Activo");
         radioGroup.setItems("S", "N");
         radioGroup.setValue("S");
+        return radioGroup;
+    }
+
+    public RadioButtonGroup<String> getTiposIndicadores() {
+        RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
+        radioGroup.setLabel("Tipos de indicadore ");
+        radioGroup.setItems(new ComboDao().getListaGruposRama(ComboBean.DWTIPOINDICADOR, 25));
+
+        return radioGroup;
+    }
+
+    public RadioButtonGroup<String> getAreasIndicadores() {
+        RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
+        radioGroup.setLabel("Área de actvidad ");
+        radioGroup.setItems(new ComboDao().getListaGruposRama(ComboBean.DWAREASINDICADORES, 25));
+
         return radioGroup;
     }
 
@@ -440,6 +462,34 @@ public class ObjetosComunes {
 
     /**
      *
+     * @return
+     */
+    public IntegerField getMes() {
+        IntegerField campo = getIntegerField(null);
+        campo.setLabel("Mes");
+        campo.setClearButtonVisible(true);
+        campo.setWidth("50px");
+        campo.setMaxWidth("75px");
+        campo.setMinWidth("75px");
+        campo.setMin(1);
+        campo.setMax(12);
+        return campo;
+    }
+
+    public IntegerField getAno() {
+        IntegerField campo = getIntegerField(null);
+        campo.setLabel("Año");
+        campo.setClearButtonVisible(true);
+        campo.setWidth("100px");
+        campo.setMaxWidth("100px");
+        campo.setMinWidth("100px");
+        campo.setMin(2000);
+        campo.setMax(LocalDate.now().getYear() + 2);
+        return campo;
+    }
+
+    /**
+     *
      * @param label
      * @return
      */
@@ -539,4 +589,25 @@ public class ObjetosComunes {
         return campo;
     }
 
+    public Component getCaja() {
+        FlexLayout caja = new FlexLayout();
+        caja.addClassName("card");
+        caja.setAlignItems(FlexComponent.Alignment.CENTER);
+        caja.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        caja.setWidth("50%");
+        caja.setHeight("400px");
+        return caja;
+    }
+
+    public Component getCaja(String titulo) {
+        Span card1Label = new Span(titulo);
+        FlexLayout card = new FlexLayout(card1Label);
+        card.addClassName("card");
+        card.setAlignItems(FlexComponent.Alignment.CENTER);
+        card.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        card.setWidth("100%");
+        card.setHeight("200px");
+        return card;
+
+    }
 }

@@ -17,6 +17,7 @@ import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.dao.JimenaDao;
 import es.sacyl.gsa.inform.dao.PacienteDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
+import es.sacyl.gsa.inform.ui.indicadores.ViewIndicadores;
 import es.sacyl.gsa.inform.ui.lopd.FrmLopdIncidenciaNueva;
 import es.sacyl.gsa.inform.ui.usuarios.FrmUsuariosPedir;
 import java.time.LocalDateTime;
@@ -70,9 +71,13 @@ public final class LlamdasExternas {
             case "LOPDNUEVA":
                 doPantallaLopd();
                 break;
-                
+
             case "PEDIRUSUARIO":
                 doPantallaPedirUsuario();
+                break;
+
+            case "VERINDICADORES":
+                doPantallaIndicadores();
                 break;
         }
     }
@@ -124,9 +129,14 @@ public final class LlamdasExternas {
         contenedorFormularios.removeAll();
         FrmUsuariosPedir pedirUsuario = new FrmUsuariosPedir();
         if (usuarioBean.getSolicita().equals("S")) {
-            contenedorFormularios.add(pedirUsuario);            
+            contenedorFormularios.add(pedirUsuario);
         } else {
             contenedorFormularios.add(new H3("SOLO USUARIOS AUTORIZADOS PUEDEN PEDIR ACCESO"));
-        }        
+        }
+    }
+
+    public void doPantallaIndicadores() {
+        contenedorFormularios.removeAll();
+        contenedorFormularios.add(new ViewIndicadores());
     }
 }
