@@ -133,26 +133,18 @@ public class CentroFicheroBean extends MasterBean implements Serializable {
     }
 
     public String getNombreFicheroNoExtension() {
+        return new FicheroNombre(getNombreFichero()).getNombreSinExtension();
+        /*
         if (getNombreFichero() != null && getNombreFichero().length() > 4) {
             return nombreFichero.substring(0, nombreFichero.length() - 4);
         } else {
             return "";
         }
+         */
     }
 
     public String getExtensionFichero() {
-        String extension = "";
-        /*
-        if (getNombre() != null && getNombre().length() > 5) {
-            extension = getNombre().trim().substring(getNombre().trim().length() - 3, getNombre().trim().length());
-        }
-         */
-        //   int posPunto = getNombre().indexOf(".");
-        int posPunto = getNombreFichero().lastIndexOf(".");
-        if (posPunto != -1) {
-            extension = getNombreFichero().substring(posPunto, getNombreFichero().length());
-        }
-        return extension;
+        return new FicheroNombre(getNombreFichero()).getExtension();
     }
 
 }

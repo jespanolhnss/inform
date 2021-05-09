@@ -12,6 +12,7 @@ import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
@@ -120,7 +121,7 @@ public class PdfEventoPagina implements IEventHandler {
 
         textopieParagraph.setTextAlignment(TextAlignment.CENTER);// textopieParagraph.setFont("size=8");
         textopieParagraph.setFont(times);
-        Cell cell = new Cell();
+        Cell cell = new Cell().setBorder(Border.NO_BORDER);
         cell.add(textopieParagraph);
         tablaPie.addCell(cell);
 
@@ -128,7 +129,7 @@ public class PdfEventoPagina implements IEventHandler {
         Paragraph nParagraph = new Paragraph(" -" + pageNum + "-").setFontSize(7);
         nParagraph.setFont(times);
         nParagraph.setTextAlignment(TextAlignment.CENTER);
-        Cell cell1 = new Cell();
+        Cell cell1 = new Cell().setBorder(Border.NO_BORDER);
         cell1.add(nParagraph);
         tablaPie.addCell(cell1);
 

@@ -34,7 +34,7 @@ public class ViewPortada extends VerticalLayout {
     public ViewPortada() {
         this.add(accordion);
         doCajaInformaticos();
-        doGraficos();
+        //     doGraficos();
 
     }
 

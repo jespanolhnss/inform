@@ -562,6 +562,7 @@ public final class FrmLopdIncidenciaGestionar extends FrmMasterPantalla implemen
             VentanaPdf ventanaPdf = new VentanaPdf(incidenciaPdfCompleta.getUrlDelPdf());
             ventanaPdf.addDialogCloseActionListener(event1 -> {
                 Utilidades.borraFichero(incidenciaPdfCompleta.getNombrePdfAbsoluto());
+
             });
         });
         /**

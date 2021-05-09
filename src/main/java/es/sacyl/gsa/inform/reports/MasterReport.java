@@ -1,6 +1,7 @@
 package es.sacyl.gsa.inform.reports;
 
 import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
@@ -44,6 +45,9 @@ public abstract class MasterReport {
     protected int fontSize = 13;
 
     protected int altoFila = 12;
+
+    protected DeviceRgb GRISCLARO = new DeviceRgb(239, 238, 238);
+    protected DeviceRgb BLANCO = new DeviceRgb(254, 254, 254);
 
     protected File file;
     protected String nombreDelFicheroPdf = null;
@@ -114,6 +118,13 @@ public abstract class MasterReport {
 
     public void doCreaFicheroPdf() {
         Utilidades.iStoFile(getStream(), nombrePdfAbsoluto);
+    }
+
+    public void doBorraPdf() {
+        File file = new File(nombrePdfAbsoluto);
+        if (file.isFile()) {
+            file.delete();
+        }
     }
 
     public Document getDocument() {

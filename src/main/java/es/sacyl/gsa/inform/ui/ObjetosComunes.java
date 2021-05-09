@@ -266,6 +266,7 @@ public class ObjetosComunes {
         if (icon != null) {
             boton.setIcon(icon);
         }
+
         boton.setHeight("35px");
         return boton;
     }

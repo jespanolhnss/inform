@@ -1,6 +1,5 @@
 package es.sacyl.gsa.inform.reports.indicadores;
 
-import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Cell;
@@ -49,9 +48,6 @@ public class ServicioEvolucionAnoPdf extends MasterReport {
 
         }
     };
-
-    private DeviceRgb GRISCLARO = new DeviceRgb(239, 238, 238);
-    private DeviceRgb BLANCO = new DeviceRgb(254, 254, 254);
 
     public ServicioEvolucionAnoPdf(Integer anoparam, String servicioParm) {
         this.ano = anoparam;

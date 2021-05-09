@@ -5,6 +5,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -41,6 +42,7 @@ import org.vaadin.klaudeta.PaginatedGrid;
  */
 public final class FrmAplicaciónEquipo extends FrmMasterVentana {
 
+    private final HorizontalLayout contenedorFiltros1 = new HorizontalLayout();
     private final ComboBox<String> equipoTipoComboBuscador = new CombosUi().getEquipoTipoCombo(null, 50);
 
     private final ComboBox<AutonomiaBean> autonomiaComboBuscador = new CombosUi().getAutonomiaCombo(AutonomiaBean.AUTONOMIADEFECTO, null);
@@ -157,13 +159,20 @@ public final class FrmAplicaciónEquipo extends FrmMasterVentana {
     @Override
     public void doComponenesAtributos() {
         buscador.setTitle("Valor a buscar");
+        titulo.setText(" Equipos asociados a la aplicación " + aplicacionBean.getNombre());
     }
 
     @Override
     public void doComponentesOrganizacion() {
 
-        contenedorFiltros.add(provinciaComboBuscador, centroTipoComboBuscador, equipoMarcaComboBuscador, centroComboBuscador, buscador);
-        contenedorDerecha.add(equipoGrid);
+        contenedorDerecha.removeAll();
+        contenedorDerecha.add(contenedorFiltros, contenedorFiltros1, equipoGrid);
+        contenedorFiltros.add(provinciaComboBuscador, centroTipoComboBuscador,
+                centroComboBuscador
+        );
+        contenedorFiltros1.add(
+                equipoTipoComboBuscador, equipoMarcaComboBuscador, buscador
+        );
 
         contenedorFormulario.add(id, fecha, comentario, equipoDetalle);
     }

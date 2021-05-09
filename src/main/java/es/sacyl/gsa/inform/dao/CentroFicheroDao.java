@@ -194,7 +194,7 @@ public class CentroFicheroDao extends ConexionDao implements Serializable, Conex
 
     @Override
     public CentroFicheroBean getRegistroResulset(ResultSet rs) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 
     @Override

@@ -10,9 +10,10 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -21,6 +22,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToLongConverter;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.bean.AplicacionBean;
@@ -37,12 +39,14 @@ import es.sacyl.gsa.inform.dao.AplicacionPerfilDao;
 import es.sacyl.gsa.inform.dao.AplicacionesDatosDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.EquipoAplicacionDao;
+import es.sacyl.gsa.inform.reports.recursos.AplicacionPDF;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.GridUi;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
+import es.sacyl.gsa.inform.ui.VentanaPdf;
 import es.sacyl.gsa.inform.util.Constantes;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -59,9 +63,9 @@ import org.vaadin.klaudeta.PaginatedGrid;
 @CssImport("./styles/styles.css")
 public final class FrmAplicacion extends FrmMasterPantalla {
 
-    private final Button botonPerfiles = new ObjetosComunes().getBoton("Perfil", null, VaadinIcon.FILE_TABLE.create());
-    private final Button equiposButton = new ObjetosComunes().getBoton("Equipo", null, VaadinIcon.FILE_TABLE.create());
-    private final Button datosGenericosButton = new ObjetosComunes().getBoton("Dato", null, VaadinIcon.TABLE.create());
+    private final Button botonPerfiles = new ObjetosComunes().getBoton(null, null, VaadinIcon.CLIPBOARD_USER.create());
+    private final Button equiposButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.DESKTOP.create());
+    private final Button datosGenericosButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.INPUT.create());
 
     private final ComboBox<ProveedorBean> proveedorComboBuscador = new CombosUi().getProveedorCombo(null, null);
     private final ComboBox<GfhBean> gfhcomboBuscador = new CombosUi().getServicioCombo(null, null);
@@ -77,7 +81,8 @@ public final class FrmAplicacion extends FrmMasterPantalla {
     private final ComboBox<GfhBean> gfhCombo = new CombosUi().getServicioCombo(null, null);
     private final DatePicker fechaInstalacion = new ObjetosComunes().getDatePicker("Instalación", null, null);
 
-    private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
+    //  private final RadioButtonGroup<String> estadoCombo = new ObjetosComunes().getEstadoRadio();
+    private final ComboBox<String> estadoCombo = new CombosUi().getSiNoCombo("Activo");
 
     private AplicacionBean aplicacionBean = null;
     private final Binder<AplicacionBean> aplicacionesBinder = new Binder<>();
@@ -110,6 +115,7 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         doGridDatoGenerico();
         doBinderPropiedades();
         doCompentesEventos();
+        doControlBotones(null);
     }
 
     @Override
@@ -117,13 +123,10 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         super.doControlBotones(obj);
         if (obj == null) {
             nombre.focus();
-            botonBorrar.setEnabled(false);
             datosGenericosButton.setEnabled(false);
             botonPerfiles.setEnabled(false);
             equiposButton.setEnabled(false);
         } else {
-
-            botonBorrar.setEnabled(false);
             datosGenericosButton.setEnabled(true);
             botonPerfiles.setEnabled(true);
             equiposButton.setEnabled(true);
@@ -179,11 +182,25 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         equipoTab.setLabel("Equipos(0)");
         aplicacionesPerfiGrid.setItems(new ArrayList<>());
         perfilesTab.setLabel("Perfieles(0)");
+        datoGenericoGrid.setItems(new ArrayList<>());
+        datosTab.setLabel("Características (0)");
         doControlBotones(null);
     }
 
     @Override
     public void doImprimir() {
+
+        AplicacionPDF aplicacionPdf = new AplicacionPDF(aplicacionBean);
+        aplicacionPdf.doCreaFicheroPdf();
+        VentanaPdf ventanaPdf = new VentanaPdf(aplicacionPdf.getUrlDelPdf());
+        ventanaPdf.addDialogCloseActionListener(event1 -> {
+            aplicacionPdf.doBorraPdf();
+        });
+        /*
+        Page page = new Page(getUI().get());
+        page.open(aplicacionPdf.getUrlDelPdf(), "_blank");
+         */
+
     }
 
     @Override
@@ -201,7 +218,6 @@ public final class FrmAplicacion extends FrmMasterPantalla {
             } else {
                 return "tr.my-style-2";
             }
-
         });
         doActualizaGrid();
 
@@ -237,9 +253,22 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         datoGenericoGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         datoGenericoGrid.setHeightByRows(true);
         datoGenericoGrid.setPageSize(14);
-        datoGenericoGrid.addColumn(DatoGenericoBean::getId).setAutoWidth(true).setHeader(new Html("<b>Id</b>"));
+        //   datoGenericoGrid.addColumn(DatoGenericoBean::getId).setAutoWidth(true).setHeader(new Html("<b>Id</b>"));
+        datoGenericoGrid.addColumn(new ComponentRenderer<>(datoGenerico -> {
+            Image img = new Image("icons/unpixel.png", "img");
+            if (datoGenerico.getFicheroBlobs() != null) {
+                img = new Image("icons/pdf.png", "pdf");
+                img.addClickListener(event -> {
+                    Page page = new Page(getUI().get());
+                    page.open(datoGenerico.getPathRelativo(), "_blank");
+                });
+            }
+            return img;
+
+        })).setHeader("Pdf");
         datoGenericoGrid.addColumn(DatoGenericoBean::getTipoDato).setAutoWidth(true).setHeader(new Html("<b>Tipo</b>"));
-        datoGenericoGrid.addColumn(DatoGenericoBean::getValor).setAutoWidth(true).setHeader(new Html("<b>Valor</b>"));
+        datoGenericoGrid.addColumn(DatoGenericoBean::getValorAncho25).setAutoWidth(true).setHeader(new Html("<b>Valor</b>"));
+
         doActualizaGridDatos();
 
     }
@@ -305,7 +334,7 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         ArrayList<DatoGenericoBean> listaDatosGenerico = new AplicacionesDatosDao().getLista(null, aplicacionBean);
 
         datoGenericoGrid.setItems(listaDatosGenerico);
-        datosTab.setLabel("Datos (" + Integer.toString(listaDatosGenerico.size()) + ")");
+        datosTab.setLabel("Caracterísitcas (" + Integer.toString(listaDatosGenerico.size()) + ")");
     }
 
     @Override
@@ -354,7 +383,7 @@ public final class FrmAplicacion extends FrmMasterPantalla {
                 .asRequired()
                 .bind(AplicacionBean::getGfh, AplicacionBean::setGfh);
 
-        aplicacionesBinder.forField(estadoRadio)
+        aplicacionesBinder.forField(estadoCombo)
                 .bind(AplicacionBean::getEstadoString, AplicacionBean::setEstado);
 
         //id,nombre,proveedor,ambito,gestionusuarios,descripcion,servicio,fechainstalacion,estado,usucambio,fechacambio
@@ -388,7 +417,9 @@ public final class FrmAplicacion extends FrmMasterPantalla {
     @Override
     public void doComponentesOrganizacion() {
         this.titulo.setText("Aplicaciones");
-        contenedorBotones.add(botonPerfiles, equiposButton, datosGenericosButton);
+        botonImprimir.setText("");
+
+        contenedorBotones.add(botonPerfiles, equiposButton, datosGenericosButton, botonImprimir);
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
                 new FormLayout.ResponsiveStep("50px", 2),
@@ -414,9 +445,10 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         this.contenedorFormulario.add(fechaInstalacion, 2);
 
         this.contenedorFormulario.add(proveedorCombo, 3);
-        this.contenedorFormulario.add(gfhCombo, 3);
-        this.contenedorFormulario.add(estadoRadio, 2);
-        this.contenedorFormulario.add(descripcion, 4);
+        this.contenedorFormulario.add(gfhCombo, 2);
+        this.contenedorFormulario.add(estadoCombo);
+
+        this.contenedorFormulario.add(descripcion, 6);
 
         // contenedorIzquierda.add(aplicacionesPerfiGrid);
         this.contenedorIzquierda.removeAll();
@@ -448,6 +480,7 @@ public final class FrmAplicacion extends FrmMasterPantalla {
             aplicacionBean = event.getItem();
             aplicacionBean.setListaPerfiles(new AplicacionPerfilDao().getLista(null, aplicacionBean));
             aplicacionBean.setListaEquipoBeans(new EquipoAplicacionDao().getLista(null, null, aplicacionBean));
+            aplicacionBean.setListaDatosGenerico(new AplicacionesDatosDao().getLista(null, aplicacionBean));
             aplicacionesBinder.readBean(event.getItem());
             doControlBotones(aplicacionBean);
             doActualizaGridPerfiles();
