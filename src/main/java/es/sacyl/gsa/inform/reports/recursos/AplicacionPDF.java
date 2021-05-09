@@ -7,6 +7,7 @@ package es.sacyl.gsa.inform.reports.recursos;
 
 import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
@@ -57,8 +58,8 @@ public class AplicacionPDF extends MasterReport implements Serializable {
             float[] anchos = {50f, 50f, 50f, 350f};
             float[] anchos1 = {70f, 100f, 70f, 100f, 70f, 100f};
 
-            Table tabla = new Table(anchos1);
             for (AplicacionBean app : lista) {
+                Table tabla = new Table(anchos1);
                 Paragraph parrafo = new Paragraph(app.getNombre() + "(" + app.getId() + ")").setFontSize(this.getFontSize() + 3);
                 tabla.addCell(new Cell(0, 6).setBorder(new SolidBorder(BLANCO, 1)).setBackgroundColor(GRISCLARO).add(parrafo).setTextAlignment(TextAlignment.CENTER));
 
@@ -69,18 +70,33 @@ public class AplicacionPDF extends MasterReport implements Serializable {
 
                 parrafo = new Paragraph("Usuarios").setFontSize(this.getFontSize());
                 tabla.addCell(new Cell().setBorder(new SolidBorder(BLANCO, 1)).setBackgroundColor(GRISCLARO).add(parrafo).setTextAlignment(TextAlignment.CENTER));
-                parrafo = new Paragraph(app.getGestionUsuarios()).setFontSize(this.getFontSize());
-                tabla.addCell(new Cell().setBorder(new SolidBorder(GRISCLARO, 1)).add(parrafo));
+                if (app.getGestionUsuarios() != null) {
+                    parrafo = new Paragraph(app.getGestionUsuarios()).setFontSize(this.getFontSize());
+                    tabla.addCell(new Cell().setBorder(new SolidBorder(GRISCLARO, 1)).add(parrafo));
+                } else {
+                    parrafo = new Paragraph("");
+                    tabla.addCell(new Cell().setBorder(new SolidBorder(GRISCLARO, 1)).add(parrafo));
+                }
 
                 parrafo = new Paragraph("Ámbito").setFontSize(this.getFontSize());
                 tabla.addCell(new Cell().setBorder(new SolidBorder(BLANCO, 1)).setBackgroundColor(GRISCLARO).add(parrafo).setTextAlignment(TextAlignment.CENTER));
-                parrafo = new Paragraph(app.getAmbito()).setFontSize(this.getFontSize());
-                tabla.addCell(new Cell().setBorder(new SolidBorder(GRISCLARO, 1)).add(parrafo));
+                if (app.getAmbito() != null) {
+                    parrafo = new Paragraph(app.getAmbito()).setFontSize(this.getFontSize());
+                    tabla.addCell(new Cell().setBorder(new SolidBorder(GRISCLARO, 1)).add(parrafo));
+                } else {
+                    parrafo = new Paragraph("");
+                    tabla.addCell(new Cell().setBorder(new SolidBorder(GRISCLARO, 1)).add(parrafo));
+                }
 
                 parrafo = new Paragraph("Descripción").setFontSize(this.getFontSize());
                 tabla.addCell(new Cell().setBorder(new SolidBorder(BLANCO, 1)).setBackgroundColor(GRISCLARO).add(parrafo).setTextAlignment(TextAlignment.CENTER));
-                parrafo = new Paragraph(app.getDescripcion()).setFontSize(this.getFontSize());
-                tabla.addCell(new Cell(0, 5).setBorder(new SolidBorder(GRISCLARO, 1)).add(parrafo));
+                if (app.getDescripcion() != null) {
+                    parrafo = new Paragraph(app.getDescripcion()).setFontSize(this.getFontSize());
+                    tabla.addCell(new Cell(0, 5).setBorder(new SolidBorder(GRISCLARO, 1)).add(parrafo));
+                } else {
+                    parrafo = new Paragraph("");
+                    tabla.addCell(new Cell().setBorder(new SolidBorder(GRISCLARO, 1)).add(parrafo));
+                }
                 if (app.getListaDatosGenerico().size() > 0) {
                     parrafo = new Paragraph("Características y  datos asociados ").setFontSize(this.getFontSize());
                     tabla.addCell(new Cell(0, 6).setBorder(new SolidBorder(BLANCO, 1)).setBackgroundColor(GRISCLARO).add(parrafo).setTextAlignment(TextAlignment.CENTER));
@@ -125,6 +141,8 @@ public class AplicacionPDF extends MasterReport implements Serializable {
 
                 }
                 document.add(tabla);
+                //salto pagina
+                document.add(new AreaBreak());
             }
 
         } catch (Exception e) {

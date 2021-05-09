@@ -69,6 +69,7 @@ public final class FrmAplicacion extends FrmMasterPantalla {
 
     private final ComboBox<ProveedorBean> proveedorComboBuscador = new CombosUi().getProveedorCombo(null, null);
     private final ComboBox<GfhBean> gfhcomboBuscador = new CombosUi().getServicioCombo(null, null);
+    private final Button botonImprimirBuscador = new ObjetosComunes().getBoton(null, null, VaadinIcon.PRINT.create());
 
     private final TextField id = new ObjetosComunes().getTextField("Código");
     private final TextField nombre = new ObjetosComunes().getTextField("Nombre");
@@ -196,10 +197,22 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         ventanaPdf.addDialogCloseActionListener(event1 -> {
             aplicacionPdf.doBorraPdf();
         });
-        /*
-        Page page = new Page(getUI().get());
-        page.open(aplicacionPdf.getUrlDelPdf(), "_blank");
-         */
+
+    }
+
+    public void doImprimir(ArrayList<AplicacionBean> listaParam) {
+        ArrayList<AplicacionBean> listaPddf = new ArrayList<>();
+        for (AplicacionBean app : listaParam) {
+            app.setListaDatosGenerico(new AplicacionesDatosDao().getLista(null, app));
+            aplicacionBean.setListaEquipoBeans(new EquipoAplicacionDao().getLista(null, null, app));
+            listaPddf.add(app);
+        }
+        AplicacionPDF aplicacionPdf = new AplicacionPDF(listaPddf);
+        aplicacionPdf.doCreaFicheroPdf();
+        VentanaPdf ventanaPdf = new VentanaPdf(aplicacionPdf.getUrlDelPdf());
+        ventanaPdf.addDialogCloseActionListener(event1 -> {
+            aplicacionPdf.doBorraPdf();
+        });
 
     }
 
@@ -454,7 +467,7 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         this.contenedorIzquierda.removeAll();
         this.contenedorIzquierda.add(contenedorBotones, contenedorFormulario, tabs, page1, page2, page3);
 
-        this.contenedorBuscadores.add(buscador, gfhcomboBuscador, proveedorComboBuscador);
+        this.contenedorBuscadores.add(buscador, gfhcomboBuscador, proveedorComboBuscador, botonImprimirBuscador);
         this.contenedorDerecha.removeAll();
         this.contenedorDerecha.add(contenedorBuscadores, aplicacionesGrid);
 
@@ -563,6 +576,10 @@ public final class FrmAplicacion extends FrmMasterPantalla {
                 });
                 frmEquipoAplicacion.open();
             }
+        });
+
+        botonImprimirBuscador.addClickListener(event -> {
+            doImprimir(aplicacionesLista);
         });
     }
 
