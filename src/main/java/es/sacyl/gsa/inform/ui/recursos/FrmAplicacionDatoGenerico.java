@@ -225,6 +225,10 @@ public final class FrmAplicacionDatoGenerico extends FrmMasterVentana {
     @Override
     public void doComponenesAtributos() {
         this.titulo.setText("Datos y características de :" + aplicacionBean.getNombre());
+        contenedorIzquierda.getStyle().set("overflow", "auto");
+        contenedorFormulario.getStyle().set("overflow", "auto");
+        valor.getStyle().set("overflow", "auto");
+        valor.setMaxHeight("300px");
         fechaCambio.setEnabled(false);
         tecnicoapellidosNombre.setEnabled(false);
         upload.setVisible(false);

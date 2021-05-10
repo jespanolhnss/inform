@@ -334,7 +334,7 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
             connection = super.getConexionBBDD();
 
             if (texto != null && !texto.isEmpty()) {
-                sql = sql.concat(" AND   UPPER(ap,descripcion) like'%" + texto.toUpperCase() + "%'  ");
+                sql = sql.concat(" AND   UPPER(ap.descripcion) like'%" + texto.toUpperCase() + "%'  ");
             }
             if (gfhBean != null) {
                 sql = sql.concat(" AND ap.gfh=" + gfhBean.getId());
