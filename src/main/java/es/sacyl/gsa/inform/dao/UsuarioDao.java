@@ -5,6 +5,7 @@ import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.bean.FuncionalidadBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.ParametroBean;
+import es.sacyl.gsa.inform.bean.PeticionesPendientesBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionAppBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
@@ -870,6 +871,39 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             logger.debug(sql);
         } catch (SQLException e) {
             logger.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+    
+    public ArrayList<PeticionesPendientesBean> getPeticionesPendientes() {
+        Connection connection = null;
+        ArrayList<PeticionesPendientesBean> lista = new ArrayList<>();
+        String select;
+        select = "select up.idusuario, up.fechasolicitud, upa.idaplicacion, upa.idperfil " +
+            "from usuariospeticiones up " +
+            "join usuariospeticionesapp upa on up.id = upa.idpeticion " +
+            "where up.tipo = 'Alta' and up.estado = 0 and upa.estado = 0";
+        
+        try {
+            connection = super.getConexionBBDD();
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(select);
+            while (resulSet.next()) {
+                PeticionesPendientesBean pendiente = new PeticionesPendientesBean();
+                pendiente.setIdUsuario(resulSet.getLong("idusuario"));
+                pendiente.setFechaSolicitud(Utilidades.getFechaLocalDaten(resulSet.getLong("fechasolicitud")));
+                pendiente.setIdAplicacion(resulSet.getLong("idaplicacion"));
+                pendiente.setIdPerfil(resulSet.getInt("idperfil"));
+                lista.add(pendiente);
+            }
+            statement.close();
+            logger.debug(select);
+        } catch (SQLException e) {
+            logger.error(select + Utilidades.getStackTrace(e));
         } catch (Exception e) {
             logger.error(Utilidades.getStackTrace(e));
         } finally {

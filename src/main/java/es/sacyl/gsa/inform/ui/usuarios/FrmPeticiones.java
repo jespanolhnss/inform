@@ -9,7 +9,9 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.converter.StringToLongConverter;
+import es.sacyl.gsa.inform.bean.PeticionesPendientesBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
+import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import java.util.ArrayList;
 import org.vaadin.klaudeta.PaginatedGrid;
@@ -32,13 +34,13 @@ public final class FrmPeticiones extends FrmMasterPantalla {
     /* Componentes */
     UsuarioPeticionBean peticionBean = new UsuarioPeticionBean();
     Binder<UsuarioPeticionBean> peticionBinder;
-    ArrayList<UsuarioPeticionBean> peticionArrayList;
-    PaginatedGrid<UsuarioPeticionBean> gridPeticiones;
+    //ArrayList<UsuarioPeticionBean> peticionArrayList;
+    PaginatedGrid<PeticionesPendientesBean> gridPeticiones;
     
     public FrmPeticiones() {
         super();
         this.gridPeticiones = new PaginatedGrid<>();
-        this.peticionArrayList = new ArrayList<>();
+        //this.peticionArrayList = new ArrayList<>();
         this.peticionBinder = new Binder<>();        
         setSizeFull();
         doComponentesOrganizacion();
@@ -75,15 +77,17 @@ public final class FrmPeticiones extends FrmMasterPantalla {
 
     @Override
     public void doGrid() {
-        gridPeticiones.addColumn(UsuarioPeticionBean::getFechaSolicitud).setHeader("Fecha");
-        gridPeticiones.addColumn(UsuarioPeticionBean::getIdusuario).setHeader("Usuario");
-        gridPeticiones.addColumn(UsuarioPeticionBean::getTipo).setHeader("Tipo");
-        gridPeticiones.addColumn(UsuarioPeticionBean::getComentario).setHeader("Comentario");
+        gridPeticiones.addColumn(PeticionesPendientesBean::getFechaSolicitud).setHeader("Fecha");
+        gridPeticiones.addColumn(PeticionesPendientesBean::getUsuario).setHeader("Usuario");
+        gridPeticiones.addColumn(PeticionesPendientesBean::getAplicacion).setHeader("Aplicacion");
+        
         doActualizaGrid();        
     }
 
     @Override
     public void doActualizaGrid() {
+        ArrayList<PeticionesPendientesBean> peticionesPendientes = new UsuarioDao().getPeticionesPendientes();
+        gridPeticiones.setItems(peticionesPendientes);
         
     }
 
