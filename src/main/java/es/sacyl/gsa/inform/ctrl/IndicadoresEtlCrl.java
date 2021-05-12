@@ -144,7 +144,6 @@ public final class IndicadoresEtlCrl {
                 // el servicio DW lo saca de maes_serv
                 indicadorDw.setServicio(indHis.getMaes_sev().trim());
                 if (indicadorDw.getValor() != 0) {
-
                     new DWDao().doGrabaDatos(indicadorDw, "DW_HOS_INDICADORES");
                 }
             }

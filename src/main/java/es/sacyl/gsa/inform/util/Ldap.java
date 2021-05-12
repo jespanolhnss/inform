@@ -30,15 +30,19 @@ import org.slf4j.LoggerFactory;
 public class Ldap {
 
     private static final Logger logger = LoggerFactory.getLogger(Ldap.class);
-    private UsuarioBean usuario = null;
+    //  private UsuarioBean usuario = null;
 
     public Ldap() {
-        logger.debug("java.classpath" + ":" + System.getProperty("java.classpath"));
-        usuario = new UsuarioBean();
+        //    logger.debug("Antes de crear usuariobean ");
+        //  logger.debug("java.classpath" + ":" + System.getProperty("java.classpath"));
+
     }
 
     public UsuarioBean loginActiveDirectory(String user, String password) throws LoginException {
 
+        logger.debug("Antes de crear usuariobean ");
+        logger.debug("java.classpath" + ":" + System.getProperty("java.classpath"));
+        UsuarioBean usuario = null;
         try {
 
             Hashtable<String, String> envInicial = new Hashtable<>();
@@ -97,7 +101,7 @@ public class Ldap {
             ctls.setReturningAttributes(new String[]{"sn", "givenName", "uid"});
 
             NamingEnumeration answer = ctx.search("dc=grs,dc=root", filter, ctls);
-
+            usuario = new UsuarioBean();
             while (answer.hasMoreElements()) {
 
                 SearchResult searchResult = (SearchResult) answer.next();

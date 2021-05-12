@@ -80,7 +80,12 @@ public class ServicioEvolucionAnoPdf extends MasterReport {
                 int[] meses = indicador.getMesesTotales();
                 for (int i = 0; i < meses.length; i++) {
                     int val = meses[i];
-                    String valor = Integer.toString(val);
+                    String valor;
+                    if (indicador.getDwindicador().getCalculado().equals("N")) {
+                        valor = Integer.toString(val);
+                    } else {
+                        valor = doCaculaValor(lista, indicador, i);
+                    }
                     Text texto = new Text(valor).setHorizontalAlignment(HorizontalAlignment.RIGHT);
                     texto.setTextAlignment(TextAlignment.RIGHT);
                     parrafo = new Paragraph(texto).setHorizontalAlignment(HorizontalAlignment.RIGHT).setFontSize(this.getFontSize());
@@ -95,4 +100,28 @@ public class ServicioEvolucionAnoPdf extends MasterReport {
         }
     }
 
+    public String doCaculaValor(ArrayList<DWIndicadorValorAno> lista, DWIndicadorValorAno indicador, Integer mes) {
+        String valor = "";
+
+        switch (indicador.getDwindicador().getCodigo()) {
+            case "HOS101": // estancia media
+                Integer estaciasTotales = getIndicadorMes(lista, "HOS027", mes);
+                Integer altasExternas = getIndicadorMes(lista, "HOS009", mes);
+                Integer altasInternas = getIndicadorMes(lista, "HOS031", mes);
+                float val = estaciasTotales / (altasExternas + altasInternas);
+                valor = Float.toString(val);
+                break;
+        }
+        return valor;
+    }
+
+    public Integer getIndicadorMes(ArrayList<DWIndicadorValorAno> lista, String codigo, Integer mes) {
+        Integer val = 0;
+        for (DWIndicadorValorAno indicador : lista) {
+            if (indicador.getDwindicador().getCodigo().equals(codigo)) {
+                val = indicador.getMesesTotales()[mes];
+            }
+        }
+        return val;
+    }
 }

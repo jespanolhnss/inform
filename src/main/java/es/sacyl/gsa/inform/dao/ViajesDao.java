@@ -274,53 +274,6 @@ public class ViajesDao extends ConexionDao implements Serializable {
         return listaViajes;
     }
 
-    /**
-     *
-     * @param viajeBean
-     * @return
-     *
-     * Se usa para montar el false tree en el grid y que por cada viaje muestre
-     * la lista de centros del viaje
-     *
-     */
-    public ArrayList<ViajeBean> getListaViajesHijosTree(ViajeBean viajeBean) {
-        Connection connection = null;
-        ArrayList<ViajeBean> listaViajes = new ArrayList<>();
-        if (viajeBean != null && !viajeBean.getId().equals(new Long(0))) {
-            try {
-                connection = super.getConexionBBDD();
-                sql = "   SELECT    c.idcentro FROM viajescentros  c "
-                        + " WHERE   c.idviaje = " + viajeBean.getId();
-                Statement statement = connection.createStatement();
-                ResultSet resulSet = statement.executeQuery(sql);
-                int i = 1;
-                while (resulSet.next()) {
-                    /**
-                     * crea un viaje ficticio con el id= id del padre + 1* 10000
-                     * con la misma matrícula y fecha en asigna el centro al
-                     * viajes hijo
-                     */
-                    ViajeBean viajeBeanew = new ViajeBean();
-                    viajeBeanew.setId(viajeBean.getId() + (10000 * i));
-                    viajeBeanew.setMatricula(viajeBean.getMatricula());
-                    viajeBeanew.setSalida(viajeBean.getSalida());
-                    viajeBeanew.setCentro(new CentroDao().getPorId(resulSet.getLong("idcentro")));
-                    viajeBeanew.setViajePadre(viajeBean);
-                    listaViajes.add(viajeBeanew);
-                    i++;
-                }
-                statement.close();
-                LOGGER.debug(sql);
-            } catch (SQLException e) {
-                LOGGER.error(sql + Utilidades.getStackTrace(e));
-            } catch (Exception e) {
-                LOGGER.error(Utilidades.getStackTrace(e));
-            } finally {
-                this.doCierraConexion(connection);
-            }
-        }
-        return listaViajes;
-    }
 
     /**
      *

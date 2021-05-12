@@ -422,15 +422,20 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
      *
      * @param ubicacionBean
      * @return
+     *
+     * Lista todas las ubicaciones a partir de un padre
      */
     public ArrayList<UbicacionBean> getListaHijos(UbicacionBean ubicacionBean) {
         Connection connection = null;
         ArrayList<UbicacionBean> lista = new ArrayList<>();
-        String sqlU = sql;
+        // para que monte la sql a partir del padre
+        String sqlU = sql.replace("WITH u.IDPADRE IS NULL", "WITH u.IDPADRE=" + ubicacionBean.getId());
+        // + "    LTRIM(SYS_CONNECT_BY_PATH(u.DESCRIPCION, ' -> '), ' -> ') AS descripcionfull,"
+        sqlU = sqlU.replace("SYS_CONNECT_BY_PATH(u.DESCRIPCION", "'" + ubicacionBean.getDescripcion() + "'||" + " SYS_CONNECT_BY_PATH(u.DESCRIPCION"
+        );
         try {
             connection = super.getConexionBBDD();
-
-            sqlU = sqlU.concat(" AND  ubicacionesidpadre = " + ubicacionBean.getId());
+            // sqlU = sqlU.concat(" AND  ubicacionesidpadre = " + ubicacionBean.getId());
             sqlU = sqlU.concat(" ORDER BY  ubicacionescentro,  ubicacionesdescripcion  ");
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sqlU);
