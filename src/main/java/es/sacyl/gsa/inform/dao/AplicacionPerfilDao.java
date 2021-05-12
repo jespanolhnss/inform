@@ -57,7 +57,7 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
                 + " LEFT  JOIN gfh ON gfh.id=ap.gfh"
                 + " LEFT JOIN usuarios usu ON usu.id=appp.usucambio"
                 + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
-                + " LEFT JOIN gfh gfh ON usu.idgfh = gfh.id"
+                //+ " LEFT JOIN gfh gfh ON usu.idgfh = gfh.id"
                 + " WHERE 1=1 ";
     }
 

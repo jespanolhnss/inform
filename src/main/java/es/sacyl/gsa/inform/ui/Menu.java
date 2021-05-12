@@ -45,6 +45,7 @@ import es.sacyl.gsa.inform.ui.tablas.FrmProvincia;
 import es.sacyl.gsa.inform.ui.tablas.FrmUbicacion;
 import es.sacyl.gsa.inform.ui.tablas.FrmUsuarioCategoria;
 import es.sacyl.gsa.inform.ui.tablas.FrmZona;
+import es.sacyl.gsa.inform.ui.usuarios.FrmPeticiones;
 import es.sacyl.gsa.inform.ui.usuarios.FrmUsuarios;
 import es.sacyl.gsa.inform.ui.usuarios.FrmUsuariosPedir;
 import es.sacyl.gsa.inform.ui.viajes.FrmViajesRegistrar;
@@ -158,6 +159,8 @@ public class Menu extends MenuBar {
             });
 
             usuariosSubMenu.addItem("Solicitudes", e -> {
+                this.contenedorFormularios.removeAll();
+                this.contenedorFormularios.add(new FrmPeticiones());
             });
             usuariosSubMenu.addItem("Gestionar", e -> {
                 this.contenedorFormularios.removeAll();

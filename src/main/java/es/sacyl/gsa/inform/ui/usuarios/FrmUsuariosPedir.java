@@ -224,13 +224,8 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         tipo.setItems("Alta", "Baja");
         tipo.setLabel("Tipo");
         tipo.setPlaceholder("Alta o Baja");
-
         comentario.setWidthFull();
         usuarioLabel.setText("DATOS DEL USUARIO: ");
-
-        //comentario.setSizeFull();
-        usuarioLabel.setText("DATOS DEL USUARIO: ");
-
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
                 new FormLayout.ResponsiveStep("50px", 2),

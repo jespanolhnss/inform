@@ -60,7 +60,6 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
                 + " LEFT  JOIN CAUTONOM a ON a.codigo=p.CODAUTO  "
                 + " LEFT JOIN usuarios usu ON usu.id=ap.usucambio"
                 + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
-                + " LEFT JOIN gfh gfh ON usu.idgfh = gfh.id"
                 + " WHERE  1=1 ";
     }
 

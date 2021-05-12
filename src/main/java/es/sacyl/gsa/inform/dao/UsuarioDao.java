@@ -795,8 +795,8 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 connection = super.getConexionBBDD();
                 String insertar;
                 insertar = "insert into usuariospeticionesapp "
-                        + "(id,idpeticion,idaplicacion,idperfil,tipo,comentario) "
-                        + "values (?,?,?,?,?,?)";
+                        + "(id,idpeticion,idaplicacion,idperfil,tipo,comentario,estado) "
+                        + "values (?,?,?,?,?,?,?)";
                 PreparedStatement statement = connection.prepareStatement(insertar);
                 statement.setLong(1, peticionAppBean.getId());
                 if (peticionAppBean.getIdPeticion() != null) {
@@ -809,7 +809,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 } else {
                     statement.setNull(3, Types.INTEGER);
                 }
-                if (peticionAppBean.getPerfil() != null) {
+                if (peticionAppBean.getIdPerfil() != null) {
                     statement.setLong(4, peticionAppBean.getIdPerfil());
                 } else {
                     statement.setNull(4, Types.INTEGER);
@@ -824,6 +824,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 } else {
                     statement.setNull(6, Types.CHAR);
                 }
+                statement.setInt(7, 0);
                 insertado = statement.executeUpdate() > 0;
                 insertado = true;
                 statement.close();
@@ -883,10 +884,10 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         Connection connection = null;
         ArrayList<PeticionesPendientesBean> lista = new ArrayList<>();
         String select;
-        select = "select up.idusuario, up.fechasolicitud, upa.idaplicacion, upa.idperfil " +
+        select = "select idusuario, up.fechasolicitud, upa.idaplicacion, upa.idperfil, up.tipo " +
             "from usuariospeticiones up " +
             "join usuariospeticionesapp upa on up.id = upa.idpeticion " +
-            "where up.tipo = 'Alta' and up.estado = 0 and upa.estado = 0";
+            "where up.estado = 0 and upa.estado = 0";
         
         try {
             connection = super.getConexionBBDD();
@@ -894,10 +895,11 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             ResultSet resulSet = statement.executeQuery(select);
             while (resulSet.next()) {
                 PeticionesPendientesBean pendiente = new PeticionesPendientesBean();
-                pendiente.setIdUsuario(resulSet.getLong("idusuario"));
+                pendiente.setUsuario(new UsuarioDao().getPorId(resulSet.getLong("idusuario")));
                 pendiente.setFechaSolicitud(Utilidades.getFechaLocalDaten(resulSet.getLong("fechasolicitud")));
-                pendiente.setIdAplicacion(resulSet.getLong("idaplicacion"));
+                pendiente.setAplicacion(new AplicacionDao().getPorId(resulSet.getLong("idaplicacion")));    
                 pendiente.setIdPerfil(resulSet.getInt("idperfil"));
+                pendiente.setTipo(resulSet.getString("tipo"));
                 lista.add(pendiente);
             }
             statement.close();
