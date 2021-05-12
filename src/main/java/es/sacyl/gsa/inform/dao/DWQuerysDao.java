@@ -54,9 +54,7 @@ public class DWQuerysDao extends ConexionDao {
                 ResultSet resulSet = statement.executeQuery(sql);
                 while (resulSet.next()) {
                     // el tipo de indicador definimos código y nombre
-                    DWIndicador indi = new DWIndicador();
-                    indi.setCodigo(resulSet.getString("indicador"));
-                    indi.setNombre(resulSet.getString("nombre"));
+                    DWIndicador indi = new DWIndicadorDao().getPorCodigo(resulSet.getString("indicador"));
                     DWIndicadorValorAno indicador = new DWIndicadorValorAno();
                     indicador.setDwindicador(indi);
                     indicador.setAno(ano);

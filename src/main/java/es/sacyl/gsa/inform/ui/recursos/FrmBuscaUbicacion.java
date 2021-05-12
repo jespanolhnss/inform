@@ -19,14 +19,12 @@ import java.util.ArrayList;
 public final class FrmBuscaUbicacion extends Dialog {
 
     private final Button botonCancelar = new ObjetosComunes().getBoton("Cancela", null, VaadinIcon.CLOSE_CIRCLE.create());
-
     private final TreeGrid<UbicacionBean> ubicacionGrid = new TreeGrid<>();
     private ComboBox<UbicacionBean> ubicacionCombo = null;
     private UbicacionBean ubicacionBean = new UbicacionBean();
     ArrayList<UbicacionBean> ubicacionArrayList = new ArrayList<>();
 
     public FrmBuscaUbicacion(CentroBean centroBean) {
-
         this.setWidth("600px");
         this.setHeight("600px");
         ubicacionCombo = new CombosUi().getUbicacionCombo(null,
