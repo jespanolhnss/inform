@@ -172,6 +172,8 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
         botonBorrar.setVisible(false);
         botonImprimir.setVisible(false);
         botonLimpiar.setVisible(false);
+        equipoMarcaCombo.setValue("");
+        equipoTipoCombo.setValue("");
     }
 
     /**

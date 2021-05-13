@@ -51,7 +51,7 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
                 + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo "
                 + " FROM aplicaciones ap "
                 + " LEFT  JOIN gfh  ON gfh.id=ap.gfh"
                 + " LEFT  JOIN proveedores prvee ON  prvee.id=ap.proveedor"
@@ -333,7 +333,7 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
             connection = super.getConexionBBDD();
 
             if (texto != null && !texto.isEmpty()) {
-                sql = sql.concat(" AND   UPPER(ap.descripcion) like'%" + texto.toUpperCase() + "%'  ");
+                sql = sql.concat(" AND   UPPER(ap.nombre) like'%" + texto.toUpperCase() + "%'  ");
             }
             if (gfhBean != null) {
                 sql = sql.concat(" AND ap.gfh=" + gfhBean.getId());

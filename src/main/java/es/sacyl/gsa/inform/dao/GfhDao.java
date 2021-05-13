@@ -27,7 +27,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
     public GfhDao() {
         super();
         sql = " SELECT gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo "
                 + " FROM gfh gfh WHERE 1=1 ";
     }
 
@@ -46,6 +46,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
             gfh.setDescripcion(rs.getString("gfhdescripcion"));
             gfh.setAsistencial(rs.getInt("gfhasistencial"));
             gfh.setEstado(rs.getInt("gfhestado"));
+            gfh.setGfhpersigo(rs.getString("gfhpersigo"));
         } catch (SQLException e) {
             logger.error(Utilidades.getStackTrace(e));
         }
@@ -77,8 +78,8 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
         try {
             connection = super.getConexionBBDD();
 
-            sql = " INSERT INTO gfh (id,codigo,idjimena,descripcion,asistencial,estado,fechacambio,usucambio) "
-                    + " VALUES (?,?,?,?,?,?,?,?)  ";
+            sql = " INSERT INTO gfh (id,codigo,idjimena,descripcion,asistencial,estado,fechacambio,usucambio,gfhpersigo) "
+                    + " VALUES (?,?,?,?,?,?,?,?,?)  ";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setLong(1, gfhBean.getId());
                 statement.setString(2, gfhBean.getCodigo());
@@ -96,7 +97,11 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
                 } else {
                     statement.setLong(8, UsuarioBean.USUARIO_SISTEMA.getId());
                 }
-
+                if (gfhBean.getGfhpersigo() != null) {
+                    statement.setString(9, gfhBean.getGfhpersigo());
+                } else {
+                    statement.setNull(9, Types.VARCHAR);
+                }
                 insertado = statement.executeUpdate() > 0;
                 statement.close();
             }
@@ -125,7 +130,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
         try {
             connection = super.getConexionBBDD();
             sql = " UPDATE   gfh SET "
-                    + " codigo=?,idjimena=?,descripcion=?,asistencial=?,estado=?,fechacambio=?,usucambio=?  "
+                    + " codigo=?,idjimena=?,descripcion=?,asistencial=?,estado=?,fechacambio=?,usucambio=?,gfhpersigo=?  "
                     + " WHERE id= ? ";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, gfhBean.getCodigo());
@@ -144,7 +149,12 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
                 } else {
                     statement.setNull(7, Types.INTEGER);
                 }
-                statement.setLong(8, gfhBean.getId());
+                if (gfhBean.getGfhpersigo() != null) {
+                    statement.setString(8, gfhBean.getGfhpersigo());
+                } else {
+                    statement.setNull(8, Types.VARCHAR);
+                }
+                statement.setLong(9, gfhBean.getId());
                 insertado = statement.executeUpdate() > 0;
                 statement.close();
             }

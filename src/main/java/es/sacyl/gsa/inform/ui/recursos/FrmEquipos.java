@@ -74,6 +74,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     private static final Logger LOGGER = LogManager.getLogger(FrmEquipos.class);
     private final HorizontalLayout contenedorBuscadores1 = new HorizontalLayout();
+    private final HorizontalLayout contenedorBuscadores2 = new HorizontalLayout();
 
     private final ComboBox<AutonomiaBean> autonomiaComboBuscador = new CombosUi().getAutonomiaCombo(AutonomiaBean.AUTONOMIADEFECTO, null);
     private final ComboBox<ProvinciaBean> provinciaComboBuscador = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null, AutonomiaBean.AUTONOMIADEFECTO);
@@ -532,8 +533,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorDerecha.removeAll();
         buscador.setPlaceholder("Valor a buscar");
         buscador.setWidth("200px");
-        contenedorBuscadores.add(autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador, buscador);
+        contenedorBuscadores.add(autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador);
         contenedorBuscadores1.add(equipoTipoComboBuscador, equipoMarcaComboBuscador, botonImprimir, excelButton, etiquetaListaButton);
+        contenedorBuscadores2.add(buscador);
 
         contenedorDerecha.add(this.contenedorBuscadores, this.contenedorBuscadores1, equipoGrid);
 
@@ -816,21 +818,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 if (recuperado != null) {
                     doActualizaDatosBotones(recuperado);
                 } else {
-                    datoGenericoBeansArrayList = new GalenoDao().getEquipo(inventario.getValue());
-                    if (datoGenericoBeansArrayList.size() > 0) {
-                        FrmBuscaInventarioOld frmBuscaInventarioOld = new FrmBuscaInventarioOld(inventario.getValue(), datoGenericoBeansArrayList);
-                        frmBuscaInventarioOld.addDetachListener(event1 -> {
-                            doActualizaDatosBotones(frmBuscaInventarioOld.getEquipoBean());
-                            ip.setValue(frmBuscaInventarioOld.getIpValor());
-                            //  doGestionaUnaIp(ip.getValue());
-                        });
-                        frmBuscaInventarioOld.addDialogCloseActionListener(event1 -> {
-                            doActualizaDatosBotones(frmBuscaInventarioOld.getEquipoBean());
-                            ip.setValue(frmBuscaInventarioOld.getIpValor());
-                            //doGestionaUnaIp(ip.getValue());
-                        });
-                        frmBuscaInventarioOld.open();
-                    }
+                    doRecuperaEquipoDeGaleno();
                 }
             }
         }
@@ -856,6 +844,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
                                     equipoBean = equipoBeanRecuperado;
                                     doActualizaDatosBotones(equipoBean);
                                 } else {
+                                    doRecuperaEquipoDeGaleno();
                                     if (!IpCtrl.isLibre(ip.getValue())) {
                                         Notification.show(" Ip ocupada");
                                         ip.clear();
@@ -946,6 +935,34 @@ public final class FrmEquipos extends FrmMasterPantalla {
         excelButton.addClickListener(event -> {
             ImpresorasExcel impresorasExcel = new ImpresorasExcel();
         });
+    }
+
+    public void doRecuperaEquipoDeGaleno() {
+        ArrayList<DatoGenericoBean> datoGenericoBeansArrayList = new ArrayList<>();
+        if (inventario.getValue().isEmpty()) {
+            if (IpCtrl.isValid(ip.getValue())) {
+                datoGenericoBeansArrayList = new GalenoDao().getEquipo(ip.getValue(), "Ip");
+            } else {
+                Notification.show("Ip no válida");
+                ip.focus();
+            }
+        } else {
+            datoGenericoBeansArrayList = new GalenoDao().getEquipo(inventario.getValue(), "Inventario");
+        }
+        if (datoGenericoBeansArrayList.size() > 0) {
+            FrmBuscaInventarioOld frmBuscaInventarioOld = new FrmBuscaInventarioOld(inventario.getValue(), datoGenericoBeansArrayList);
+            frmBuscaInventarioOld.addDetachListener(event1 -> {
+                doActualizaDatosBotones(frmBuscaInventarioOld.getEquipoBean());
+                ip.setValue(frmBuscaInventarioOld.getIpValor());
+                //  doGestionaUnaIp(ip.getValue());
+            });
+            frmBuscaInventarioOld.addDialogCloseActionListener(event1 -> {
+                doActualizaDatosBotones(frmBuscaInventarioOld.getEquipoBean());
+                ip.setValue(frmBuscaInventarioOld.getIpValor());
+                //doGestionaUnaIp(ip.getValue());
+            });
+            frmBuscaInventarioOld.open();
+        }
     }
 
     public void doImprimeListaEtiquetas() {

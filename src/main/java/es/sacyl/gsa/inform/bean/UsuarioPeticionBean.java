@@ -13,28 +13,28 @@ import java.time.LocalDate;
  * @author 06532775Q
  */
 public class UsuarioPeticionBean extends MasterBean implements Serializable {
-    
-    Long idusuario;
-    Long idpeticionario;
+
+    UsuarioBean usuario;
+    UsuarioBean peticionario;
     LocalDate fechaSolicitud;
     String centros;
     String comentario;
     String tipo;
 
-    public Long getIdusuario() {
-        return idusuario;
+    public UsuarioBean getUsuario() {
+        return usuario;
     }
 
-    public void setIdusuario(Long idusuario) {
-        this.idusuario = idusuario;
+    public void setUsuario(UsuarioBean usuario) {
+        this.usuario = usuario;
     }
 
-    public Long getIdpeticionario() {
-        return idpeticionario;
+    public UsuarioBean getPeticionario() {
+        return peticionario;
     }
 
-    public void setIdpeticionario(Long idpeticionario) {
-        this.idpeticionario = idpeticionario;
+    public void setPeticionario(UsuarioBean peticionario) {
+        this.peticionario = peticionario;
     }
 
     public LocalDate getFechaSolicitud() {
@@ -44,7 +44,7 @@ public class UsuarioPeticionBean extends MasterBean implements Serializable {
     public void setFechaSolicitud(LocalDate fechaSolicitud) {
         this.fechaSolicitud = fechaSolicitud;
     }
-    
+
     public String getCentros() {
         return centros;
     }
@@ -52,7 +52,7 @@ public class UsuarioPeticionBean extends MasterBean implements Serializable {
     public void setCentros(String centros) {
         this.centros = centros;
     }
-    
+
     public String getComentario() {
         return comentario;
     }
@@ -60,11 +60,11 @@ public class UsuarioPeticionBean extends MasterBean implements Serializable {
     public void setComentario(String comentario) {
         this.comentario = comentario;
     }
-    
+
     public String getTipo() {
         return tipo;
     }
-    
+
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
@@ -100,5 +100,5 @@ public class UsuarioPeticionBean extends MasterBean implements Serializable {
     public void setUsucambio(UsuarioBean usucambio) {
         this.usucambio = usucambio;
     }
-    
+
 }

@@ -252,6 +252,34 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
 
     }
 
+    public void doCompletaDatosPersigo() {
+        UsuarioBean usuarioBeanHnss = new UsuarioDao().getPorDni(nifUsuario.getValue());
+        if (usuarioBeanHnss.getDni() != null) {
+            if (usuarioBean.getNombre() == null || usuarioBean.getNombre().isEmpty()) {
+                usuarioBean.setNombre(usuarioBeanHnss.getNombre());
+            }
+            if (usuarioBean.getApellido1() == null || usuarioBean.getApellido1().isEmpty()) {
+                usuarioBean.setApellido1(usuarioBeanHnss.getApellido1());
+            }
+            if (usuarioBean.getApellido2() == null || usuarioBean.getApellido2().isEmpty()) {
+                usuarioBean.setApellido1(usuarioBeanHnss.getApellido2());
+            }
+            if (usuarioBean.getMail() == null || usuarioBean.getMail().isEmpty()) {
+                usuarioBean.setMail(usuarioBeanHnss.getMail());
+            }
+            if (usuarioBean.getMovilUsuario() == null || usuarioBean.getMovilUsuario().isEmpty()) {
+                usuarioBean.setMovilUsuario(usuarioBeanHnss.getMovilUsuario());
+            }
+            if (usuarioBean.getCorreoPrivadoUsuario() == null || usuarioBean.getCorreoPrivadoUsuario().isEmpty()) {
+                usuarioBean.setCorreoPrivadoUsuario(usuarioBeanHnss.getCorreoPrivadoUsuario());
+            }
+            if (usuarioBean.getCategoria() == null) {
+                usuarioBean.setCategoria(usuarioBeanHnss.getCategoria());
+            }
+
+        }
+    }
+
     @Override
     public void doCompentesEventos() {
         nifUsuario.addBlurListener(event -> {
@@ -260,14 +288,16 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
                 if (usuarioBean.getDni() != null) {
                     usuarioBinder.readBean(usuarioBean);
                     categoriaUsuario.setValue(usuarioBean.getCategoria());
-
+                    doCompletaDatosPersigo();
+                } else {
+                    usuarioBean = new UsuarioDao().getPorDni(nifUsuario.getValue());
+                    if (usuarioBean.getDni() != null) {
+                        usuarioBinder.readBean(usuarioBean);
+                        categoriaUsuario.setValue(usuarioBean.getCategoria());
+                    }
                 }
             } else {
-                usuarioBean = new UsuarioDao().getUsuarioNuestro(nifUsuario.getValue());
-                if (usuarioBean.getDni() != null) {
-                    usuarioBinder.readBean(usuarioBean);
-                    categoriaUsuario.setValue(usuarioBean.getCategoria());
-                }
+
             }
         });
 
@@ -349,7 +379,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
                 + solicitanteBean.getApellido1() + " "
                 + solicitanteBean.getApellido2();
         peticionarioLabel.setText(filiacionSolicitante);
-        peticionBean.setIdpeticionario(solicitanteBean.getId());
+        peticionBean.setPeticionario(solicitanteBean);
     }
 
 }

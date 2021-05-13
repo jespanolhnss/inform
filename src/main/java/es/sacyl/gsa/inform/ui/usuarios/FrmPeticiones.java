@@ -8,18 +8,12 @@ package es.sacyl.gsa.inform.ui.usuarios;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.converter.StringToIntegerConverter;
-import com.vaadin.flow.data.converter.StringToLongConverter;
-import com.vaadin.flow.data.renderer.LocalDateRenderer;
-import es.sacyl.gsa.inform.bean.PeticionesPendientesBean;
-import es.sacyl.gsa.inform.dao.UsuarioDao;
+import es.sacyl.gsa.inform.bean.UsuarioGalenoBean;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import org.vaadin.klaudeta.PaginatedGrid;
 
 /**
@@ -27,9 +21,9 @@ import org.vaadin.klaudeta.PaginatedGrid;
  * @author 06532775Q
  */
 public final class FrmPeticiones extends FrmMasterPantalla {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     TextField idUsuario = new TextField("Id Usuario");
     TextField nombreUsuario = new TextField("Nombre Usuario");
     TextField idPeticionario = new TextField("Peticionario");
@@ -41,19 +35,19 @@ public final class FrmPeticiones extends FrmMasterPantalla {
             .getDatePicker("Fecha Solicitud", "Fecha solicitud", LocalDate.now());
     TextField idAplicacion = new TextField("Aplicación");
     TextField perfil = new TextField("Perfil");
-    
+
     /* Componentes */
     //UsuarioPeticionBean peticionBean = new UsuarioPeticionBean();
-    PeticionesPendientesBean pendientesBean = new PeticionesPendientesBean();
-    Binder<PeticionesPendientesBean> peticionBinder;
+    // UsuarioGalenoBean pendientesBean = new UsuarioGalenoBean();
+    //  Binder<UsuarioGalenoBean> peticionBinder;
     //ArrayList<UsuarioPeticionBean> peticionArrayList;
-    PaginatedGrid<PeticionesPendientesBean> gridPeticiones;
-    
+    PaginatedGrid<UsuarioGalenoBean> gridPeticiones;
+
     public FrmPeticiones() {
         super();
         this.gridPeticiones = new PaginatedGrid<>();
         //this.peticionArrayList = new ArrayList<>();
-        this.peticionBinder = new Binder<>();        
+        //      this.peticionBinder = new Binder<>();
         setSizeFull();
         doComponentesOrganizacion();
         doGrid();
@@ -64,50 +58,42 @@ public final class FrmPeticiones extends FrmMasterPantalla {
 
     @Override
     public void doGrabar() {
-        
+
     }
 
     @Override
     public void doBorrar() {
-        
+
     }
 
     @Override
     public void doAyuda() {
-        
+
     }
 
     @Override
     public void doLimpiar() {
-        
+
     }
 
     @Override
     public void doImprimir() {
-        
+
     }
 
     @Override
     public void doGrid() {
-        //gridPeticiones.addColumn(PeticionesPendientesBean::getFechaSolicitud).setHeader("Fecha");
-        gridPeticiones.addColumn(new LocalDateRenderer<>(PeticionesPendientesBean::getFechaSolicitud,"dd/MM/YYYY")).setHeader("Fecha");
-        gridPeticiones.addColumn(PeticionesPendientesBean::getNombreUsuario).setHeader("Usuario");
-        gridPeticiones.addColumn(PeticionesPendientesBean::getNombreAplicacion).setHeader("Aplicacion");       
-        gridPeticiones.addColumn(PeticionesPendientesBean::getTipo).setHeader("Tipo"); 
-        
-        doActualizaGrid();        
+
     }
 
     @Override
     public void doActualizaGrid() {
-        ArrayList<PeticionesPendientesBean> peticionesPendientes;
-        peticionesPendientes = new UsuarioDao().getPeticionesPendientes();
-        gridPeticiones.setItems(peticionesPendientes);
-        
+
     }
 
     @Override
     public void doBinderPropiedades() {
+        /*
         peticionBinder.forField(idUsuario)
                 .withConverter(new StringToLongConverter("Introducir un Long"))
                 .bind(PeticionesPendientesBean::getIdUsuario, PeticionesPendientesBean::setIdUsuario);
@@ -121,13 +107,14 @@ public final class FrmPeticiones extends FrmMasterPantalla {
                 .bind(PeticionesPendientesBean::getIdAplicacion, PeticionesPendientesBean::setIdAplicacion);
         peticionBinder.forField(perfil)
                 .withConverter(new StringToIntegerConverter("Solo números"))
-                .bind(PeticionesPendientesBean::getIdPerfil, PeticionesPendientesBean::setIdPerfil);        
+                .bind(PeticionesPendientesBean::getIdPerfil, PeticionesPendientesBean::setIdPerfil);
+         */
     }
 
     @Override
     public void doComponenesAtributos() {
         contenedorDerecha.setSpacing(true);
-        contenedorDerecha.setMargin(true); 
+        contenedorDerecha.setMargin(true);
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
                 new FormLayout.ResponsiveStep("50px", 2),
@@ -136,20 +123,20 @@ public final class FrmPeticiones extends FrmMasterPantalla {
 
     @Override
     public void doComponentesOrganizacion() {
-        contenedorFormulario.add(idUsuario,nombreUsuario,tipo,fechaSolicitud,idAplicacion,perfil);
+        contenedorFormulario.add(idUsuario, nombreUsuario, tipo, fechaSolicitud, idAplicacion, perfil);
         contenedorDerecha.add(gridPeticiones);
-        
+
     }
 
     @Override
     public void doCompentesEventos() {
-        gridPeticiones.addItemClickListener(event -> { 
+        gridPeticiones.addItemClickListener(event -> {
             Notification.show("Hola caracola", 14, Notification.Position.MIDDLE);
-            pendientesBean = event.getItem();
-            nombreUsuario.setValue(pendientesBean.getNombreUsuario());
-            peticionBinder.readBean(event.getItem());
+            //   pendientesBean = event.getItem();
+            //   nombreUsuario.setValue(pendientesBean.getNombreUsuario());
+            //  peticionBinder.readBean(event.getItem());
         });
-        
+
     }
-    
+
 }

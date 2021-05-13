@@ -134,6 +134,9 @@ public class UsuarioBean extends MasterBean implements Serializable {
     }
 
     public void setDni(String dni) {
+        if (dni != null) {
+            dni.trim();
+        }
         this.dni = dni;
     }
 
@@ -153,22 +156,33 @@ public class UsuarioBean extends MasterBean implements Serializable {
     }
 
     public void setNombre(String nombre) {
+        if (nombre != null) {
+            nombre.trim();
+        }
         this.nombre = nombre;
     }
 
     public String getApellido1() {
+
         return apellido1;
     }
 
     public String getApellido2() {
+
         return apellido2;
     }
 
     public void setApellido1(String apellido1) {
+        if (apellido1 != null) {
+            apellido1.trim();
+        }
         this.apellido1 = apellido1;
     }
 
     public void setApellido2(String apellido2) {
+        if (apellido2 != null) {
+            apellido2.trim();
+        }
         this.apellido2 = apellido2;
     }
 
@@ -201,6 +215,9 @@ public class UsuarioBean extends MasterBean implements Serializable {
     }
 
     public void setMail(String mail) {
+        if (mail != null) {
+            mail.trim();
+        }
         this.mail = mail;
     }
 
@@ -209,6 +226,9 @@ public class UsuarioBean extends MasterBean implements Serializable {
     }
 
     public void setTelefono(String telefono) {
+        if (telefono != null) {
+            telefono.trim();
+        }
         this.telefono = telefono;
     }
 

@@ -134,7 +134,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
                 + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo "
                 + ",usue.id as usueid,usue.dni as usuedni,usue.apellido1 as usueapellido1"
                 + ",usue.apellido2 as usueapellido2,usue.nombre as usuenombre"
                 + ",usue.estado as usueestado,usue.usucambio as usueusucambio"

@@ -29,8 +29,8 @@ public class CategoriaDao extends ConexionDao implements Serializable {
 
     public CategoriaDao() {
         super();
-        sql = " SELECT uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
-                + ", uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
+        sql = " SELECT   uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo "
+                + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
                 + " FROM categorias uc WHERE  1=1 ";
     }
 
