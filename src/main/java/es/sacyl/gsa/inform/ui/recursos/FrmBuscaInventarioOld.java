@@ -232,6 +232,7 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
                 case "nserie":
                     numeroSerie.setValue(dato.getValor());
                     break;
+
                 case "edificio":
                     switch (dato.getValor()) {
                         case "A2": //exterior

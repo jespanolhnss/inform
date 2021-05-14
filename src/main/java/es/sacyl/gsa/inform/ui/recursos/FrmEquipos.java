@@ -537,7 +537,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorBuscadores1.add(equipoTipoComboBuscador, equipoMarcaComboBuscador, botonImprimir, excelButton, etiquetaListaButton);
         contenedorBuscadores2.add(buscador);
 
-        contenedorDerecha.add(this.contenedorBuscadores, this.contenedorBuscadores1, equipoGrid);
+        contenedorDerecha.add(this.contenedorBuscadores, this.contenedorBuscadores1, contenedorBuscadores1, equipoGrid);
 
         contenedorFormulario.add(id);
         contenedorFormulario.add(equipoTipoCombo);
@@ -987,6 +987,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         // actualiza datos usuarios
         if (this.equipoBean != null) {
             this.equipoBean = equipoBeanParam;
+
             Long id = this.equipoBean.getUbicacion().getId();
             equipoBean.setUbicacion(new UbicacionDao().getPorId(id));
             equipoBinder.readBean(this.equipoBean);
