@@ -17,7 +17,6 @@ import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.NivelesAtentionTipoBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
-import es.sacyl.gsa.inform.ctrl.IpCtrl;
 import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
@@ -38,8 +37,8 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
     private ArrayList<DatoGenericoBean> datoGenericoBeansArrayList = new ArrayList<>();
     private String inventarioNumero = null;
 
-    private final ComboBox<String> equipoTipoCombo = new CombosUi().getEquipoTipoCombo(null, 50);
-    private final ComboBox<String> equipoMarcaCombo = new CombosUi().getGrupoRamaComboValor(ComboBean.TIPOEQUIPOMARCA, equipoTipoCombo.getValue(), null, "Marca");
+    private final ComboBox<String> equipoTipoComboOld = new CombosUi().getEquipoTipoCombo(null, 50);
+    private ComboBox<String> equipoMarcaComboOld = new CombosUi().getGrupoRamaComboValor(ComboBean.TIPOEQUIPOMARCA, equipoTipoComboOld.getValue(), null, "Marca");
 
     private final TextField inventario = new ObjetosComunes().getTextField("Inventario");
     private final TextField modelo = new ObjetosComunes().getTextField("Modelo");
@@ -57,7 +56,7 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
     private Binder<EquipoBean> equipoBinder = new Binder<>();
     private String ipValor;
 
-    public FrmBuscaInventarioOld(String inventarioNumero, ArrayList<DatoGenericoBean> datoGenericoBeansArrayList) {
+    public FrmBuscaInventarioOld(ArrayList<DatoGenericoBean> datoGenericoBeansArrayList) {
         this.inventarioNumero = inventarioNumero;
         this.datoGenericoBeansArrayList = datoGenericoBeansArrayList;
         doComponentesOrganizacion();
@@ -72,7 +71,7 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
 
     @Override
     public void doGrabar() {
-        if (equipoBinder.writeBeanIfValid(equipoBean) && IpCtrl.isValid(ip.getValue())) {
+        if (equipoBinder.writeBeanIfValid(equipoBean)) {
             this.close();
         } else {
             BinderValidationStatus<EquipoBean> validate = equipoBinder.validate();
@@ -126,7 +125,7 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
     @Override
     public void doBinderPropiedades() {
 
-        equipoBinder.forField(equipoTipoCombo)
+        equipoBinder.forField(equipoTipoComboOld)
                 .withNullRepresentation("")
                 .asRequired()
                 .bind(EquipoBean::getTipo, EquipoBean::setTipo);
@@ -136,26 +135,36 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
                 .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(EquipoBean::getInventario, EquipoBean::setInventario);
 
-        equipoBinder.forField(equipoMarcaCombo)
+        equipoBinder.forField(equipoMarcaComboOld)
                 .withNullRepresentation("")
                 .asRequired()
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 50))
                 .bind(EquipoBean::getMarca, EquipoBean::setMarca);
 
         equipoBinder.forField(modelo)
                 .withNullRepresentation("")
-                .asRequired()
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 50))
                 .bind(EquipoBean::getModelo, EquipoBean::setModelo);
 
         equipoBinder.forField(numeroSerie)
                 .withNullRepresentation("")
-                .asRequired()
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 50))
                 .bind(EquipoBean::getNumeroSerie, EquipoBean::setNumeroSerie);
+
+        equipoBinder.forField(nombredominio)
+                .withNullRepresentation("")
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 50))
+                .bind(EquipoBean::getNombredominio, EquipoBean::setNombredominio);
+
+        equipoBinder.forField(observaciones)
+                .withNullRepresentation("")
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 50))
+                .bind(EquipoBean::getComentario, EquipoBean::setComentario);
 
         equipoBinder.forField(centroCombo)
                 .asRequired()
@@ -172,8 +181,8 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
         botonBorrar.setVisible(false);
         botonImprimir.setVisible(false);
         botonLimpiar.setVisible(false);
-        equipoMarcaCombo.setValue("");
-        equipoTipoCombo.setValue("");
+        equipoMarcaComboOld.setValue("");
+        equipoTipoComboOld.setValue("");
     }
 
     /**
@@ -181,7 +190,7 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
      */
     @Override
     public void doComponentesOrganizacion() {
-        contenedorFormulario.add(inventario, equipoTipoCombo, equipoMarcaCombo, modelo,
+        contenedorFormulario.add(inventario, equipoTipoComboOld, equipoMarcaComboOld, modelo,
                 numeroSerie, ip, nombredominio, observaciones, centroCombo);
         contenedorDerecha.add(inventarioGrid);
 
@@ -189,6 +198,10 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
 
     @Override
     public void doCompentesEventos() {
+        equipoTipoComboOld.addValueChangeListener(event -> {
+            ArrayList<String> lista = new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPOMARCA, event.getValue(), 100);
+            equipoMarcaComboOld.setItems(lista);
+        });
     }
 
     /**
@@ -205,12 +218,8 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
                     inventario.setValue(dato.getValor());
                     break;
                 case "nom_maqui":
-                    lista = new ComboDao().getListaGruposRamaAprox(ComboBean.TIPOEQUIPOMARCA, 100, dato.getValor());
-                    if (lista.size() == 1) {
-                        equipoTipoCombo.setValue(lista.get(0));
-                    }
-                    break;
 
+                    break;
                 case "ip":
                     ip.setValue(dato.getValor());
                     break;
@@ -221,10 +230,8 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
                     observaciones.setValue(dato.getValor());
                     break;
                 case "marca":
-                    lista = new ComboDao().getListaGruposRamaValorAprox(ComboBean.TIPOEQUIPOMARCA, dato.getValor(), 100);
-                    if (lista.size() == 1) {
-                        equipoMarcaCombo.setValue(lista.get(0));
-                    }
+                    //     lista = new ComboDao().getListaGruposRamaValorAprox(ComboBean.TIPOEQUIPOMARCA, null, 100);
+                    //   equipoMarcaComboOld = new CombosUi().getGrupoRamaComboValor(ComboBean.TIPOEQUIPOMARCA, equipoTipoComboOld.getValue(), null, "Marca");
                     break;
                 case "modelo":
                     modelo.setValue(dato.getValor());
@@ -232,7 +239,6 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
                 case "nserie":
                     numeroSerie.setValue(dato.getValor());
                     break;
-
                 case "edificio":
                     switch (dato.getValor()) {
                         case "A2": //exterior
@@ -255,8 +261,44 @@ public final class FrmBuscaInventarioOld extends FrmMasterVentana {
                     break;
                 case "gfh":
                     break;
+                case "tipo":
+                    equipoTipoComboOld.setValue(this.recodificaTipo(dato.getValor()));
+                    break;
+
             }
         }
+    }
+
+    public String recodificaTipo(String tipo) {
+        String tipoRecodificado = "";
+        switch (tipo) {
+            case "CPU":
+                tipoRecodificado = "Cpu";
+                break;
+            case "CPU ORDE PORTATIL":
+                tipoRecodificado = "Portátil";
+                break;
+            case "CPU SERVI FISICO":
+                tipoRecodificado = "Servidor";
+                break;
+            case "CPU SERVI VIRTUAL":
+                tipoRecodificado = "Servidor";
+                break;
+            case "CPU TABLE PC":
+                tipoRecodificado = "Tablet";
+                break;
+            case "HUB-SWITCH":
+                tipoRecodificado = "Switch";
+                break;
+            case "MONITOR DE PC":
+                tipoRecodificado = "Monitor";
+                break;
+            case "TECLADO DE PC":
+                tipoRecodificado = "Teclado";
+                break;
+
+        }
+        return tipoRecodificado;
     }
 
     public EquipoBean getEquipoBean() {

@@ -41,7 +41,7 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
                 + ", e.mac as equipomac"
                 + " ,e.estado as equipoestado,e.fechacambio as equipofechacambio, e.usucambio as equipousucambio "
                 + " ,gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + ",gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo"
                 + " ,u.id as ubicacionesid , u.centro as ubicacionescentro, u.descripcion as ubicacionesdescripcion,"
                 + " u.idpadre ubicacionesidpadre, u.nivel  as ubicacionesnivel  "
                 + " , usu.id as usuarioid,usu.dni as usuariodni,usu.apellido1 as usuarioapellido1"

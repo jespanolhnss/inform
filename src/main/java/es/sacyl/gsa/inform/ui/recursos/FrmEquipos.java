@@ -111,6 +111,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final RadioButtonGroup<String> estado = new ObjetosComunes().getEstadoRadio();
 
     private final ComboBox<CentroBean> centroCombo = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPOCENTROSALUD, null, null);
+    private final ComboBox<UbicacionBean> ubicacionComboPadre = new CombosUi().getUbicacionCombo("Zona", centroCombo.getValue(), null, null);
     private final ComboBox<UbicacionBean> ubicacionCombo = new CombosUi().getUbicacionCombo(null, centroCombo.getValue(), null, null);
     private final TextField ubicacion = new ObjetosComunes().getTextField("Ubicación");
     //  private final TextField servicio = new ObjetosComunes().getTextField("Servicio");
@@ -151,6 +152,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
         doCompentesEventos();
         doControlBotones(null);
         doActualizaComboCentro();
+        equipoTipoCombo.setValue("");
+        equipoTipoComboBuscador.setValue(ComboBean.TIPOEQUIPOCPU);
     }
 
     /**
@@ -293,7 +296,6 @@ public final class FrmEquipos extends FrmMasterPantalla {
         equipoBean.setMarca(equipoMarcaCombo.getValue());
         equipoBean.setModelo(modelo.getValue());
         id.clear();
-        ip.clear();
         inventario.clear();
         numeroSerie.clear();
         macAdress.clear();
@@ -326,6 +328,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
             equipoGrid.removeAllColumns();
             equipoGrid.addColumn(EquipoBean::getIpsCadena).setAutoWidth(true).setHeader(new Html("<b>Ip</b>"));
             equipoGrid.addColumn(EquipoBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Est</b>")).setWidth("20px");
+            equipoGrid.addColumn(EquipoBean::getIpsCadena).setAutoWidth(true).setHeader(new Html("<b>Ip</b>"));
             equipoGrid.addColumn(EquipoBean::getInventario).setAutoWidth(true).setHeader(new Html("<b>Invent</b>")).setWidth("70px");
             equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
             equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
@@ -333,6 +336,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         } else {
             equipoGrid.removeAllColumns();
             equipoGrid.addColumn(EquipoBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Est</b>")).setWidth("20px");
+
             equipoGrid.addColumn(EquipoBean::getInventario).setAutoWidth(true).setHeader(new Html("<b>Invent</b>")).setWidth("70px");
             equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
             equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
@@ -418,21 +422,21 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 .withNullRepresentation("")
                 .asRequired()
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 50))
                 .bind(EquipoBean::getMarca, EquipoBean::setMarca);
 
         equipoBinder.forField(modelo)
                 .withNullRepresentation("")
                 .asRequired()
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 50))
                 .bind(EquipoBean::getModelo, EquipoBean::setModelo);
 
         equipoBinder.forField(numeroSerie)
                 .withNullRepresentation("")
                 .asRequired()
                 .withValidator(new StringLengthValidator(
-                        FrmMensajes.AVISODATOABLIGATORIO, 1, 15))
+                        FrmMensajes.AVISODATOABLIGATORIO, 1, 50))
                 .bind(EquipoBean::getNumeroSerie, EquipoBean::setNumeroSerie);
 
         equipoBinder.forField(macAdress)
@@ -440,11 +444,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
                         FrmMensajes.AVISODATOABLIGATORIO, 0, 17))
                 .bind(EquipoBean::getMacadress, EquipoBean::setMacadress);
 
-        /*
-        equipoBinder.forField(ip)
-                .withNullRepresentation("")
-                .bind(EquipoBean::getIpsCadena,null);
-         */
+        equipoBinder.forField(nombredominio)
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 0, 17))
+                .bind(EquipoBean::getNombredominio, EquipoBean::setNombredominio);
+
         equipoBinder.forField(comentario)
                 .withNullRepresentation("")
                 .bind(EquipoBean::getComentario, EquipoBean::setComentario);
@@ -492,6 +496,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
         botonImprimir.setEnabled(true);
 
         nombredominio.setMinWidth("170px");
+
+        nombreusuario.setMaxWidth("300px");
 
         wwwimage.setVisible(false);
         comentario.setMaxWidth("640px");
@@ -557,8 +563,10 @@ public final class FrmEquipos extends FrmMasterPantalla {
         contenedorFormulario.add(centroCombo, 3);
         contenedorFormulario.add(servicioCombo, 3);
 
-        contenedorFormulario.add(ubicacionCombo, 5);
+        contenedorFormulario.add(ubicacionComboPadre, 2);
+        contenedorFormulario.add(ubicacionCombo, 3);
         contenedorFormulario.add(ayudaUbicacion);
+
         contenedorFormulario.add(dni, ayudaUsuario);
         contenedorFormulario.add(nombreusuario, 4);
 
@@ -586,7 +594,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
          */
         equipoTipoCombo.addValueChangeListener(event -> {
             equipoMarcaCombo.setItems(new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPOMARCA, event.getValue(), 100));
-            if (equipoTipoCombo.getValue().equals(EquipoBean.TIPOCPU) || equipoTipoCombo.getValue().equals(EquipoBean.TIPOTELEFONO)) {
+            if (equipoTipoCombo != null && !equipoTipoCombo.getValue().isEmpty() && equipoTipoCombo.getValue().equals(EquipoBean.TIPOCPU) || equipoTipoCombo.getValue().equals(EquipoBean.TIPOTELEFONO)) {
                 dni.setVisible(true);
                 nombreusuario.setVisible(true);
                 ayudaUsuario.setVisible(true);
@@ -641,10 +649,15 @@ public final class FrmEquipos extends FrmMasterPantalla {
          * valores de combo hijo de ubicaciones.
          */
         centroCombo.addValueChangeListener(event -> {
-            ubicacionCombo.setItems(new UbicacionDao().getLista(null, event.getValue(), null));
+            ubicacionComboPadre.setItems(new UbicacionDao().getListaPadresCentro(event.getValue()));
+            //
+
             doActualizaGrid();
         });
-
+        ubicacionComboPadre.addValueChangeListener(event -> {
+            ArrayList<UbicacionBean> lista = new UbicacionDao().getListaHijos(ubicacionComboPadre.getValue(), centroCombo.getValue());
+            ubicacionCombo.setItems(lista);
+        });
         /**
          * Cuado seleccina un equipo en e grid, actualiza el bean, hace visibles
          * los botones, actualiza los valores del formulario, actualiza las
@@ -938,30 +951,41 @@ public final class FrmEquipos extends FrmMasterPantalla {
     }
 
     public void doRecuperaEquipoDeGaleno() {
+        String cadena = "";
         ArrayList<DatoGenericoBean> datoGenericoBeansArrayList = new ArrayList<>();
         if (inventario.getValue().isEmpty()) {
             if (IpCtrl.isValid(ip.getValue())) {
                 datoGenericoBeansArrayList = new GalenoDao().getEquipo(ip.getValue(), "Ip");
+                cadena = " IP = " + ip.getValue();
             } else {
                 Notification.show("Ip no válida");
                 ip.focus();
             }
         } else {
             datoGenericoBeansArrayList = new GalenoDao().getEquipo(inventario.getValue(), "Inventario");
+            cadena = "Inventario" + inventario.getValue();
         }
         if (datoGenericoBeansArrayList.size() > 0) {
-            FrmBuscaInventarioOld frmBuscaInventarioOld = new FrmBuscaInventarioOld(inventario.getValue(), datoGenericoBeansArrayList);
+            FrmBuscaInventarioOld frmBuscaInventarioOld = new FrmBuscaInventarioOld(datoGenericoBeansArrayList);
             frmBuscaInventarioOld.addDetachListener(event1 -> {
-                doActualizaDatosBotones(frmBuscaInventarioOld.getEquipoBean());
-                ip.setValue(frmBuscaInventarioOld.getIpValor());
-                //  doGestionaUnaIp(ip.getValue());
+                if (frmBuscaInventarioOld.getEquipoBean() != null) {
+                    equipoBean = frmBuscaInventarioOld.getEquipoBean();
+                    equipoBinder.readBean(equipoBean);
+                    doActualizaDatosBotones(equipoBean);
+                    ip.setValue(frmBuscaInventarioOld.getIpValor());
+                }
             });
             frmBuscaInventarioOld.addDialogCloseActionListener(event1 -> {
-                doActualizaDatosBotones(frmBuscaInventarioOld.getEquipoBean());
-                ip.setValue(frmBuscaInventarioOld.getIpValor());
-                //doGestionaUnaIp(ip.getValue());
+                if (frmBuscaInventarioOld.getEquipoBean() != null) {
+                    equipoBean = frmBuscaInventarioOld.getEquipoBean();
+                    equipoBinder.readBean(equipoBean);
+                    doActualizaDatosBotones(equipoBean);
+                    ip.setValue(frmBuscaInventarioOld.getIpValor());
+                }
             });
             frmBuscaInventarioOld.open();
+        } else {
+            Notification.show(" No se encuentran datos en galeno para " + cadena);
         }
     }
 
@@ -985,13 +1009,17 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         // actualiza lista de ips
         // actualiza datos usuarios
-        if (this.equipoBean != null) {
-            this.equipoBean = equipoBeanParam;
-
-            Long id = this.equipoBean.getUbicacion().getId();
-            equipoBean.setUbicacion(new UbicacionDao().getPorId(id));
-            equipoBinder.readBean(this.equipoBean);
-            equipoBean.setListaIps(new IpDao().getLista(null, null, equipoBean, null, null));
+        if (equipoBeanParam != null) {
+            // lee el registro para incluir la ubicación y las ips
+            this.equipoBean = new EquipoDao().getPorId(equipoBeanParam.getId(), equipoBeanParam.getCentro(), equipoBeanParam.getServicio(), null);
+            equipoBinder.readBean(equipoBean);
+            /*
+            if (equipoBean.getUbicacion() != null && !this.equipoBean.getUbicacion().getId().equals(new Long(0))) {
+                Long id = this.equipoBean.getUbicacion().getId();
+                equipoBean.setUbicacion(new UbicacionDao().getPorId(id, centroCombo.getValue()));
+            }
+             */
+            //   equipoBean.setListaIps(new IpDao().getLista(null, null, equipoBean, null, null));
             ip.setValue(equipoBean.getIpsCadena());
             // Estos datos sólo los carga cuando hace clic en el grid
             equipoBean.setDatosGenericoBeans(new EquipoDao().getListaDatosGenericos(equipoBean));

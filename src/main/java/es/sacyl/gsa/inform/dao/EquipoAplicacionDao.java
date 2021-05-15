@@ -39,7 +39,7 @@ public class EquipoAplicacionDao extends ConexionDao implements Serializable, Co
                 + " ,ap.fechaInstalacion aplicacionfechaInstalacion,   ap.estado as aplicacionestado"
                 + " ,ap. usucambio as aplicacionusucambio,ap. fechacambio as aplicacionfechacambio "
                 + " ,gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + " ,gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + " ,gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo"
                 + " ,prvee.id as proveedorid, prvee.nombre as proveedornombre"
                 + " ,prvee.direccion as proveedordirecion,prvee.codpostal as proveedorcodpostal"
                 + " ,prvee.telefonos as proveedortelfoonos,prvee.mail as proveedormail"

@@ -85,8 +85,16 @@ public class GfhBean extends MasterBean implements Serializable {
         return gfhpersigo;
     }
 
+    public DatoGenericoBean getGfhpersigoDato() {
+        return new DatoGenericoBean(gfhpersigo, gfhpersigo);
+    }
+
     public void setGfhpersigo(String gfhpersigo) {
         this.gfhpersigo = gfhpersigo;
+    }
+
+    public void setGfhpersigo(DatoGenericoBean gfhpersigo) {
+        this.gfhpersigo = gfhpersigo.getTipoDato();
     }
 
     @Override

@@ -22,10 +22,11 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
 
     private static final Logger LOGGER = LogManager.getLogger(UbicacionDao.class);
     private static final long serialVersionUID = 1L;
+    String sqlold;
 
     public UbicacionDao() {
         super();
-        sql = " SELECT u.id as ubicacionesid , u.centro as ubicacionescentro, u.descripcion as ubicacionesdescripcion"
+        sqlold = " SELECT u.id as ubicacionesid , u.centro as ubicacionescentro, u.descripcion as ubicacionesdescripcion"
                 + " ,u.idpadre ubicacionesidpadre, u.nivel  as ubicacionesnivel  "
                 + " ,padre.id as padreid , padre.centro as padrecentro, padre.descripcion as padredescripcion"
                 + " ,padre.idpadre padreidpadre, padre.nivel  as padrenivel  "
@@ -119,6 +120,18 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
                 + "CONNECT BY PRIOR u.ID = u.IDPADRE "
                 + " ORDER SIBLINGS BY u.ID "
                 + " ) WHERE 1=1 ";
+
+        sql = "SELECT * FROM (  "
+                + "  SELECT  u.id as ubicacionesid , u.centro as ubicacionescentro, u.descripcion as ubicacionesdescripcion "
+                + " ,u.idpadre ubicacionesidpadre, u.nivel  as ubicacionesnivel   "
+                + " ,padre.id as padreid , padre.centro as padrecentro, padre.descripcion as padredescripcion  "
+                + " ,padre.idpadre padreidpadre, padre.nivel  as padrenivel  ,    level,    pd.DESCRIPCION parent_name"
+                + ",    CONNECT_BY_ROOT u.id AS root_id,    LTRIM(SYS_CONNECT_BY_PATH(u.DESCRIPCION, ' -> '), ' -> ') AS descripcionfull, "
+                + "   CONNECT_BY_ISLEAF AS leaf    "
+                + " FROM     UBICACIONES u    "
+                + " LEFT JOIN ubicaciones padre ON padre.id=u.idpadre               "
+                + " LEFT JOIN UBICACIONES pd ON u.IDPADRE = pd.ID    START WITH u.IDPADRE IS NULL CONNECT BY PRIOR u.ID = u.IDPADRE  ORDER SIBLINGS BY u.ID  ) "
+                + " WHERE 1=1";
     }
 
     /**
@@ -143,17 +156,18 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
             ubicacionBean.setId(rs.getLong("ubicacionesid"));
             ubicacionBean.setDescripcion(rs.getString("ubicacionesdescripcion"));
             if (centroBean == null) {
-                //  ubicacionBean.setCentro(new CentroDao().getPorId(rs.getLong("ubicacionescentro")));
-                ubicacionBean.setCentro(new CentroDao().getRegistroResulset(rs));
+                ubicacionBean.setCentro(new CentroDao().getPorId(rs.getLong("ubicacionescentro")));
+                //  ubicacionBean.setCentro(new CentroDao().getRegistroResulset(rs));
             } else {
                 ubicacionBean.setCentro(centroBean);
             }
             if (rs.getLong("ubicacionesidpadre") != new Long(0)) {
-                ubicacionBean.setPadre(getPorId(rs.getLong("ubicacionesidpadre")));
+                ubicacionBean.setPadre(getPorId(rs.getLong("ubicacionesidpadre"), centroBean));
             }
             ubicacionBean.setNivel(rs.getInt("ubicacionesnivel"));
             // tiene que recuperar el padre para obtener el nombre completo en el arbol
             //   ubicacionBean.setDescripcionFull(getNombreCompleto(ubicacionBean, ubicacionBean.getCentro()));
+
             ubicacionBean.setDescripcionFull(rs.getString("descripcionfull"));
         } catch (SQLException e) {
             LOGGER.error(Utilidades.getStackTrace(e));
@@ -168,6 +182,10 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
      */
     @Override
     public UbicacionBean getPorId(Long id) {
+        return getPorId(id, null);
+    }
+
+    public UbicacionBean getPorId(Long id, CentroBean centro) {
         Connection connection = null;
         UbicacionBean ubicacionBean = null;
         String sqlU = sql;
@@ -177,7 +195,7 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sqlU);
                 if (resulSet.next()) {
-                    ubicacionBean = getRegistroResulset(resulSet, null);
+                    ubicacionBean = getRegistroResulset(resulSet, centro);
                 }
                 statement.close();
             }
@@ -200,7 +218,7 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
     @Override
     public boolean doGrabaDatos(UbicacionBean ubicacionBean) {
         boolean actualizado = false;
-        if (this.getPorId(ubicacionBean.getId()) == null) {
+        if (this.getPorId(ubicacionBean.getId(), ubicacionBean.getCentro()) == null) {
             ubicacionBean.setId(getSiguienteId("ubicaciones"));
             actualizado = this.doInsertaDatos(ubicacionBean);
         } else {
@@ -425,17 +443,17 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
      *
      * Lista todas las ubicaciones a partir de un padre
      */
-    public ArrayList<UbicacionBean> getListaHijos(UbicacionBean ubicacionBean) {
+    public ArrayList<UbicacionBean> getListaHijos(UbicacionBean ubicacionBean, CentroBean centro) {
         Connection connection = null;
         ArrayList<UbicacionBean> lista = new ArrayList<>();
         // para que monte la sql a partir del padre
         String sqlU = sql.replace("WITH u.IDPADRE IS NULL", "WITH u.IDPADRE=" + ubicacionBean.getId());
-        // + "    LTRIM(SYS_CONNECT_BY_PATH(u.DESCRIPCION, ' -> '), ' -> ') AS descripcionfull,"
-        sqlU = sqlU.replace("SYS_CONNECT_BY_PATH(u.DESCRIPCION", "'" + ubicacionBean.getDescripcion() + "'||" + " SYS_CONNECT_BY_PATH(u.DESCRIPCION"
-        );
+        sqlU = sqlU.replace("SYS_CONNECT_BY_PATH(u.DESCRIPCION", "'" + ubicacionBean.getDescripcion() + "'||" + " SYS_CONNECT_BY_PATH(u.DESCRIPCION");
+
+        //  String sqlU = sqlold.concat(" AND  u.idpadre = " + ubicacionBean.getId());
         try {
             connection = super.getConexionBBDD();
-            // sqlU = sqlU.concat(" AND  ubicacionesidpadre = " + ubicacionBean.getId());
+            sqlU = sqlU.concat(" AND  ubicacionesidpadre = " + ubicacionBean.getId());
             sqlU = sqlU.concat(" ORDER BY  ubicacionescentro,  ubicacionesdescripcion  ");
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(sqlU);
@@ -467,7 +485,7 @@ public class UbicacionDao extends ConexionDao implements Serializable, ConexionI
             } else {
                 nombre = ">" + nombre;
             }
-            ubicacion = getPorId(ubicacion.getPadre().getId());
+            ubicacion = getPorId(ubicacion.getPadre().getId(), centroBean);
         }
         if (ubicacion != null && ubicacion.getDescripcion() != null) {
             nombre = ubicacion.getDescripcion() + nombre;

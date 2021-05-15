@@ -2,6 +2,7 @@ package es.sacyl.gsa.inform.dao;
 
 import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.bean.CategoriaBean;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.FuncionalidadBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.ParametroBean;
@@ -905,6 +906,37 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 //   pendiente.setIdPerfil(resulSet.getInt("idperfil"));
                 pendiente.setTipo(resulSet.getString("tipo"));
                 lista.add(pendiente);
+            }
+            statement.close();
+            logger.debug(select);
+        } catch (SQLException e) {
+            logger.error(select + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+
+    public ArrayList<DatoGenericoBean> getGfhPersigo() {
+        Connection connection = null;
+        ArrayList<DatoGenericoBean> lista = new ArrayList<>();
+        String select;
+        select = "select idusuario, up.fechasolicitud, upa.idaplicacion, upa.idperfil, up.tipo "
+                + "from usuariospeticiones up "
+                + "join usuariospeticionesapp upa on up.id = upa.idpeticion "
+                + "where up.estado = 0 and upa.estado = 0";
+
+        try {
+            connection = super.getConexionBBDD();
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(select);
+            while (resulSet.next()) {
+                DatoGenericoBean dato = new DatoGenericoBean();
+                dato.setTipoDato(resulSet.getString("gfh"));
+                dato.setTipoDato(resulSet.getString("descgfh"));
+                lista.add(dato);
             }
             statement.close();
             logger.debug(select);

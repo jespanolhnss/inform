@@ -1,6 +1,7 @@
 package es.sacyl.gsa.inform.ui.tablas;
 
 import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
@@ -10,8 +11,10 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.dao.GfhDao;
+import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
@@ -33,7 +36,7 @@ public final class FrmGfh extends FrmMasterPantalla {
     private final TextField descripcion = new ObjetosComunes().getTextField("Nombre", "nombre", 50, "300px", "50px");
     private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
     private final RadioButtonGroup<String> asistencialRadio = new ObjetosComunes().getSNRadio("Asistencial");
-
+    private final ComboBox<DatoGenericoBean> gfhPersiog = new CombosUi().getGfhPersigo();
     private GfhBean servicioBean = null;
     private final Binder<GfhBean> servicioBinder = new Binder<>();
     private final PaginatedGrid<GfhBean> servicioGrid = new PaginatedGrid<>();
@@ -173,6 +176,10 @@ public final class FrmGfh extends FrmMasterPantalla {
                 .withNullRepresentation("")
                 .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(GfhBean::getIdjimena, GfhBean::setIdjimena);
+
+        servicioBinder.forField(gfhPersiog)
+                .bind(GfhBean::getGfhpersigoDato, GfhBean::setGfhpersigo);
+
     }
 
     @Override
@@ -183,7 +190,7 @@ public final class FrmGfh extends FrmMasterPantalla {
 
     @Override
     public void doComponentesOrganizacion() {
-        this.contenedorFormulario.add(id, codigo, descripcion, estadoRadio, idjimena, asistencialRadio);
+        this.contenedorFormulario.add(id, codigo, descripcion, estadoRadio, idjimena, gfhPersiog, asistencialRadio);
         this.contenedorBuscadores.add(buscador);
         this.contenedorDerecha.removeAll();
         this.contenedorDerecha.add(contenedorBuscadores, servicioGrid);

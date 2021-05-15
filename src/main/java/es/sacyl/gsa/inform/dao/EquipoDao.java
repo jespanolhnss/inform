@@ -309,6 +309,10 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
      */
     @Override
     public EquipoBean getPorId(Long id) {
+        return getPorId(id, null, null, null);
+    }
+
+    public EquipoBean getPorId(Long id, CentroBean centro, GfhBean gfh, AplicacionBean aplicacion) {
         Connection connection = null;
         EquipoBean equipoBean = null;
         try {
@@ -317,7 +321,7 @@ public class EquipoDao extends ConexionDao implements Serializable, ConexionInte
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
                 if (resulSet.next()) {
-                    equipoBean = getRegistroResulset(resulSet, null, null, true, true, null, true);
+                    equipoBean = getRegistroResulset(resulSet, centro, gfh, true, true, aplicacion, true);
                 }
                 statement.close();
             }

@@ -33,6 +33,11 @@ public class DatoGenericoBean extends MasterBean implements Serializable {
         super();
     }
 
+    public DatoGenericoBean(String tipo, String valor) {
+        this.tipoDato = tipo;
+        this.valor = valor;
+    }
+
     public Long getIdDatoEqipo() {
         return idDatoEqipo;
     }
@@ -42,7 +47,11 @@ public class DatoGenericoBean extends MasterBean implements Serializable {
     }
 
     public String getTipoDato() {
-        return tipoDato;
+        if (tipoDato != null) {
+            return tipoDato;
+        } else {
+            return "";
+        }
     }
 
     public void setTipoDato(String tipoDato) {

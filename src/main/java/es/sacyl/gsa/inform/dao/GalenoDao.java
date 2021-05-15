@@ -158,10 +158,11 @@ public class GalenoDao {
         Connection conn = this.conecta();
         ArrayList<DatoGenericoBean> datos = new ArrayList<>();
         String sql = "  SELECT  dir1 ,dir2,dir3,dir4 ,nombre_equipo,gfh,usuario,observaciones"
-                + " ,cod_maqui,invt_marca.descripcion,modelo,nserie ,nom_maqui,equipo,fec_baja,edificio,codplan,codala,sala"
+                + " ,cod_maqui,invt_marca.descripcion,modelo,nserie ,nom_maqui,equipo,fec_baja,edificio,codplan,codala,sala,nom_tipo"
                 + " FROM hnss_ip_lineas"
                 + " JOIN  hnss_ip on hnss_ip.id=hnss_ip_lineas.id_ip"
                 + " LEFT JOIN  man_maqui on man_maqui.cod_maqui=hnss_ip_lineas. numero_registro"
+                + " LEFT JOIN inv_tipm ON inv_tipm.cod_tipo=man_maqui.tipo "
                 + " LEFT JOIN  invt_marca on invt_marca.codigo=man_maqui.marca WHERE 1=1 "
                 + "  AND  hnss_ip_lineas.fecha_fin is null  ";
         if (tipo.equals("Ip")) {
@@ -311,7 +312,15 @@ public class GalenoDao {
                     if (resulSet.getString("sala") != null) {
                         datog.setValor(datog.getValor() + "-" + resulSet.getString("sala").trim());
                     }
+                    datos.add(datog);
 
+                    datog = new DatoGenericoBean();
+                    datog.setTipoDato("tipo");
+                    if (resulSet.getString("nom_tipo") != null) {
+                        datog.setValor(resulSet.getString("nom_tipo").trim());
+                    } else {
+                        datog.setValor("");
+                    }
                     datos.add(datog);
 
                 }
