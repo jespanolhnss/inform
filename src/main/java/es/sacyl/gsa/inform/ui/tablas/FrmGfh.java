@@ -134,6 +134,7 @@ public final class FrmGfh extends FrmMasterPantalla {
         servicioGrid.addColumn(GfhBean::getId).setAutoWidth(true).setHeader(new Html("<b>Id</b>"));
         servicioGrid.addColumn(GfhBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Estado</b>"));
         servicioGrid.addColumn(GfhBean::getCodigo).setAutoWidth(true).setHeader(new Html("<b>Cod</b>"));
+        servicioGrid.addColumn(GfhBean::getGfhpersigo).setAutoWidth(true).setHeader(new Html("<b>Per</b>"));
         servicioGrid.addColumn(GfhBean::getDescripcion).setAutoWidth(true).setHeader(new Html("<b>Nombre</b>"));
 
         doActualizaGrid();

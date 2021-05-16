@@ -201,13 +201,16 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
     @Override
     public boolean doGrabaDatos(UsuarioBean usuarioBean) {
         boolean grabado = false;
+        // como busca por dni puede que exista pero el bean sie procede de persigo no tiene id
 
-        if (getPorDni(usuarioBean.getDni()) == null) {
+        UsuarioBean usubb = getPorDni(usuarioBean.getDni());
+        if (usubb == null) {
             usuarioBean.setId(getSiguienteId("usuarios"));
             grabado = this.doInsertaDatos(usuarioBean);
         } else {
+            usuarioBean.setId(usubb.getId());
             grabado = this.doActualizaDatos(usuarioBean);
-            grabado = doActualizaFuncionalidad(usuarioBean);
+            //  grabado = doActualizaFuncionalidad(usuarioBean);
         }
         return grabado;
     }
@@ -674,7 +677,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
 
         try {
             connection = super.getConexionBBDD();
-            String select = " select nif,ape1,ape2,nombre,mail,tel1,codfunc FROM usuariospersigo where nif = '" + value + "'";
+            String select = " select nif,ape1,ape2,nombre,mail,tel1,codfunc,gfh FROM usuariospersigo where nif = '" + value + "'";
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(select);
                 while (resulSet.next()) {
@@ -684,7 +687,12 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                     usuario.setNombre(resulSet.getString("nombre"));
                     usuario.setMail(resulSet.getString("mail"));
                     usuario.setTelefono(resulSet.getString("tel1"));
-                    usuario.setCategoria(new CategoriaDao().getPorCodigo(resulSet.getString("codfunc")));
+                    if (resulSet.getString("codfunc") != null) {
+                        usuario.setCategoria(new CategoriaDao().getPorCodigo(resulSet.getString("codfunc").trim()));
+                    }
+                    if (resulSet.getString("gfh") != null) {
+                        usuario.setGfh(new GfhDao().getPorCodigoPersigo(resulSet.getString("gfh").trim()));
+                    }
                 }
             }
             logger.debug(select);
@@ -706,7 +714,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         try {
             connection = super.getConexionBBDD();
             String select;
-            select = " select dni,apellido1,apellido2,nombre,mail,telefono,movil,mailprivado FROM usuarios where dni = '" + dni + "'";
+            select = sql + " AND  dni = '" + dni + "'";
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(select);
                 while (resulSet.next()) {
@@ -771,7 +779,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             if (peticion.getTipo() != null) {
                 statement.setString(8, peticion.getTipo());
             } else {
-                statement.setNull(9, Types.CHAR);
+                statement.setNull(8, Types.CHAR);
             }
             insertado = statement.executeUpdate() > 0;
             statement.close();
@@ -889,7 +897,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         Connection connection = null;
         ArrayList<UsuarioPeticionBean> lista = new ArrayList<>();
         String select;
-        select = "select idusuario, up.fechasolicitud, upa.idaplicacion, upa.idperfil, up.tipo "
+        select = "select idpeticionario, idusuario, up.fechasolicitud, upa.idaplicacion, upa.idperfil, up.tipo "
                 + "from usuariospeticiones up "
                 + "join usuariospeticionesapp upa on up.id = upa.idpeticion "
                 + "where up.estado = 0 and upa.estado = 0";
@@ -900,10 +908,10 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             ResultSet resulSet = statement.executeQuery(select);
             while (resulSet.next()) {
                 UsuarioPeticionBean pendiente = new UsuarioPeticionBean();
+                pendiente.setPeticionario(new UsuarioDao().getPorId(resulSet.getLong("idpeticionario")));
                 pendiente.setUsuario(new UsuarioDao().getPorId(resulSet.getLong("idusuario")));
                 pendiente.setFechaSolicitud(Utilidades.getFechaLocalDaten(resulSet.getLong("fechasolicitud")));
-                //     pendiente.setAplicacion(resulSet.getLong("idaplicacion"));
-                //   pendiente.setIdPerfil(resulSet.getInt("idperfil"));
+
                 pendiente.setTipo(resulSet.getString("tipo"));
                 lista.add(pendiente);
             }
@@ -923,10 +931,9 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         Connection connection = null;
         ArrayList<DatoGenericoBean> lista = new ArrayList<>();
         String select;
-        select = "select idusuario, up.fechasolicitud, upa.idaplicacion, upa.idperfil, up.tipo "
-                + "from usuariospeticiones up "
-                + "join usuariospeticionesapp upa on up.id = upa.idpeticion "
-                + "where up.estado = 0 and upa.estado = 0";
+        select = " select unique gfh,descgfh from "
+                + " usuariospersigo"
+                + "  order by descgfh";
 
         try {
             connection = super.getConexionBBDD();
@@ -935,7 +942,13 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             while (resulSet.next()) {
                 DatoGenericoBean dato = new DatoGenericoBean();
                 dato.setTipoDato(resulSet.getString("gfh"));
-                dato.setTipoDato(resulSet.getString("descgfh"));
+                if (dato.getTipoDato() != null) {
+                    dato.setTipoDato(dato.getTipoDato().trim());
+                }
+                dato.setValor(resulSet.getString("descgfh"));
+                if (dato.getValor() != null) {
+                    dato.setValor(dato.getValor().trim());
+                }
                 lista.add(dato);
             }
             statement.close();

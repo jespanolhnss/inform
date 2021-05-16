@@ -714,7 +714,7 @@ public class CombosUi {
         ComboBox<DatoGenericoBean> combo;
         combo = new ComboBox<>("Gfhs Pérsigo");
         combo.setItems(new UsuarioDao().getGfhPersigo());
-        combo.setItemLabelGenerator(DatoGenericoBean::getTipoDato);
+        combo.setItemLabelGenerator(DatoGenericoBean::getValor);
         combo.setMinWidth("150px");
         combo.setClearButtonVisible(true);
         return combo;

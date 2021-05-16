@@ -61,7 +61,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
     @Override
     public boolean doGrabaDatos(GfhBean gfhBean) {
         boolean actualizado = false;
-        if (gfhBean.getId() == null || gfhBean.getId().equals(new Long(0)) || this.getPorId(gfhBean.getId()) == null) {
+        if (this.getPorId(gfhBean.getId()) == null) {
             gfhBean.setId(getSiguienteId("gfh"));
             actualizado = doInsertaDatos(gfhBean);
         } else {
@@ -308,7 +308,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
         GfhBean gfh = null;
         try {
             connection = super.getConexionBBDD();
-            sql = "SELECT  *  FROM gfh WHERE 1=1 ";
+            //      sql = "SELECT  *  FROM gfh WHERE 1=1 ";
             if (estado != null) {
                 sql = sql.concat(" AND  estado =" + estado);
             }
@@ -335,13 +335,42 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
         return gfh;
     }
 
+    public GfhBean getPorCodigoPersigo(String codigo) {
+        Connection connection = null;
+        GfhBean gfh = null;
+        try {
+            connection = super.getConexionBBDD();
+            //  sql = "SELECT  *  FROM gfh WHERE 1=1 ";
+            if (codigo != null && !codigo.isEmpty()) {
+                sql = sql.concat(" AND gfhpersigo='" + codigo + "'");
+            }
+            logger.debug(sql);
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resulSet = statement.executeQuery(sql);
+                if (resulSet.next()) {
+                    gfh = getRegistroResulset(resulSet);
+                } else {
+                    logger.error("No existe gfh en hnss para el código persigo " + codigo);
+                }
+                statement.close();
+            }
+        } catch (SQLException e) {
+            logger.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return gfh;
+    }
+
     public GfhBean getServicioCodigoExiste(String codigo, GfhBean gfhParam) {
         Connection connection = null;
         GfhBean gfh = null;
         try {
             connection = super.getConexionBBDD();
-            sql = "SELECT  *  FROM gfh WHERE estado=" + ConexionDao.BBDD_ACTIVOSI + " AND codigo='" + codigo
-                    + "' AND id!=" + gfhParam.getId();
+            sql = sql.concat(" AND  estado=" + ConexionDao.BBDD_ACTIVOSI + " AND codigo='" + codigo
+                    + "' AND id!=" + gfhParam.getId());
             logger.debug(sql);
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);
@@ -351,8 +380,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
                 statement.close();
             }
         } catch (SQLException e) {
-            logger.error(sql);
-            logger.error(ConexionDao.ERROR_BBDD_SQL, e);
+            logger.error(sql + Utilidades.getStackTrace(e));
         } catch (Exception e) {
             logger.error(Utilidades.getStackTrace(e));
         } finally {

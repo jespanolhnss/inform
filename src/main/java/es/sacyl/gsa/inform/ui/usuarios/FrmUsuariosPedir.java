@@ -120,6 +120,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
             }
             centrosString = centrosString.concat(cadena.getId().toString());
         }
+        peticionBean.setFechaSolicitud(LocalDate.now());
         peticionBean.setCentros(centrosString);
         peticionBean.setComentario(comentario.getValue());
         peticionBean.setTipo(tipo.getValue());
@@ -195,9 +196,9 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         usuarioBinder.forField(movilUsuario).bind(UsuarioBean::getMovilUsuario, UsuarioBean::setMovilUsuario);
         usuarioBinder.forField(categoriaUsuario).bind(UsuarioBean::getCategoria, UsuarioBean::setCategoria);
         usuarioBinder.forField(gfhUsuario).bind(UsuarioBean::getGfh, UsuarioBean::setGfh);
-        usuarioBinder.forField(tipo).bind(UsuarioBean::getTipo, UsuarioBean::setTipo);
-        usuarioBinder.forField(comentario).bind(UsuarioBean::getComentario, UsuarioBean::setComentario);
 
+        //  peticionBean.forField(tipo).bind(UsuarioPeticionBean::getTipo, UsuarioPeticionBean::setTipo);
+        //  peticionBean.forField(comentario).bind(UsuarioPeticionBean::getComentario, UsuarioPeticionBean::setComentario);
         solicitanteBinder.forField(idSolicitante)
                 .withConverter(new StringToLongConverter("Introducir un Long"))
                 .bind(UsuarioBean::getId, UsuarioBean::setId);
@@ -254,7 +255,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
 
     public void doCompletaDatosPersigo() {
         UsuarioBean usuarioBeanHnss = new UsuarioDao().getPorDni(nifUsuario.getValue());
-        if (usuarioBeanHnss.getDni() != null) {
+        if (usuarioBeanHnss != null && usuarioBeanHnss.getDni() != null) {
             if (usuarioBean.getNombre() == null || usuarioBean.getNombre().isEmpty()) {
                 usuarioBean.setNombre(usuarioBeanHnss.getNombre());
             }
@@ -276,7 +277,9 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
             if (usuarioBean.getCategoria() == null) {
                 usuarioBean.setCategoria(usuarioBeanHnss.getCategoria());
             }
-
+            if (usuarioBean.getGfh() == null) {
+                usuarioBean.setGfh(usuarioBeanHnss.getGfh());
+            }
         }
     }
 

@@ -97,6 +97,14 @@ public class UsuarioPeticionBean extends MasterBean implements Serializable {
         return usucambio;
     }
 
+    public String getUsuarioNombre() {
+        if (usuario != null) {
+            return usuario.getApellidosNombre();
+        } else {
+            return "";
+        }
+    }
+
     public void setUsucambio(UsuarioBean usucambio) {
         this.usucambio = usucambio;
     }
