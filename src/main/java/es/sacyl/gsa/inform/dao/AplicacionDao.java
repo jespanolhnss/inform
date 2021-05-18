@@ -363,6 +363,32 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
         return lista;
     }
 
+    public ArrayList<AplicacionBean> getListaPedir() {
+        Connection connection = null;
+        ArrayList<AplicacionBean> lista = new ArrayList<>();
+        try {
+            connection = super.getConexionBBDD();
+
+            sql = sql.concat(" AND ap.estado=" + ConexionDao.BBDD_ACTIVOSI);
+            sql = sql.concat(" AND  GESTIONUSUARIOS IN ('INFORMATICA')");
+            sql = sql.concat(" ORDER BY ap.nombre  ");
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(sql);
+            while (resulSet.next()) {
+                lista.add(getRegistroResulset(resulSet, null, null, false));
+            }
+            statement.close();
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+
     @Override
     public ArrayList<AplicacionBean> getLista(String texto) {
         return getLista(texto, null, null, null, null);

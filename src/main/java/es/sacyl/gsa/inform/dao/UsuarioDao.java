@@ -1,6 +1,7 @@
 package es.sacyl.gsa.inform.dao;
 
 import com.vaadin.flow.server.VaadinSession;
+import es.sacyl.gsa.inform.bean.AplicacionPerfilBean;
 import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.FuncionalidadBean;
@@ -21,6 +22,8 @@ import java.sql.Types;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -802,7 +805,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
 
         for (UsuarioPeticionAppBean peticionAppBean : arrayListAplicaciones) {
             peticionAppBean.setId(getSiguienteId("usuariospeticionesapp"));
-            peticionAppBean.setIdPeticion(peticionBean.getId());
+            peticionAppBean.setPeticion(peticionBean);
 
             try {
                 connection = super.getConexionBBDD();
@@ -812,13 +815,77 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                         + "values (?,?,?,?,?,?,?)";
                 PreparedStatement statement = connection.prepareStatement(insertar);
                 statement.setLong(1, peticionAppBean.getId());
-                if (peticionAppBean.getIdPeticion() != null) {
-                    statement.setLong(2, peticionAppBean.getIdPeticion());
+                if (peticionAppBean.getPeticion() != null) {
+                    statement.setLong(2, peticionAppBean.getPeticion().getId());
                 } else {
                     statement.setNull(2, Types.INTEGER);
                 }
-                if (peticionAppBean.getIdAplicacion() != null) {
-                    statement.setLong(3, peticionAppBean.getIdAplicacion());
+                if (peticionAppBean.getAplicacion() != null) {
+                    statement.setLong(3, peticionAppBean.getAplicacion().getId());
+                } else {
+                    statement.setNull(3, Types.INTEGER);
+                }
+                if (peticionAppBean.getIdPerfil() != null) {
+                    statement.setLong(4, peticionAppBean.getIdPerfil());
+                } else {
+                    statement.setNull(4, Types.INTEGER);
+                }
+                if (peticionAppBean.getTipo() != null) {
+                    statement.setString(5, peticionAppBean.getTipo());
+                } else {
+                    statement.setNull(5, Types.CHAR);
+                }
+                if (peticionAppBean.getComentario() != null) {
+                    statement.setString(6, peticionAppBean.getComentario());
+                } else {
+                    statement.setNull(6, Types.CHAR);
+                }
+                statement.setInt(7, 0);
+                insertado = statement.executeUpdate() > 0;
+                insertado = true;
+                statement.close();
+                logger.debug(insertar);
+            } catch (SQLException e) {
+                logger.error(Utilidades.getStackTrace(e));
+                logger.error(ConexionDao.ERROR_BBDD_SQL, e);
+            } catch (Exception e) {
+                logger.error(Utilidades.getStackTrace(e));
+            } finally {
+                this.doCierraConexion(connection);
+
+            }
+        }
+
+        return insertado;
+
+    }
+
+    public boolean doGrabaPeticionApp(UsuarioPeticionBean peticionBean, Map< Long, ArrayList<AplicacionPerfilBean>> listaMap) {
+        Connection connection = null;
+        boolean insertado = false;
+
+        Iterator<Map.Entry<Long, ArrayList<AplicacionPerfilBean>>> iterator = listaMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            UsuarioPeticionAppBean peticionAppBean = new UsuarioPeticionAppBean();
+            Map.Entry<Long, ArrayList<AplicacionPerfilBean>> entry = iterator.next();
+            peticionAppBean.setId(getSiguienteId("usuariospeticionesapp"));
+            peticionAppBean.setPeticion(peticionBean);
+            peticionAppBean.setIdPerfil(entry.getValue().get(0).getId());
+            try {
+                connection = super.getConexionBBDD();
+                String insertar;
+                insertar = "insert into usuariospeticionesapp "
+                        + "(id,idpeticion,idaplicacion,idperfil,tipo,comentario,estado) "
+                        + "values (?,?,?,?,?,?,?)";
+                PreparedStatement statement = connection.prepareStatement(insertar);
+                statement.setLong(1, peticionAppBean.getId());
+                if (peticionAppBean.getPeticion() != null) {
+                    statement.setLong(2, peticionAppBean.getPeticion().getId());
+                } else {
+                    statement.setNull(2, Types.INTEGER);
+                }
+                if (peticionAppBean.getAplicacion() != null) {
+                    statement.setLong(3, peticionAppBean.getAplicacion().getId());
                 } else {
                     statement.setNull(3, Types.INTEGER);
                 }
@@ -897,10 +964,9 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         Connection connection = null;
         ArrayList<UsuarioPeticionBean> lista = new ArrayList<>();
         String select;
-        select = "select idpeticionario, idusuario, up.fechasolicitud, upa.idaplicacion, upa.idperfil, up.tipo "
-                + "from usuariospeticiones up "
-                + "join usuariospeticionesapp upa on up.id = upa.idpeticion "
-                + "where up.estado = 0 and upa.estado = 0";
+        select = "select up.id as idusuariopeticon, up.idpeticionario, up.idusuario, up.fechasolicitud ,up.tipo,up.comentario"
+                + " from usuariospeticiones up "
+                + " where up.estado = 0";
 
         try {
             connection = super.getConexionBBDD();
@@ -908,12 +974,47 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             ResultSet resulSet = statement.executeQuery(select);
             while (resulSet.next()) {
                 UsuarioPeticionBean pendiente = new UsuarioPeticionBean();
+                pendiente.setId(resulSet.getLong("idusuariopeticon"));
                 pendiente.setPeticionario(new UsuarioDao().getPorId(resulSet.getLong("idpeticionario")));
                 pendiente.setUsuario(new UsuarioDao().getPorId(resulSet.getLong("idusuario")));
                 pendiente.setFechaSolicitud(Utilidades.getFechaLocalDaten(resulSet.getLong("fechasolicitud")));
-
                 pendiente.setTipo(resulSet.getString("tipo"));
+                pendiente.setComentario(resulSet.getString("comentario"));
+
                 lista.add(pendiente);
+            }
+            statement.close();
+            logger.debug(select);
+        } catch (SQLException e) {
+            logger.error(select + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+
+    public ArrayList<UsuarioPeticionAppBean> getListaAppPeticiones(UsuarioPeticionBean usuarioPeticionBean) {
+        Connection connection = null;
+        ArrayList<UsuarioPeticionAppBean> lista = new ArrayList<>();
+        String select;
+        select = "select * "
+                + "from  usuariospeticionesapp upa WHERE  upA.idPETICION=" + usuarioPeticionBean.getId();
+
+        try {
+            connection = super.getConexionBBDD();
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(select);
+            while (resulSet.next()) {
+                UsuarioPeticionAppBean petiapp = new UsuarioPeticionAppBean();
+                petiapp.setId(resulSet.getLong("id"));
+                petiapp.setPeticion(usuarioPeticionBean);
+                petiapp.setAplicacion(new AplicacionDao().getPorId(resulSet.getLong("idaplicacion")));
+                petiapp.setPerfil(new AplicacionPerfilDao().getPorId(resulSet.getLong("idperfil")));
+                petiapp.setComentario(resulSet.getString("comentario"));
+                petiapp.setEstado(resulSet.getInt("estado"));
+                lista.add(petiapp);
             }
             statement.close();
             logger.debug(select);

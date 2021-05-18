@@ -85,7 +85,8 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
             if (aplicacionBean != null) {
                 aplicacionPerfilBean.setAplicacion(aplicacionBean);
             } else {
-                aplicacionPerfilBean.setAplicacion(AplicacionDao.getRegistroResulset(rs, null, null, null));
+                //  aplicacionPerfilBean.setAplicacion(AplicacionDao.getRegistroResulset(rs, null, null, null));
+                aplicacionPerfilBean.setAplicacion(new AplicacionDao().getPorId(rs.getLong("aplicacionid")));
             }
             aplicacionPerfilBean.setCodigo(rs.getString("appperfilcodigo"));
             aplicacionPerfilBean.setEstado(rs.getInt("appperfilestado"));

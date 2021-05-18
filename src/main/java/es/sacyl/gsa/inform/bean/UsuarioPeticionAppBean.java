@@ -13,18 +13,17 @@ import java.time.LocalDate;
  * @author 06532775Q
  */
 public class UsuarioPeticionAppBean extends MasterBean implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
-    Long idPeticion;
-    Long idAplicacion;
-    Long idPerfil;    
+
+    UsuarioPeticionBean Peticion;
+    AplicacionBean aplicacion;
+    Long idPerfil;
     AplicacionPerfilBean perfil;
-    
+
     public AplicacionPerfilBean getPerfil() {
         return perfil;
     }
-    
 
     public void setPerfil(AplicacionPerfilBean perfil) {
         this.perfil = perfil;
@@ -32,20 +31,28 @@ public class UsuarioPeticionAppBean extends MasterBean implements Serializable {
     String tipo;
     String comentario;
 
-    public Long getIdPeticion() {
-        return idPeticion;
+    public UsuarioPeticionBean getPeticion() {
+        return Peticion;
     }
 
-    public void setIdPeticion(Long idPeticion) {
-        this.idPeticion = idPeticion;
+    public void setPeticion(UsuarioPeticionBean Peticion) {
+        this.Peticion = Peticion;
     }
 
-    public Long getIdAplicacion() {
-        return idAplicacion;
+    public AplicacionBean getAplicacion() {
+        return aplicacion;
     }
 
-    public void setIdAplicacion(Long idAplicacion) {
-        this.idAplicacion = idAplicacion;
+    public String getAplicacionString() {
+        if (aplicacion != null) {
+            return aplicacion.getNombre();
+        } else {
+            return "?";
+        }
+    }
+
+    public void setAplicacion(AplicacionBean aplicacion) {
+        this.aplicacion = aplicacion;
     }
 
     public Long getIdPerfil() {
@@ -54,7 +61,7 @@ public class UsuarioPeticionAppBean extends MasterBean implements Serializable {
 
     public void setIdPerfil(Long idPerfil) {
         this.idPerfil = idPerfil;
-    }    
+    }
 
     public String getTipo() {
         return tipo;
@@ -103,7 +110,5 @@ public class UsuarioPeticionAppBean extends MasterBean implements Serializable {
     public void setUsucambio(UsuarioBean usucambio) {
         this.usucambio = usucambio;
     }
-    
-    
-    
+
 }

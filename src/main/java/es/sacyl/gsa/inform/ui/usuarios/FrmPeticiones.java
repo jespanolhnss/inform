@@ -9,13 +9,14 @@ import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
-import es.sacyl.gsa.inform.bean.AplicacionBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
+import es.sacyl.gsa.inform.bean.UsuarioPeticionAppBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
@@ -44,7 +45,6 @@ public final class FrmPeticiones extends FrmMasterPantalla {
     TextField idAplicacion = new TextField("Aplicación");
     TextField perfil = new TextField("Perfil");
 
-    Label peticionarioLbl = new Label();
     /* Componentes */
     UsuarioPeticionBean peticionBean = new UsuarioPeticionBean();
     UsuarioBean peticionario = new UsuarioBean();
@@ -56,13 +56,14 @@ public final class FrmPeticiones extends FrmMasterPantalla {
     // Binder<UsuarioGalenoBean> peticionBinder;
     ArrayList<UsuarioPeticionBean> peticionArrayList = new ArrayList<>();
     PaginatedGrid<UsuarioPeticionBean> gridPeticiones = new PaginatedGrid<>();
-    PaginatedGrid<AplicacionBean> gridAplicaciones = new PaginatedGrid<>();
+    Grid<UsuarioPeticionAppBean> gridAplicaciones = new Grid<>();
 
     public FrmPeticiones() {
         super();
         setSizeFull();
         doComponentesOrganizacion();
         doGrid();
+        doGridAplicaciones();
         doActualizaGrid();
         doComponenesAtributos();
         doCompentesEventos();
@@ -103,6 +104,22 @@ public final class FrmPeticiones extends FrmMasterPantalla {
         gridPeticiones.addColumn(UsuarioPeticionBean::getUsuarioNombre).setAutoWidth(true).setHeader(new Html("<b>Usu</b>"));
         gridPeticiones.addColumn(UsuarioPeticionBean::getFechaSolicitud).setAutoWidth(true).setHeader(new Html("<b>Fecha</b>"));
 
+    }
+
+    public void doGridAplicaciones() {
+        gridAplicaciones.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        gridAplicaciones.setHeightByRows(true);
+        gridAplicaciones.setPageSize(5);
+        gridAplicaciones.addColumn(UsuarioPeticionAppBean::getId).setAutoWidth(true).setHeader(new Html("<b>Id</b>"));
+        gridAplicaciones.addColumn(UsuarioPeticionAppBean::getAplicacionString).setAutoWidth(true).setHeader(new Html("<b>Usu</b>"));
+        gridAplicaciones.addColumn(UsuarioPeticionAppBean::getComentario).setAutoWidth(true).setHeader(new Html("<b>Usu</b>"));
+
+        //      gridAplicaciones.addColumn(UsuarioPeticionAppBean::getFechaSolicitud).setAutoWidth(true).setHeader(new Html("<b>Fecha</b>"));
+    }
+
+    public void doActualizaGridAplicacioes() {
+        ArrayList<UsuarioPeticionAppBean> listaApp = new UsuarioDao().getListaAppPeticiones(peticionBean);
+        gridAplicaciones.setItems(listaApp);
     }
 
     @Override
@@ -150,9 +167,9 @@ public final class FrmPeticiones extends FrmMasterPantalla {
                 new FormLayout.ResponsiveStep("50px", 3));
         contenedorFormulario.add(peticionarioDetalle, 3);
         contenedorFormulario.add(usuarioDetalle, 3);
-        contenedorFormulario.add(usuarioDetalle, idUsuario, nombreUsuario, tipo, fechaSolicitud, idAplicacion, perfil);
+        contenedorFormulario.add(usuarioDetalle, idUsuario, nombreUsuario, tipo, fechaSolicitud);
+        contenedorFormulario.add(gridAplicaciones, 3);
         contenedorDerecha.add(gridPeticiones);
-
     }
 
     @Override
@@ -162,15 +179,15 @@ public final class FrmPeticiones extends FrmMasterPantalla {
             peticionBean = event.getItem();
             usuario = peticionBean.getUsuario();
             peticionario = peticionBean.getPeticionario();
-            peticionarioDetalle.setContent(new Html(peticionario.toHtml(".")));
+            peticionarioDetalle.setContent(new Html(peticionario.toHtml("<br>")));
             peticionarioDetalle.setSummary(new Label("Peticionario" + peticionario.getApellidosNombre()));
             peticionarioDetalle.setOpened(false);
-            peticionarioLbl.setText(peticionario.toHtml("<br>"));
             usuarioDetalle.setContent(new Html(usuario.toHtml("<br>")));
             usuarioDetalle.setSummary(new Label("Usuario:" + usuario.getApellidosNombre()));
             usuarioDetalle.setOpened(false);
+            ArrayList<UsuarioPeticionAppBean> listaApp = new UsuarioDao().getListaAppPeticiones(peticionBean);
+            gridAplicaciones.setItems(listaApp);
         });
-
     }
 
 }
