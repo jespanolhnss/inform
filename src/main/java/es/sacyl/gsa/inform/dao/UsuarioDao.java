@@ -4,6 +4,7 @@ import com.vaadin.flow.server.VaadinSession;
 import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.bean.FuncionalidadBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
+import es.sacyl.gsa.inform.bean.GruposPaginasGaleno;
 import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.bean.PeticionesPendientesBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
@@ -913,5 +914,34 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         }
         return lista;
     }
+    
+    public ArrayList<GruposPaginasGaleno> getGruposPaginasGaleno() {
+        Connection connection = null;
+        ArrayList<GruposPaginasGaleno> lista = new ArrayList<>();
+        String select;
+        select = "select id, grupo from galeno_grupospg";
+        
+        try {
+            connection = super.getConexionBBDD();
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(select);
+            while (resulSet.next()) {
+                GruposPaginasGaleno grupos = new GruposPaginasGaleno();
+                grupos.setId(resulSet.getLong("id"));
+                grupos.setGrupo(resulSet.getString("grupo"));
+                lista.add(grupos);
+            }
+            statement.close();
+            logger.debug(select);
+        } catch (SQLException e) {
+            logger.error(select + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+
 
 }
