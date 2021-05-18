@@ -19,38 +19,36 @@ import java.util.ArrayList;
 public final class FrmBuscaUbicacion extends Dialog {
 
     private final Button botonCancelar = new ObjetosComunes().getBoton("Cancela", null, VaadinIcon.CLOSE_CIRCLE.create());
-
     private final TreeGrid<UbicacionBean> ubicacionGrid = new TreeGrid<>();
     private ComboBox<UbicacionBean> ubicacionCombo = null;
     private UbicacionBean ubicacionBean = new UbicacionBean();
     ArrayList<UbicacionBean> ubicacionArrayList = new ArrayList<>();
 
     public FrmBuscaUbicacion(CentroBean centroBean) {
-
         this.setWidth("600px");
         this.setHeight("600px");
         ubicacionCombo = new CombosUi().getUbicacionCombo(null,
                 centroBean, null, null);
         ubicacionArrayList = new UbicacionDao().getListaPadresCentro(centroBean);
+        ubicacionCombo.setItems(ubicacionArrayList);
         doGrid();
         doComponentesOrganizacion();
         doCompentesEventos();
     }
 
     public void doGrid() {
-        ubicacionCombo.setItems(ubicacionArrayList);
+        // ubicacionCombo.setItems(ubicacionArrayList);
         ubicacionGrid.setHeightByRows(true);
         ubicacionGrid.setPageSize(20);
-        ubicacionGrid.setItems(ubicacionArrayList,
-                UbicacionBean::getHijos);
+
         ubicacionGrid.addHierarchyColumn(UbicacionBean::getPadreString)
                 .setHeader("Ubicación Padre");
         ubicacionGrid.addColumn(UbicacionBean::getDescripcion).setHeader("Descripción");
         //  ubicacionGrid.addColumn(UbicacionBean::getNivel).setHeader("Nivel");
         ubicacionGrid.setHeightByRows(true);
         ubicacionGrid.setPageSize(35);
-        ubicacionGrid.setItems(ubicacionArrayList,
-                UbicacionBean::getHijos);
+        //  ubicacionGrid.setItems(ubicacionArrayList,
+        //        UbicacionBean::getHijos);
         ubicacionGrid.expand(ubicacionArrayList);
     }
 
@@ -64,13 +62,27 @@ public final class FrmBuscaUbicacion extends Dialog {
             this.close();
         });
         ubicacionCombo.addValueChangeListener(event -> {
+            if (event.getValue() != null) {
+                //   ubicacionArrayList = new UbicacionDao().getListaHijos(ubicacionCombo.getValue());
+                ubicacionArrayList = new ArrayList<>();
+                ubicacionArrayList.add(event.getValue());
+                /**
+                 * En el grid añado un sólo item para que sólo cree el arbol a
+                 * partir de ese item
+                 */
+                ubicacionGrid.setItems(ubicacionArrayList,
+                        UbicacionBean::getHijos);
+                ubicacionGrid.expand(ubicacionArrayList);
+            }
+
+            /*
             ArrayList<UbicacionBean> ubicacionArrayList = new ArrayList<>();
             ubicacionArrayList.add(ubicacionCombo.getValue());
             ubicacionGrid.setItems(ubicacionArrayList,
                     UbicacionBean::getHijos);
             ubicacionGrid.expand(ubicacionArrayList);
             ubicacionGrid.expandRecursively(ubicacionArrayList, 5);
-
+             */
         });
         ubicacionGrid.addItemClickListener(event -> {
             ubicacionBean = event.getItem();

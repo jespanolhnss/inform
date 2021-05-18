@@ -18,7 +18,6 @@ import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.converter.StringToLongConverter;
@@ -73,8 +72,8 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
     ViajeBean viajeBean = new ViajeBean();
     Binder<ViajeBean> viajesBinder = new Binder<>();
     String tituloGridViajes = "LISTADO DE VIAJES";
-    //   PaginatedGrid<ViajeBean> viajesGrid = new PaginatedGrid<>();
-    TreeGrid<ViajeBean> viajesGrid = new TreeGrid<>();
+    PaginatedGrid<ViajeBean> viajesGrid = new PaginatedGrid<>();
+//    TreeGrid<ViajeBean> viajesGrid = new TreeGrid<>();
 
     ArrayList<ViajeBean> arrayListViajes = new ArrayList<>();
 
@@ -204,11 +203,9 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         //       viajesGrid.addColumn(ViajeBean::getLlegada).setHeader("Llegada");
         //  viajesGrid.addColumn(ViajeBean::getMatricula).setHeader("Matrícula");
 
-        viajesGrid.addHierarchyColumn(ViajeBean::getSalidaPadre)
-                .setHeader("Salida");
         viajesGrid.addColumn(ViajeBean::getSalidaString).setHeader("Salida");
         viajesGrid.addColumn(ViajeBean::getMatricula).setHeader("Matrícula");
-        viajesGrid.addColumn(ViajeBean::getCentroNombre).setHeader("Centro");
+        viajesGrid.addColumn(ViajeBean::getCentrosNombre).setHeader("Centro");
         viajesGrid.setWidthFull();
 
         // grid centro
@@ -289,9 +286,9 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         arrayListViajes = new ViajesDao().getListaViajes(desde.getValue(), hasta.getValue(), centroComboBuscador.getValue(), null, 1);
         //    viajesGrid.setItems(arrayListViajes);
 
-        //viajesGrid.setItems(arrayListViajes, ViajeBean::getListaCentros  );
-        viajesGrid.setItems(arrayListViajes, ViajeBean::getListraCentrosTree);
-        viajesGrid.expand(arrayListViajes);
+        viajesGrid.setItems(arrayListViajes);
+        //  viajesGrid.setItems(arrayListViajes, ViajeBean::getListraCentrosTree);
+        //  viajesGrid.expand(arrayListViajes);
 
     }
 
@@ -324,9 +321,15 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
 
         provinciaComboBuscador.setLabel("");
         centroTipoComboBuscador.setLabel("");
+        centroTipoComboBuscador.setValue(CentroTipoBean.CENTROTIPOCENTROSALUD);
+        centroTipoComboBuscador.setPlaceholder("Tipo de centro");
+
         centroComboBuscador.setLabel("");
+        centroComboBuscador.setPlaceholder("Elige centro");
         desde.setLabel("");
+        desde.setPlaceholder("De fecha");
         hasta.setLabel("");
+        hasta.setPlaceholder("hasta fecha");
 
         botonImprimir.setVisible(true);
         id.setWidth("150px");

@@ -1,12 +1,13 @@
 package es.sacyl.gsa.inform.dao;
 
 import com.vaadin.flow.server.VaadinSession;
+import es.sacyl.gsa.inform.bean.AplicacionPerfilBean;
 import es.sacyl.gsa.inform.bean.CategoriaBean;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.FuncionalidadBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.GruposPaginasGaleno;
 import es.sacyl.gsa.inform.bean.ParametroBean;
-import es.sacyl.gsa.inform.bean.PeticionesPendientesBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionAppBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
@@ -22,6 +23,8 @@ import java.sql.Types;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,7 +58,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
                 + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo"
                 + " FROM usuarios usu  "
                 + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
                 + " LEFT JOIN gfh gfh ON usu.idgfh = gfh.id"
@@ -81,6 +84,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             usuario = new UsuarioBean();
             usuario.setId(resulSet.getLong("usuarioid"));
             usuario.setDni(resulSet.getString("usuariodni"));
+
             usuario.setApellido1(resulSet.getString("usuarioapellido1"));
             usuario.setApellido2(resulSet.getString("usuarioapellido2"));
             usuario.setNombre(resulSet.getString("usuarionombre"));
@@ -201,13 +205,16 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
     @Override
     public boolean doGrabaDatos(UsuarioBean usuarioBean) {
         boolean grabado = false;
+        // como busca por dni puede que exista pero el bean sie procede de persigo no tiene id
 
-        if (usuarioBean.getId().equals(new Long(0))) {
+        UsuarioBean usubb = getPorDni(usuarioBean.getDni());
+        if (usubb == null) {
             usuarioBean.setId(getSiguienteId("usuarios"));
             grabado = this.doInsertaDatos(usuarioBean);
         } else {
+            usuarioBean.setId(usubb.getId());
             grabado = this.doActualizaDatos(usuarioBean);
-            grabado = doActualizaFuncionalidad(usuarioBean);
+            //  grabado = doActualizaFuncionalidad(usuarioBean);
         }
         return grabado;
     }
@@ -674,7 +681,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
 
         try {
             connection = super.getConexionBBDD();
-            String select = " select nif,ape1,ape2,nombre,mail,tel1 FROM usuariospersigo where nif = '" + value + "'";
+            String select = " select nif,ape1,ape2,nombre,mail,tel1,codfunc,gfh FROM usuariospersigo where nif = '" + value + "'";
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(select);
                 while (resulSet.next()) {
@@ -684,6 +691,12 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                     usuario.setNombre(resulSet.getString("nombre"));
                     usuario.setMail(resulSet.getString("mail"));
                     usuario.setTelefono(resulSet.getString("tel1"));
+                    if (resulSet.getString("codfunc") != null) {
+                        usuario.setCategoria(new CategoriaDao().getPorCodigo(resulSet.getString("codfunc").trim()));
+                    }
+                    if (resulSet.getString("gfh") != null) {
+                        usuario.setGfh(new GfhDao().getPorCodigoPersigo(resulSet.getString("gfh").trim()));
+                    }
                 }
             }
             logger.debug(select);
@@ -696,19 +709,21 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         }
         return usuario;
     }
-    
-    public UsuarioBean getUsuarioNuestro(String value) {
+
+    public UsuarioBean getPorDni(String dni) {
 
         Connection connection = null;
-        UsuarioBean usuario = new UsuarioBean();
+        UsuarioBean usuario = null;
 
         try {
             connection = super.getConexionBBDD();
             String select;
-            select = " select dni,apellido1,apellido2,nombre,mail,telefono,movil,mailprivado FROM usuarios where dni = '" + value + "'";
+            select = sql + " AND  dni = '" + dni + "'";
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(select);
                 while (resulSet.next()) {
+                    usuario = getRegistroResulset(resulSet, Boolean.FALSE);
+                    /*
                     usuario.setDni(resulSet.getString("dni"));
                     usuario.setApellido1(resulSet.getString("apellido1"));
                     usuario.setApellido2(resulSet.getString("apellido2"));
@@ -717,6 +732,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                     usuario.setTelefono(resulSet.getString("telefono"));
                     usuario.setMovilUsuario(resulSet.getString("movil"));
                     usuario.setCorreoPrivadoUsuario(resulSet.getString("mailprivado"));
+                     */
                 }
             }
             logger.debug(select);
@@ -734,7 +750,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         Connection connection = null;
         boolean insertado = false;
         peticion.setId(getSiguienteId("usuariospeticiones"));
-        peticion.setIdusuario(usuario.getId());
+        peticion.setUsuario(usuario);
 
         try {
             connection = super.getConexionBBDD();
@@ -750,8 +766,8 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
 
             PreparedStatement statement = connection.prepareStatement(insertar);
             statement.setLong(1, peticion.getId());
-            statement.setLong(2, peticion.getIdpeticionario());
-            statement.setLong(3, peticion.getIdusuario());
+            statement.setLong(2, peticion.getPeticionario().getId());
+            statement.setLong(3, peticion.getUsuario().getId());
             statement.setInt(4, ConexionDao.BBDD_ACTIVONO);
             statement.setInt(5, Integer.parseInt(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
             if (peticion.getCentros() != null) {
@@ -767,7 +783,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             if (peticion.getTipo() != null) {
                 statement.setString(8, peticion.getTipo());
             } else {
-                statement.setNull(9, Types.CHAR);
+                statement.setNull(8, Types.CHAR);
             }
             insertado = statement.executeUpdate() > 0;
             statement.close();
@@ -790,7 +806,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
 
         for (UsuarioPeticionAppBean peticionAppBean : arrayListAplicaciones) {
             peticionAppBean.setId(getSiguienteId("usuariospeticionesapp"));
-            peticionAppBean.setIdPeticion(peticionBean.getId());
+            peticionAppBean.setPeticion(peticionBean);
 
             try {
                 connection = super.getConexionBBDD();
@@ -800,13 +816,77 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                         + "values (?,?,?,?,?,?,?)";
                 PreparedStatement statement = connection.prepareStatement(insertar);
                 statement.setLong(1, peticionAppBean.getId());
-                if (peticionAppBean.getIdPeticion() != null) {
-                    statement.setLong(2, peticionAppBean.getIdPeticion());
+                if (peticionAppBean.getPeticion() != null) {
+                    statement.setLong(2, peticionAppBean.getPeticion().getId());
                 } else {
                     statement.setNull(2, Types.INTEGER);
                 }
-                if (peticionAppBean.getIdAplicacion() != null) {
-                    statement.setLong(3, peticionAppBean.getIdAplicacion());
+                if (peticionAppBean.getAplicacion() != null) {
+                    statement.setLong(3, peticionAppBean.getAplicacion().getId());
+                } else {
+                    statement.setNull(3, Types.INTEGER);
+                }
+                if (peticionAppBean.getIdPerfil() != null) {
+                    statement.setLong(4, peticionAppBean.getIdPerfil());
+                } else {
+                    statement.setNull(4, Types.INTEGER);
+                }
+                if (peticionAppBean.getTipo() != null) {
+                    statement.setString(5, peticionAppBean.getTipo());
+                } else {
+                    statement.setNull(5, Types.CHAR);
+                }
+                if (peticionAppBean.getComentario() != null) {
+                    statement.setString(6, peticionAppBean.getComentario());
+                } else {
+                    statement.setNull(6, Types.CHAR);
+                }
+                statement.setInt(7, 0);
+                insertado = statement.executeUpdate() > 0;
+                insertado = true;
+                statement.close();
+                logger.debug(insertar);
+            } catch (SQLException e) {
+                logger.error(Utilidades.getStackTrace(e));
+                logger.error(ConexionDao.ERROR_BBDD_SQL, e);
+            } catch (Exception e) {
+                logger.error(Utilidades.getStackTrace(e));
+            } finally {
+                this.doCierraConexion(connection);
+
+            }
+        }
+
+        return insertado;
+
+    }
+
+    public boolean doGrabaPeticionApp(UsuarioPeticionBean peticionBean, Map< Long, ArrayList<AplicacionPerfilBean>> listaMap) {
+        Connection connection = null;
+        boolean insertado = false;
+
+        Iterator<Map.Entry<Long, ArrayList<AplicacionPerfilBean>>> iterator = listaMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            UsuarioPeticionAppBean peticionAppBean = new UsuarioPeticionAppBean();
+            Map.Entry<Long, ArrayList<AplicacionPerfilBean>> entry = iterator.next();
+            peticionAppBean.setId(getSiguienteId("usuariospeticionesapp"));
+            peticionAppBean.setPeticion(peticionBean);
+            peticionAppBean.setIdPerfil(entry.getValue().get(0).getId());
+            try {
+                connection = super.getConexionBBDD();
+                String insertar;
+                insertar = "insert into usuariospeticionesapp "
+                        + "(id,idpeticion,idaplicacion,idperfil,tipo,comentario,estado) "
+                        + "values (?,?,?,?,?,?,?)";
+                PreparedStatement statement = connection.prepareStatement(insertar);
+                statement.setLong(1, peticionAppBean.getId());
+                if (peticionAppBean.getPeticion() != null) {
+                    statement.setLong(2, peticionAppBean.getPeticion().getId());
+                } else {
+                    statement.setNull(2, Types.INTEGER);
+                }
+                if (peticionAppBean.getAplicacion() != null) {
+                    statement.setLong(3, peticionAppBean.getAplicacion().getId());
                 } else {
                     statement.setNull(3, Types.INTEGER);
                 }
@@ -880,27 +960,28 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         }
         return lista;
     }
-    
-    public ArrayList<PeticionesPendientesBean> getPeticionesPendientes() {
+
+    public ArrayList<UsuarioPeticionBean> getPeticionesPendientes() {
         Connection connection = null;
-        ArrayList<PeticionesPendientesBean> lista = new ArrayList<>();
+        ArrayList<UsuarioPeticionBean> lista = new ArrayList<>();
         String select;
-        select = "select idusuario, up.fechasolicitud, upa.idaplicacion, upa.idperfil, up.tipo " +
-            "from usuariospeticiones up " +
-            "join usuariospeticionesapp upa on up.id = upa.idpeticion " +
-            "where up.estado = 0 and upa.estado = 0";
-        
+        select = "select up.id as idusuariopeticon, up.idpeticionario, up.idusuario, up.fechasolicitud ,up.tipo,up.comentario"
+                + " from usuariospeticiones up "
+                + " where up.estado = 0";
+
         try {
             connection = super.getConexionBBDD();
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(select);
             while (resulSet.next()) {
-                PeticionesPendientesBean pendiente = new PeticionesPendientesBean();
+                UsuarioPeticionBean pendiente = new UsuarioPeticionBean();
+                pendiente.setId(resulSet.getLong("idusuariopeticon"));
+                pendiente.setPeticionario(new UsuarioDao().getPorId(resulSet.getLong("idpeticionario")));
                 pendiente.setUsuario(new UsuarioDao().getPorId(resulSet.getLong("idusuario")));
                 pendiente.setFechaSolicitud(Utilidades.getFechaLocalDaten(resulSet.getLong("fechasolicitud")));
-                pendiente.setAplicacion(new AplicacionDao().getPorId(resulSet.getLong("idaplicacion")));    
-                pendiente.setIdPerfil(resulSet.getInt("idperfil"));
                 pendiente.setTipo(resulSet.getString("tipo"));
+                pendiente.setComentario(resulSet.getString("comentario"));
+
                 lista.add(pendiente);
             }
             statement.close();
@@ -943,5 +1024,74 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         return lista;
     }
 
+
+    public ArrayList<UsuarioPeticionAppBean> getListaAppPeticiones(UsuarioPeticionBean usuarioPeticionBean) {
+        Connection connection = null;
+        ArrayList<UsuarioPeticionAppBean> lista = new ArrayList<>();
+        String select;
+        select = "select * "
+                + "from  usuariospeticionesapp upa WHERE  upA.idPETICION=" + usuarioPeticionBean.getId();
+
+        try {
+            connection = super.getConexionBBDD();
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(select);
+            while (resulSet.next()) {
+                UsuarioPeticionAppBean petiapp = new UsuarioPeticionAppBean();
+                petiapp.setId(resulSet.getLong("id"));
+                petiapp.setPeticion(usuarioPeticionBean);
+                petiapp.setAplicacion(new AplicacionDao().getPorId(resulSet.getLong("idaplicacion")));
+                petiapp.setPerfil(new AplicacionPerfilDao().getPorId(resulSet.getLong("idperfil")));
+                petiapp.setComentario(resulSet.getString("comentario"));
+                petiapp.setEstado(resulSet.getInt("estado"));
+                lista.add(petiapp);
+            }
+            statement.close();
+            logger.debug(select);
+        } catch (SQLException e) {
+            logger.error(select + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+
+    public ArrayList<DatoGenericoBean> getGfhPersigo() {
+        Connection connection = null;
+        ArrayList<DatoGenericoBean> lista = new ArrayList<>();
+        String select;
+        select = " select unique gfh,descgfh from "
+                + " usuariospersigo"
+                + "  order by descgfh";
+
+        try {
+            connection = super.getConexionBBDD();
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(select);
+            while (resulSet.next()) {
+                DatoGenericoBean dato = new DatoGenericoBean();
+                dato.setTipoDato(resulSet.getString("gfh"));
+                if (dato.getTipoDato() != null) {
+                    dato.setTipoDato(dato.getTipoDato().trim());
+                }
+                dato.setValor(resulSet.getString("descgfh"));
+                if (dato.getValor() != null) {
+                    dato.setValor(dato.getValor().trim());
+                }
+                lista.add(dato);
+            }
+            statement.close();
+            logger.debug(select);
+        } catch (SQLException e) {
+            logger.error(select + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
 
 }

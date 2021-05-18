@@ -39,7 +39,7 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
                 + " ,ap.fechaInstalacion aplicacionfechaInstalacion,ap.estado as aplicacionestado"
                 + " ,ap.usucambio as aplicacionusucambio,ap. fechacambio as aplicacionfechacambio  "
                 + " ,gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + " ,gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + " ,gfh.asistencial as gfhasisencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo"
                 + " ,usu.id as usuarioid,usu.dni as usuariodni,usu.apellido1 as usuarioapellido1"
                 + ",usu.apellido2 as usuarioapellido2,usu.nombre as usuarionombre"
                 + ",usu.estado as usuarioestado,usu.usucambio as usuariousucambio"
@@ -51,7 +51,7 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
                 + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo"
                 + " FROM aplicacionesPerfiles  appp "
                 + " JOIN aplicaciones ap ON ap.id=appp.idaplicaciones "
                 + " LEFT  JOIN gfh ON gfh.id=ap.gfh"
@@ -85,7 +85,8 @@ public class AplicacionPerfilDao extends ConexionDao implements Serializable, Co
             if (aplicacionBean != null) {
                 aplicacionPerfilBean.setAplicacion(aplicacionBean);
             } else {
-                aplicacionPerfilBean.setAplicacion(AplicacionDao.getRegistroResulset(rs, null, null, null));
+                //  aplicacionPerfilBean.setAplicacion(AplicacionDao.getRegistroResulset(rs, null, null, null));
+                aplicacionPerfilBean.setAplicacion(new AplicacionDao().getPorId(rs.getLong("aplicacionid")));
             }
             aplicacionPerfilBean.setCodigo(rs.getString("appperfilcodigo"));
             aplicacionPerfilBean.setEstado(rs.getInt("appperfilestado"));

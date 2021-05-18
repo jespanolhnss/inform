@@ -37,6 +37,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The main view contains a button and a click listener.
@@ -56,7 +57,7 @@ https://vaadin.com/forum/thread/17101015/webinar-introduccion-a-vaadin-flow-en-e
  */
 public class MainView extends VerticalLayout implements AttachNotifier, HasUrlParameter<String> {
 
-    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(MainView.class);
+    private static final Logger LOGGER = LogManager.getLogger(MainView.class);
 
     private Location currentLocation = null;
 
@@ -173,6 +174,8 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
     public UsuarioBean authenticate(String user, String pass) {
         //UsuarioBean usuario = new UsuarioDao().getUsuarioDni(user, Boolean.FALSE);
         UsuarioBean usuario = null;
+        LOGGER.debug("Antes de crear usuariobean ");
+        LOGGER.debug("java.classpath" + ":" + System.getProperty("java.classpath"));
         try {
             Ldap ldap = new Ldap();
             usuario = ldap.loginActiveDirectory(user, pass);
@@ -194,6 +197,9 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
      */
     public void doLogin() {
         this.removeAll();
+        LOGGER.debug("Antes de crear usuariobean ");
+        LOGGER.debug("java.classpath" + ":" + System.getProperty("java.classpath"));
+
         LoginForm componentLogin = new LoginForm();
         componentLogin.setForgotPasswordButtonVisible(false);
         componentLogin.setI18n(createEspanolI18n());

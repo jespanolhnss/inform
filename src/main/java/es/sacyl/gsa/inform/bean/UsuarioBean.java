@@ -1,7 +1,6 @@
 package es.sacyl.gsa.inform.bean;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,13 +14,6 @@ public class UsuarioBean extends MasterBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String dniSolicitante;
-    private String nombreSolicitante;
-    private String apellido1Solicitante;
-    private String apellido2Solcitante;
-    private String movilSolicitante;
-    private String telefonoSolicitante;
-    private LocalDate fechaSolicitud;
     private String dni;
     private String nombre;
     private String apellido1;
@@ -33,7 +25,7 @@ public class UsuarioBean extends MasterBean implements Serializable {
     private String telefono;
     private CategoriaBean categoria;
     private GfhBean gfh;
-    private String tipo;
+
     private String comentario;
     private String solicita;
     private String movilUsuario;
@@ -73,68 +65,16 @@ public class UsuarioBean extends MasterBean implements Serializable {
         this.nombre = nombre;
     }
 
-    public String getDniSolicitante() {
-        return dniSolicitante;
-    }
-
-    public void setDniSolicitante(String dniSolicitante) {
-        this.dniSolicitante = dniSolicitante;
-    }
-
-    public String getNombreSolicitante() {
-        return nombreSolicitante;
-    }
-
-    public void setNombreSolicitante(String nombreSolicitante) {
-        this.nombreSolicitante = nombreSolicitante;
-    }
-
-    public String getApellido1Solicitante() {
-        return apellido1Solicitante;
-    }
-
-    public void setApellido1Solicitante(String apellido1Solicitante) {
-        this.apellido1Solicitante = apellido1Solicitante;
-    }
-
-    public String getApellido2Solcitante() {
-        return apellido2Solcitante;
-    }
-
-    public void setApellido2Solcitante(String apellido2Solcitante) {
-        this.apellido2Solcitante = apellido2Solcitante;
-    }
-
-    public String getMovilSolicitante() {
-        return movilSolicitante;
-    }
-
-    public void setMovilSolicitante(String movilSolicitante) {
-        this.movilSolicitante = movilSolicitante;
-    }
-
-    public String getTelefonoSolicitante() {
-        return telefonoSolicitante;
-    }
-
-    public void setTelefonoSolicitante(String telefonoSolicitante) {
-        this.telefonoSolicitante = telefonoSolicitante;
-    }
-
-    public LocalDate getFechaSolicitud() {
-        return fechaSolicitud;
-    }
-
-    public void setFechaSolicitud(LocalDate fechaSolicitud) {
-        this.fechaSolicitud = fechaSolicitud;
-    }
-
     public String getDni() {
         return dni;
     }
 
     public void setDni(String dni) {
-        this.dni = dni;
+        if (dni != null) {
+            this.dni = dni.trim();
+        } else {
+            this.dni = dni;
+        }
     }
 
     public String getNombre() {
@@ -153,22 +93,34 @@ public class UsuarioBean extends MasterBean implements Serializable {
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        if (nombre != null) {
+            this.nombre = nombre.trim();
+        } else {
+            this.nombre = nombre;
+        }
     }
 
     public String getApellido1() {
+
         return apellido1;
     }
 
     public String getApellido2() {
+
         return apellido2;
     }
 
     public void setApellido1(String apellido1) {
+        if (apellido1 != null) {
+            this.apellido1 = apellido1.trim();
+        }
         this.apellido1 = apellido1;
     }
 
     public void setApellido2(String apellido2) {
+        if (apellido2 != null) {
+            this.apellido2 = apellido2.trim();
+        }
         this.apellido2 = apellido2;
     }
 
@@ -201,7 +153,11 @@ public class UsuarioBean extends MasterBean implements Serializable {
     }
 
     public void setMail(String mail) {
-        this.mail = mail;
+        if (mail != null) {
+            this.mail = mail.trim();
+        } else {
+            this.mail = mail;
+        }
     }
 
     public String getTelefono() {
@@ -209,7 +165,11 @@ public class UsuarioBean extends MasterBean implements Serializable {
     }
 
     public void setTelefono(String telefono) {
-        this.telefono = telefono;
+        if (telefono != null) {
+            this.telefono = telefono.trim();
+        } else {
+            this.telefono = telefono;
+        }
     }
 
     public Long getIdCategoria() {
@@ -267,14 +227,6 @@ public class UsuarioBean extends MasterBean implements Serializable {
 
     public void setGfh(GfhBean gfh) {
         this.gfh = gfh;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
     }
 
     public String getComentario() {
@@ -360,7 +312,11 @@ public class UsuarioBean extends MasterBean implements Serializable {
     }
 
     public void setMovilUsuario(String movilUsuario) {
-        this.movilUsuario = movilUsuario;
+        if (movilUsuario != null) {
+            this.movilUsuario = movilUsuario.trim();
+        } else {
+            this.movilUsuario = movilUsuario;
+        }
     }
 
     public String getCorreoPrivadoUsuario() {
@@ -402,5 +358,51 @@ public class UsuarioBean extends MasterBean implements Serializable {
             }
         }
         return laTiene;
+    }
+
+    public String toHtml(String separador) {
+
+        String cadena = "<b>";
+        cadena = cadena.concat("Dni:  ");
+        if (dni != null) {
+            cadena = cadena.concat(dni);
+        } else {
+            cadena = cadena.concat(" ");
+        }
+        cadena = cadena.concat(separador);
+
+        cadena = cadena.concat("Apellidos:  ");
+        cadena = cadena.concat(getApellidosNombre());
+        cadena = cadena.concat(separador);
+
+        cadena = cadena.concat("Telefonos:  ");
+        if (telefono != null) {
+            cadena = cadena.concat(telefono);
+        } else {
+            cadena = cadena.concat(" ");
+        }
+        if (movilUsuario != null) {
+            cadena = cadena.concat(movilUsuario);
+        } else {
+            cadena = cadena.concat(" ");
+        }
+        cadena = cadena.concat(separador);
+        cadena = cadena.concat("Correo:  ");
+        if (mail != null) {
+            cadena = cadena.concat(mail);
+        } else {
+            cadena = cadena.concat(" ");
+        }
+        cadena = cadena.concat(separador);
+
+        cadena = cadena.concat("Categoria:  ");
+        if (categoria != null) {
+            cadena = cadena.concat(categoria.getNombre());
+        } else {
+            cadena = cadena.concat(" ");
+        }
+
+        cadena = cadena.concat("</b>");
+        return cadena;
     }
 }

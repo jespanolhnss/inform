@@ -15,9 +15,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
+import es.sacyl.gsa.inform.bean.AplicacionBean;
 import es.sacyl.gsa.inform.bean.AplicacionPerfilBean;
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CategoriaBean;
@@ -28,6 +31,7 @@ import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionAppBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
+import es.sacyl.gsa.inform.dao.AplicacionDao;
 import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
@@ -35,11 +39,17 @@ import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterConstantes;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
+import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
 import es.sacyl.gsa.inform.util.Constantes;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Route("usuarios")
 public final class FrmUsuariosPedir extends FrmMasterPantalla {
@@ -72,14 +82,15 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
             AutonomiaBean.AUTONOMIADEFECTO);
     CheckboxGroup<CentroTipoBean> tiposCentro = new ObjetosComunes().getTipoCentroCecheckboxGroup();
     CheckboxGroup<CentroBean> centro = new ObjetosComunes().getCentrosCheckboxGroup();
-    Long idGaleno = new Long(9);
+    AplicacionBean galeno = new AplicacionBean(new Long(9));
     RadioButtonGroup<AplicacionPerfilBean> perfilesGaleno
-            = new ObjetosComunes().getAplicacionesPerfilesPorIdRadioButtonGroup(idGaleno);
-    Long idJimena = new Long(8);
+            = new ObjetosComunes().getAplicacionesPerfilesPorIdRadioButtonGroup(galeno.getId());
+    AplicacionBean jimena = new AplicacionBean(new Long(8));
     RadioButtonGroup<AplicacionPerfilBean> perfilesJimena
-            = new ObjetosComunes().getAplicacionesPerfilesPorIdRadioButtonGroup(idJimena);
+            = new ObjetosComunes().getAplicacionesPerfilesPorIdRadioButtonGroup(jimena.getId());
     TextField comentario = new TextField("Comentario");
 
+    ArrayList<AplicacionBean> listaAplicaciones = new ArrayList<>();
     Label peticionarioLabel = new Label();
     Label usuarioLabel = new Label();
     Label aplicacionesLabel = new Label();
@@ -98,39 +109,68 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     Icon icon = new Icon(VaadinIcon.OFFICE);
     private final Button excelBoton = new ObjetosComunes().getBoton("Excel", ButtonVariant.LUMO_LARGE, icon);
 
+    private Map<AplicacionBean, RadioButtonGroup<AplicacionPerfilBean>> mapRadio = new HashMap<>();
+    private Map<Long, ArrayList<AplicacionPerfilBean>> mapAppPerfiles = new HashMap<>();
+
     public FrmUsuariosPedir() {
         super();
         setSizeFull();
         recuperaSolicitante();
+        listaAplicaciones = new AplicacionDao().getListaPedir();
         doComponentesOrganizacion();
         doGrid();
         doComponenesAtributos();
         doCompentesEventos();
         doBinderPropiedades();
         construirAccordion();
+
     }
 
     @Override
     public void doGrabar() {
-        usuarioBinder.writeBeanIfValid(usuarioBean);
-        String centrosString = "";
-        for (CentroBean cadena : centro.getValue()) {
-            if (centrosString.length() > 1) {
-                centrosString = centrosString.concat(",");
+        if (usuarioBinder.writeBeanIfValid(usuarioBean)) {
+            String centrosString = "";
+            for (CentroBean cadena : centro.getValue()) {
+                if (centrosString.length() > 1) {
+                    centrosString = centrosString.concat(",");
+                }
+                centrosString = centrosString.concat(cadena.getId().toString());
             }
-            centrosString = centrosString.concat(cadena.getId().toString());
-        }
-        peticionBean.setCentros(centrosString);
-        peticionBean.setComentario(comentario.getValue());
-        peticionBean.setTipo(tipo.getValue());
-        if ((new UsuarioDao().doGrabaDatos(usuarioBean) == true)
-                && (new UsuarioDao().doGrabaPeticion(usuarioBean, peticionBean) == true)
-                && (new UsuarioDao().doGrabaPeticionApp(peticionBean, aplicacionesArrayList))) {
-            (new Notification(FrmMasterConstantes.AVISODATOALMACENADO, 4000, Notification.Position.MIDDLE)).open();
-            doActualizaGrid();
-            doLimpiar();
+            peticionBean.setFechaSolicitud(LocalDate.now());
+            peticionBean.setCentros(centrosString);
+            peticionBean.setComentario(comentario.getValue());
+            peticionBean.setTipo(tipo.getValue());
+            // usamos un Map para guardar la aplicacion y el perfil Que aunque es uno lo guardo en un array
+
+            Iterator<Map.Entry<AplicacionBean, RadioButtonGroup<AplicacionPerfilBean>>> iterator = mapRadio.entrySet().iterator();
+            ArrayList<UsuarioPeticionAppBean> arrayListAplicaciones = new ArrayList<>();
+            while (iterator.hasNext()) {
+                Map.Entry<AplicacionBean, RadioButtonGroup<AplicacionPerfilBean>> entry = iterator.next();
+                UsuarioPeticionAppBean usuapp = new UsuarioPeticionAppBean();
+                if (entry.getValue().getValue() != null) {
+                    usuapp.setAplicacion(entry.getKey());
+                    usuapp.setPeticion(peticionBean);
+                    usuapp.setPerfil(entry.getValue().getValue());
+                    arrayListAplicaciones.add(usuapp);
+                }
+            }
+            if ((new UsuarioDao().doGrabaDatos(usuarioBean) == true)
+                    && (new UsuarioDao().doGrabaPeticion(usuarioBean, peticionBean) == true)
+                    && (new UsuarioDao().doGrabaPeticionApp(peticionBean, arrayListAplicaciones))) {
+                (new Notification(FrmMasterConstantes.AVISODATOALMACENADO, 4000, Notification.Position.MIDDLE)).open();
+                doActualizaGrid();
+                doLimpiar();
+            } else {
+                (new Notification(FrmMasterConstantes.AVISODATOERRORBBDD, 4000, Notification.Position.MIDDLE)).open();
+            }
         } else {
-            (new Notification(FrmMasterConstantes.AVISODATOERRORBBDD, 4000, Notification.Position.MIDDLE)).open();
+            BinderValidationStatus<UsuarioBean> validate = usuarioBinder.validate();
+            String errorText = validate.getFieldValidationStatuses()
+                    .stream().filter(BindingValidationStatus::isError)
+                    .map(BindingValidationStatus::getMessage)
+                    .map(Optional::get).distinct()
+                    .collect(Collectors.joining(", "));
+            Notification.show(FrmMensajes.AVISODATOERRORVALIDANDO + errorText);
         }
     }
 
@@ -195,9 +235,9 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         usuarioBinder.forField(movilUsuario).bind(UsuarioBean::getMovilUsuario, UsuarioBean::setMovilUsuario);
         usuarioBinder.forField(categoriaUsuario).bind(UsuarioBean::getCategoria, UsuarioBean::setCategoria);
         usuarioBinder.forField(gfhUsuario).bind(UsuarioBean::getGfh, UsuarioBean::setGfh);
-        usuarioBinder.forField(tipo).bind(UsuarioBean::getTipo, UsuarioBean::setTipo);
-        usuarioBinder.forField(comentario).bind(UsuarioBean::getComentario, UsuarioBean::setComentario);
 
+        //  peticionBean.forField(tipo).bind(UsuarioPeticionBean::getTipo, UsuarioPeticionBean::setTipo);
+        //  peticionBean.forField(comentario).bind(UsuarioPeticionBean::getComentario, UsuarioPeticionBean::setComentario);
         solicitanteBinder.forField(idSolicitante)
                 .withConverter(new StringToLongConverter("Introducir un Long"))
                 .bind(UsuarioBean::getId, UsuarioBean::setId);
@@ -242,14 +282,44 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         contenedorFormulario.add(nifUsuario, nombreUsuario, apellido1Usuario, apellido2Usuario);
         contenedorFormulario.add(correoUsuario, correoPrivadoUsuario, telefonoUsuario, movilUsuario);
         contenedorFormulario.add(tipo, gfhUsuario);
-        contenedorFormulario.setColspan(gfhUsuario, 2);
-        contenedorFormulario.add(categoriaUsuario, 3);
+        //  contenedorFormulario.setColspan(gfhUsuario, 2);
+        contenedorFormulario.add(categoriaUsuario, 2);
         contenedorFormulario.add(comentario, 3);
         contenedorDerecha.add(aplicacionesLabel);
 
         contenedorDerecha.add(aplicacionesAccordion);
         //contenedorDerecha.add(excelBoton);
 
+    }
+
+    public void doCompletaDatosPersigo() {
+        UsuarioBean usuarioBeanHnss = new UsuarioDao().getPorDni(nifUsuario.getValue());
+        if (usuarioBeanHnss != null && usuarioBeanHnss.getDni() != null) {
+            if (usuarioBean.getNombre() == null || usuarioBean.getNombre().isEmpty()) {
+                usuarioBean.setNombre(usuarioBeanHnss.getNombre());
+            }
+            if (usuarioBean.getApellido1() == null || usuarioBean.getApellido1().isEmpty()) {
+                usuarioBean.setApellido1(usuarioBeanHnss.getApellido1());
+            }
+            if (usuarioBean.getApellido2() == null || usuarioBean.getApellido2().isEmpty()) {
+                usuarioBean.setApellido1(usuarioBeanHnss.getApellido2());
+            }
+            if (usuarioBean.getMail() == null || usuarioBean.getMail().isEmpty()) {
+                usuarioBean.setMail(usuarioBeanHnss.getMail());
+            }
+            if (usuarioBean.getMovilUsuario() == null || usuarioBean.getMovilUsuario().isEmpty()) {
+                usuarioBean.setMovilUsuario(usuarioBeanHnss.getMovilUsuario());
+            }
+            if (usuarioBean.getCorreoPrivadoUsuario() == null || usuarioBean.getCorreoPrivadoUsuario().isEmpty()) {
+                usuarioBean.setCorreoPrivadoUsuario(usuarioBeanHnss.getCorreoPrivadoUsuario());
+            }
+            if (usuarioBean.getCategoria() == null) {
+                usuarioBean.setCategoria(usuarioBeanHnss.getCategoria());
+            }
+            if (usuarioBean.getGfh() == null) {
+                usuarioBean.setGfh(usuarioBeanHnss.getGfh());
+            }
+        }
     }
 
     @Override
@@ -260,14 +330,16 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
                 if (usuarioBean.getDni() != null) {
                     usuarioBinder.readBean(usuarioBean);
                     categoriaUsuario.setValue(usuarioBean.getCategoria());
-
+                    doCompletaDatosPersigo();
+                } else {
+                    usuarioBean = new UsuarioDao().getPorDni(nifUsuario.getValue());
+                    if (usuarioBean.getDni() != null) {
+                        usuarioBinder.readBean(usuarioBean);
+                        categoriaUsuario.setValue(usuarioBean.getCategoria());
+                    }
                 }
             } else {
-                usuarioBean = new UsuarioDao().getUsuarioNuestro(nifUsuario.getValue());
-                if (usuarioBean.getDni() != null) {
-                    usuarioBinder.readBean(usuarioBean);
-                    categoriaUsuario.setValue(usuarioBean.getCategoria());
-                }
+
             }
         });
 
@@ -277,14 +349,14 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
 
         perfilesGaleno.addValueChangeListener(event -> {
             UsuarioPeticionAppBean perfil = new UsuarioPeticionAppBean();
-            perfil.setIdAplicacion(idGaleno);
+            perfil.setAplicacion(galeno);
             perfil.setIdPerfil(event.getValue().getId());
             aplicacionesArrayList.add(perfil);
         });
 
         perfilesJimena.addValueChangeListener(event -> {
             UsuarioPeticionAppBean perfil = new UsuarioPeticionAppBean();
-            perfil.setIdAplicacion(idJimena);
+            perfil.setAplicacion(jimena);
             perfil.setIdPerfil(event.getValue().getId());
             aplicacionesArrayList.add(perfil);
         });
@@ -309,6 +381,15 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         centrosLayout.add(tiposCentro, centro);
         aplicacionesAccordion.add("Centros", centrosLayout);
 
+        for (AplicacionBean app : listaAplicaciones) {
+            VerticalLayout galenoLayout = new VerticalLayout();
+            RadioButtonGroup<AplicacionPerfilBean> perfiles
+                    = new ObjetosComunes().getAplicacionesPerfilesPorIdRadioButtonGroup(app.getId());
+            galenoLayout.add(perfiles);
+            mapRadio.put(app, perfiles);
+            aplicacionesAccordion.add(app.getNombre(), galenoLayout);
+        }
+        /*
         VerticalLayout galenoLayout = new VerticalLayout();
         galenoLayout.add(perfilesGaleno);
         aplicacionesAccordion.add("Galeno", galenoLayout);
@@ -316,8 +397,9 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         VerticalLayout jimenaLayout = new VerticalLayout();
         jimenaLayout.add(perfilesJimena);
         aplicacionesAccordion.add("Jimena", jimenaLayout);
+         */
 
-        /*
+ /*
         VerticalLayout comentarioLayout = new VerticalLayout();
         comentarioLayout.add(comentario);
         aplicacionesAccordion.add("Comentario", comentarioLayout);
@@ -349,7 +431,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
                 + solicitanteBean.getApellido1() + " "
                 + solicitanteBean.getApellido2();
         peticionarioLabel.setText(filiacionSolicitante);
-        peticionBean.setIdpeticionario(solicitanteBean.getId());
+        peticionBean.setPeticionario(solicitanteBean);
     }
 
 }

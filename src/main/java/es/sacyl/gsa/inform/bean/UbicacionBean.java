@@ -40,7 +40,11 @@ public class UbicacionBean extends MasterBean implements Serializable {
     }
 
     public String getDescripcionFull() {
-        return descripcionFull;
+        if (descripcionFull != null) {
+            return descripcionFull;
+        } else {
+            return "";
+        }
     }
 
     public void setDescripcionFull(String descripcionFull) {
@@ -84,7 +88,7 @@ public class UbicacionBean extends MasterBean implements Serializable {
     }
 
     public ArrayList<UbicacionBean> getHijos() {
-        return new UbicacionDao().getListaHijos(this);
+        return new UbicacionDao().getListaHijos(this, this.getCentro());
     }
 
     public ArrayList<UbicacionBean> getRootUbicaciones() {

@@ -8,6 +8,7 @@ import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
 import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.DWIndicador;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.GerenciaBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.LocalidadBean;
@@ -704,6 +705,16 @@ public class CombosUi {
             combo.setItems(new GfhDao().getLista(null, ConexionDao.BBDD_ACTIVOSI));
         }
         combo.setItemLabelGenerator(GfhBean::getDescripcion);
+        combo.setMinWidth("150px");
+        combo.setClearButtonVisible(true);
+        return combo;
+    }
+
+    public ComboBox<DatoGenericoBean> getGfhPersigo() {
+        ComboBox<DatoGenericoBean> combo;
+        combo = new ComboBox<>("Gfhs Pérsigo");
+        combo.setItems(new UsuarioDao().getGfhPersigo());
+        combo.setItemLabelGenerator(DatoGenericoBean::getValor);
         combo.setMinWidth("150px");
         combo.setClearButtonVisible(true);
         return combo;

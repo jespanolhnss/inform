@@ -40,7 +40,7 @@ public class VlanDao extends ConexionDao implements Serializable, ConexionInterf
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
                 + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo"
                 + " FROM vlan  "
                 + " LEFT JOIN  usuarios usu ON usu.id=vlan.usucambio "
                 + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "

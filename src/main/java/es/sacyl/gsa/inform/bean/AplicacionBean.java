@@ -31,6 +31,11 @@ public class AplicacionBean extends MasterBean implements Serializable {
         super();
     }
 
+    public AplicacionBean(Long id) {
+        super();
+        this.id = id;
+    }
+
     public String getNombre() {
         return nombre;
     }

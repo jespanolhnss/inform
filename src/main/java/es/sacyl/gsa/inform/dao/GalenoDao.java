@@ -2,7 +2,6 @@ package es.sacyl.gsa.inform.dao;
 
 import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.ParametroBean;
-import es.sacyl.gsa.inform.ctrl.IpCtrl;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -155,23 +154,24 @@ public class GalenoDao {
         return actualizado;
     }
      */
-    public ArrayList<DatoGenericoBean> getEquipo(String dato) {
+    public ArrayList<DatoGenericoBean> getEquipo(String dato, String tipo) {
         Connection conn = this.conecta();
         ArrayList<DatoGenericoBean> datos = new ArrayList<>();
         String sql = "  SELECT  dir1 ,dir2,dir3,dir4 ,nombre_equipo,gfh,usuario,observaciones"
-                + " ,cod_maqui,invt_marca.descripcion,modelo,nserie ,nom_maqui,equipo,fec_baja,edificio,codplan,codala,sala"
+                + " ,cod_maqui,invt_marca.descripcion,modelo,nserie ,nom_maqui,equipo,fec_baja,edificio,codplan,codala,sala,nom_tipo"
                 + " FROM hnss_ip_lineas"
                 + " JOIN  hnss_ip on hnss_ip.id=hnss_ip_lineas.id_ip"
                 + " LEFT JOIN  man_maqui on man_maqui.cod_maqui=hnss_ip_lineas. numero_registro"
+                + " LEFT JOIN inv_tipm ON inv_tipm.cod_tipo=man_maqui.tipo "
                 + " LEFT JOIN  invt_marca on invt_marca.codigo=man_maqui.marca WHERE 1=1 "
                 + "  AND  hnss_ip_lineas.fecha_fin is null  ";
-        if (IpCtrl.isValid(dato)) {
+        if (tipo.equals("Ip")) {
             String[] dirs = dato.split("\\.");
             sql = sql.concat(" AND dir1='" + dirs[0] + "'");
             sql = sql.concat(" AND dir2='" + dirs[1] + "'");
             sql = sql.concat(" AND dir3='" + dirs[2] + "'");
             sql = sql.concat(" AND dir4='" + dirs[3] + "'");
-        } else {
+        } else if (tipo.equals("Inventario")) {
             sql = sql.concat(" AND cod_maqui='" + dato + "'");
         }
         if (conn != null) {
@@ -312,7 +312,15 @@ public class GalenoDao {
                     if (resulSet.getString("sala") != null) {
                         datog.setValor(datog.getValor() + "-" + resulSet.getString("sala").trim());
                     }
+                    datos.add(datog);
 
+                    datog = new DatoGenericoBean();
+                    datog.setTipoDato("tipo");
+                    if (resulSet.getString("nom_tipo") != null) {
+                        datog.setValor(resulSet.getString("nom_tipo").trim());
+                    } else {
+                        datog.setValor("");
+                    }
                     datos.add(datog);
 
                 }

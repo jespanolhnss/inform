@@ -1,5 +1,6 @@
 package es.sacyl.gsa.inform.ui.tablas;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
@@ -23,6 +24,7 @@ import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
+import es.sacyl.gsa.inform.ui.recursos.FrmBuscaUbicacion;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,6 +38,8 @@ public final class FrmUbicacion extends FrmMasterPantalla {
     private final ComboBox<AutonomiaBean> autonomiaComboBuscador = new CombosUi().getAutonomiaCombo(AutonomiaBean.AUTONOMIADEFECTO, null);
     private final ComboBox<ProvinciaBean> provinciaComboBuscador = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null, AutonomiaBean.AUTONOMIADEFECTO);
     private final ComboBox<CentroTipoBean> centroTipoComboBuscador = new CombosUi().getCentroTipoCombo(CentroTipoBean.CENTROTIPODEFECTO);
+    private ComboBox<UbicacionBean> ubicacionComboBuscador = null;
+    private final Button ayudaUbicacion = new ObjetosComunes().getBotonMini();
     private final ComboBox<CentroBean> centroCombo = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPODEFECTO, null, null);
     private final ComboBox<UbicacionBean> ubicacionCombo;
 
@@ -59,6 +63,9 @@ public final class FrmUbicacion extends FrmMasterPantalla {
         this.ubicacionBean = ubicacionBeanParam;
         ubicacionCombo = new CombosUi().getUbicacionCombo(null,
                 centroCombo.getValue(), null, null);
+        ubicacionComboBuscador = new CombosUi().getUbicacionCombo(null,
+                centroCombo.getValue(), null, null);
+
         doGrid();
         doComponenesAtributos();
         doBinderPropiedades();
@@ -66,6 +73,10 @@ public final class FrmUbicacion extends FrmMasterPantalla {
         doActualizaComboCentro();
         doComponentesOrganizacion();
         ubicacionBinder.readBean(ubicacionBean);
+        if (centroCombo.getValue() == null) {
+            centroCombo.setOpened(true);
+            centroCombo.focus();
+        }
     }
 
     @Override
@@ -74,12 +85,10 @@ public final class FrmUbicacion extends FrmMasterPantalla {
             if (new UbicacionDao().doGrabaDatos(ubicacionBean) == true) {
                 (new Notification(FrmMensajes.AVISODATOALMACENADO, 1000, Notification.Position.MIDDLE)).open();
                 doActualizaGrid();
-                doActualizaComboPadre();
                 doLimpiar();
             } else {
                 (new Notification(FrmMensajes.AVISODATOERRORBBDD, 1000, Notification.Position.MIDDLE)).open();
             }
-            // this.close();
         } else {
             BinderValidationStatus<UbicacionBean> validate = ubicacionBinder.validate();
             String errorText = validate.getFieldValidationStatuses()
@@ -106,7 +115,7 @@ public final class FrmUbicacion extends FrmMasterPantalla {
                     new UbicacionDao().doBorraDatos(ubicacionBean);
                     Notification.show(FrmMensajes.AVISODATOBORRADO);
                     doActualizaGrid();
-                    doActualizaComboPadre();
+                    //    doActualizaComboPadre();
                     doLimpiar();
                 });
         dialog.open();
@@ -118,12 +127,12 @@ public final class FrmUbicacion extends FrmMasterPantalla {
 
     @Override
     public void doLimpiar() {
-        CentroBean centroActual = centroCombo.getValue();
-        UbicacionBean ubicacionPadre = ubicacionBean.getPadre();
+        // CentroBean centroActual = centroCombo.getValue();
+        //   UbicacionBean ubicacionPadre = ubicacionBean.getPadre();
         ubicacionBean = new UbicacionBean();
-        ubicacionBinder.readBean(ubicacionBean);
-        centroCombo.setValue(centroActual);
-        ubicacionCombo.setValue(ubicacionPadre);
+        //  ubicacionBinder.readBean(ubicacionBean);
+        //     centroCombo.setValue(centroActual);
+        //   ubicacionCombo.setValue(ubicacionPadre);
         descripcion.clear();
         nivel.setValue("0");
         descripcionfull.clear();
@@ -158,15 +167,40 @@ public final class FrmUbicacion extends FrmMasterPantalla {
 
     }
 
+    /**
+     * Para optimiar sql el grid sólo lo actualiza cuando se cambia el
+     * comboubicacionBuscador padre
+     *
+     */
     @Override
     public void doActualizaGrid() {
-        //   ubicacionArrayList = new UbicacionDao().getLista(null, centroCombo.getValue(), null);
-        //    ubicacionGrid.setItems(ubicacionArrayList);
-        ubicacionArrayList = new UbicacionDao().getListaPadresCentro(centroCombo.getValue());
+
+        /**
+         * Añade la ubicación padre al Grid para que se pueda seleccionar y
+         * editar
+         */
+        ubicacionArrayList = new ArrayList<>();
+        //   ubicacionArrayList.add(ubicacionComboBuscador.getValue());
+        if (ubicacionComboBuscador.getValue() != null) {
+            ubicacionArrayList.addAll(new UbicacionDao().getListaHijos(ubicacionComboBuscador.getValue(), centroCombo.getValue()));
+        }
         grid.setItems(ubicacionArrayList,
                 UbicacionBean::getHijos);
         grid.expand(ubicacionArrayList);
+        grid.expandRecursively(ubicacionArrayList, 5);
+        doActualizaComboPadre();
 
+    }
+
+    public void doActualizaComboPadre() {
+        /**
+         * Añade a la lista de hijos el padre. Si no fuera así cuando no hay
+         * hijos no podría elegir padre a la hora de añadir una nueva ubicación
+         */
+        ArrayList<UbicacionBean> lista = new ArrayList<>();
+        lista.add(ubicacionComboBuscador.getValue());
+        lista.addAll(new UbicacionDao().getListaHijos(ubicacionComboBuscador.getValue(), centroCombo.getValue()));
+        ubicacionCombo.setItems(lista);
     }
 
     @Override
@@ -202,6 +236,7 @@ public final class FrmUbicacion extends FrmMasterPantalla {
 
     @Override
     public void doComponenesAtributos() {
+        autonomiaComboBuscador.setVisible(false);
     }
 
     @Override
@@ -215,8 +250,8 @@ public final class FrmUbicacion extends FrmMasterPantalla {
                 String.format("Collapsed %s item(s)", event.getItems().size())
                 + "\n" + message.getValue()));
          */
-        contenedorBuscadores.add(autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador);
-        contenedorFormulario.add(centroCombo, id, descripcion, ubicacionCombo, nivel, descripcionfull);
+        contenedorBuscadores.add(autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, ubicacionComboBuscador);
+        contenedorFormulario.add(centroCombo, id, descripcion, ubicacionCombo, ayudaUbicacion, nivel, descripcionfull);
         contenedorDerecha.add(grid);
     }
 
@@ -229,10 +264,35 @@ public final class FrmUbicacion extends FrmMasterPantalla {
             doActualizaComboCentro();
         });
 
+        /**
+         * Cuando elige centro actualiza el combo buscador padre
+         */
         centroCombo.addValueChangeListener(event -> {
-            doActualizaGrid();
-            doActualizaComboPadre();
+            //     doActualizaGrid();
+            //  doActualizaComboPadre();
 
+            if (centroCombo.getValue() != null) {
+                ubicacionComboBuscador.setItems(new UbicacionDao().getListaPadresCentro(centroCombo.getValue()));
+                ubicacionComboBuscador.focus();
+                ubicacionComboBuscador.setOpened(true);
+
+            } else {
+                centroCombo.focus();
+            }
+
+        });
+        ubicacionComboBuscador.addValueChangeListener(event -> {
+            if (ubicacionComboBuscador.getValue() != null) {
+                doActualizaGrid();
+                descripcion.focus();
+            } else {
+                // ubicacionComboBuscador.setOpened(true);
+                // si no elige combo padre en el buscado en el formulario el combopadre
+                // se carga los los padres del centro
+                ubicacionCombo.setItems(new UbicacionDao().getListaPadresCentro(centroCombo.getValue()));
+
+            }
+            //   doActualizaComboPadre();
         });
 
         ubicacionCombo.addValueChangeListener(event -> {
@@ -248,6 +308,24 @@ public final class FrmUbicacion extends FrmMasterPantalla {
             ubicacionBinder.readBean(ubicacionBean);
         }
         );
+
+        /**
+         * Ventana de ayuda para elegir ubicación
+         */
+        ayudaUbicacion.addClickListener(event -> {
+            if (centroCombo.getValue() != null) {
+                FrmBuscaUbicacion frmBuscaUbicacion = new FrmBuscaUbicacion(centroCombo.getValue());
+                frmBuscaUbicacion.addDialogCloseActionListener(eventAyuda -> {
+                    ubicacionCombo.setValue(frmBuscaUbicacion.getUbicacionBean());
+                });
+                frmBuscaUbicacion.addDetachListener(eventAyuda -> {
+                    ubicacionCombo.setValue(frmBuscaUbicacion.getUbicacionBean());
+                });
+                frmBuscaUbicacion.open();
+            } else {
+                Notification.show("Debes elegir centro");
+            }
+        });
     }
 
     public void doActualizaComboCentro() {
@@ -255,8 +333,4 @@ public final class FrmUbicacion extends FrmMasterPantalla {
                 provinciaComboBuscador.getValue(), null, null, centroTipoComboBuscador.getValue(), null, ConexionDao.BBDD_ACTIVOSI));
     }
 
-    public void doActualizaComboPadre() {
-        ArrayList<UbicacionBean> lista = new UbicacionDao().getLista(null, centroCombo.getValue(), null);
-        ubicacionCombo.setItems(lista);
-    }
 }

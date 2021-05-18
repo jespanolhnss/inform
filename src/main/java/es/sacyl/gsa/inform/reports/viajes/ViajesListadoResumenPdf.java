@@ -53,8 +53,14 @@ public class ViajesListadoResumenPdf extends MasterReport {
         try {
             this.setFontSize(8);
             this.getDocument().setTopMargin(100);
-
-            PdfEventoPagina evento = new PdfEventoPagina(document, "Listado de viajes desde " + formatterdd_mm_yyyy.format(desde) + " hasta " + formatterdd_mm_yyyy.format(hasta));
+            String cabecera = " Listado de viajes ";
+            if (desde != null) {
+                cabecera = cabecera.concat(" desde " + formatterdd_mm_yyyy.format(desde));
+            }
+            if (hasta != null) {
+                cabecera = cabecera.concat(" hasta " + formatterdd_mm_yyyy.format(hasta));
+            }
+            PdfEventoPagina evento = new PdfEventoPagina(document, cabecera);
             pdf.addEventHandler(PdfDocumentEvent.END_PAGE, evento);
 
             ArrayList<ViajeBean> lista = new ViajesDao().getListaViajes(desde, hasta, null, null, ConexionDao.BBDD_ACTIVOSI);
