@@ -553,7 +553,8 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 if (Utilidades.isNumeric(texto.substring(0))) {
                     sql = sql.concat(" AND usu.dni like '" + texto + "%'");
                 } else {
-                    sql = sql.concat(" AND  (upper( usu.apellido1) like '" + texto.toUpperCase() + "%'  OR  upper(usu.apellido2) like '" + texto.toUpperCase() + "%')");
+                    sql = sql.concat(" AND  (upper( usu.apellido1) like '" + texto.toUpperCase() + "%'  OR  upper(usu.apellido2) like '" + texto.toUpperCase() + "%' "
+                            + " OR  upper(usu.nombre) like '" + texto.toUpperCase() + "%'  )");
                 }
             }
             if (gfh != null) {
