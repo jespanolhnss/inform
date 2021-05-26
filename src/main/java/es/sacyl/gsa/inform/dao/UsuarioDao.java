@@ -996,13 +996,13 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         }
         return lista;
     }
-    
+
     public ArrayList<GruposPaginasGaleno> getGruposPaginasGaleno() {
         Connection connection = null;
         ArrayList<GruposPaginasGaleno> lista = new ArrayList<>();
         String select;
         select = "select id, grupo from galeno_grupospg";
-        
+
         try {
             connection = super.getConexionBBDD();
             Statement statement = connection.createStatement();
@@ -1024,7 +1024,6 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         }
         return lista;
     }
-
 
     public ArrayList<UsuarioPeticionAppBean> getListaAppPeticiones(UsuarioPeticionBean usuarioPeticionBean) {
         Connection connection = null;
