@@ -6,9 +6,10 @@ import es.sacyl.gsa.inform.bean.CategoriaBean;
 import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.FuncionalidadBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
-import es.sacyl.gsa.inform.bean.GruposPaginasGaleno;
+import es.sacyl.gsa.inform.bean.GruposPaginasGalenoBean;
 import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
+import es.sacyl.gsa.inform.bean.UsuarioGalenoBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionAppBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
 import es.sacyl.gsa.inform.util.Constantes;
@@ -171,11 +172,10 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
     }
 
     /**
-     * Gets the usuario userid.
      *
-     * @param userid the userid
+     * @param dni
      * @param conFunciolidades
-     * @return the usuario userid
+     * @return UsuarioBean
      */
     public UsuarioBean getUsuarioDni(String dni, Boolean conFunciolidades) {
         Connection connection = null;
@@ -996,9 +996,9 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         return lista;
     }
     
-    public ArrayList<GruposPaginasGaleno> getGruposPaginasGaleno() {
+    public ArrayList<GruposPaginasGalenoBean> getGruposPaginasGaleno() {
         Connection connection = null;
-        ArrayList<GruposPaginasGaleno> lista = new ArrayList<>();
+        ArrayList<GruposPaginasGalenoBean> lista = new ArrayList<>();
         String select;
         select = "select id, grupo from galeno_grupospg";
         
@@ -1007,7 +1007,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             Statement statement = connection.createStatement();
             ResultSet resulSet = statement.executeQuery(select);
             while (resulSet.next()) {
-                GruposPaginasGaleno grupos = new GruposPaginasGaleno();
+                GruposPaginasGalenoBean grupos = new GruposPaginasGalenoBean();
                 grupos.setId(resulSet.getLong("id"));
                 grupos.setGrupo(resulSet.getString("grupo"));
                 lista.add(grupos);
@@ -1092,6 +1092,55 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
             this.doCierraConexion(connection);
         }
         return lista;
+    }
+    
+    public boolean doGrabaAplicacion(UsuarioGalenoBean aplicacionBean, Map< Long, ArrayList<AplicacionPerfilBean>> listaMap) {
+        GalenoDao galenoDao = new GalenoDao();
+        Connection connection = null;
+        boolean insertado = false;
+
+            try {
+                connection = galenoDao.conecta();
+                String insertarUsuario;
+                insertarUsuario = "insert into galeno_usuarios "
+                        + "(usuario,nombre,apellido1,apellido2) "
+                        + "values (?,?,?,?)";
+                PreparedStatement statement = connection.prepareStatement(insertarUsuario);
+                if (aplicacionBean.getDni() != null) {
+                    statement.setString(1, aplicacionBean.getDni());                    
+                } else {
+                    statement.setNull(1, Types.CHAR);
+                }                
+                if (aplicacionBean.getNombre() != null) {
+                    statement.setString(2, aplicacionBean.getNombre());
+                } else {
+                    statement.setNull(2, Types.CHAR);
+                }
+                if (aplicacionBean.getApellido1() != null) {
+                    statement.setString(3, aplicacionBean.getApellido1());
+                } else {
+                    statement.setNull(3, Types.CHAR);
+                }
+                if (aplicacionBean.getApellido2() != null) {
+                    statement.setString(4, aplicacionBean.getApellido2());
+                } else {
+                    statement.setNull(4, Types.CHAR);
+                }
+                insertado = statement.executeUpdate() > 0;
+                insertado = true;
+                statement.close();
+                logger.debug(insertarUsuario);
+            } catch (SQLException e) {
+                logger.error(Utilidades.getStackTrace(e));
+                logger.error(ConexionDao.ERROR_BBDD_SQL, e);
+            } catch (Exception e) {
+                logger.error(Utilidades.getStackTrace(e));
+            } finally {
+                this.doCierraConexion(connection);
+            }       
+
+        return insertado;
+
     }
 
 }

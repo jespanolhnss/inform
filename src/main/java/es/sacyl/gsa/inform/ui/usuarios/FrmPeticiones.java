@@ -6,15 +6,17 @@
 package es.sacyl.gsa.inform.ui.usuarios;
 
 import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import es.sacyl.gsa.inform.bean.GruposPaginasGalenoBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionAppBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
@@ -57,6 +59,7 @@ public final class FrmPeticiones extends FrmMasterPantalla {
     ArrayList<UsuarioPeticionBean> peticionArrayList = new ArrayList<>();
     PaginatedGrid<UsuarioPeticionBean> gridPeticiones = new PaginatedGrid<>();
     Grid<UsuarioPeticionAppBean> gridAplicaciones = new Grid<>();
+    CheckboxGroup<GruposPaginasGalenoBean> gruposPaginasGaleno = new ObjetosComunes().getGruposPaginasGalenoCheckboxGroup();
 
     public FrmPeticiones() {
         super();
@@ -97,13 +100,14 @@ public final class FrmPeticiones extends FrmMasterPantalla {
 
     @Override
     public void doGrid() {
-
         gridPeticiones.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         gridPeticiones.setHeightByRows(true);
         gridPeticiones.setPageSize(25);
-        gridPeticiones.addColumn(UsuarioPeticionBean::getUsuarioNombre).setAutoWidth(true).setHeader(new Html("<b>Usu</b>"));
-        gridPeticiones.addColumn(UsuarioPeticionBean::getFechaSolicitud).setAutoWidth(true).setHeader(new Html("<b>Fecha</b>"));
-
+        gridPeticiones.addColumn(UsuarioPeticionBean::getUsuarioNombre).setAutoWidth(true).setHeader(new Html("<b>Usuario</b>"));
+        //gridPeticiones.addColumn(UsuarioPeticionBean::getFechaSolicitud).setAutoWidth(true).setHeader(new Html("<b>Fecha</b>"));
+        gridPeticiones.addColumn(new LocalDateRenderer<>(UsuarioPeticionBean::getFechaSolicitud,"dd-MM-YYYY"))
+                .setAutoWidth(true).setHeader(new Html("<b>Fecha</b>"));
+        
     }
 
     public void doGridAplicaciones() {
@@ -111,8 +115,8 @@ public final class FrmPeticiones extends FrmMasterPantalla {
         gridAplicaciones.setHeightByRows(true);
         gridAplicaciones.setPageSize(5);
         gridAplicaciones.addColumn(UsuarioPeticionAppBean::getId).setAutoWidth(true).setHeader(new Html("<b>Id</b>"));
-        gridAplicaciones.addColumn(UsuarioPeticionAppBean::getAplicacionString).setAutoWidth(true).setHeader(new Html("<b>Usu</b>"));
-        gridAplicaciones.addColumn(UsuarioPeticionAppBean::getComentario).setAutoWidth(true).setHeader(new Html("<b>Usu</b>"));
+        gridAplicaciones.addColumn(UsuarioPeticionAppBean::getAplicacionString).setAutoWidth(true).setHeader(new Html("<b>Aplicación</b>"));
+        gridAplicaciones.addColumn(UsuarioPeticionAppBean::getComentario).setAutoWidth(true).setHeader(new Html("<b>Comentario</b>"));
 
         //      gridAplicaciones.addColumn(UsuarioPeticionAppBean::getFechaSolicitud).setAutoWidth(true).setHeader(new Html("<b>Fecha</b>"));
     }
@@ -167,7 +171,7 @@ public final class FrmPeticiones extends FrmMasterPantalla {
                 new FormLayout.ResponsiveStep("50px", 3));
         contenedorFormulario.add(peticionarioDetalle, 3);
         contenedorFormulario.add(usuarioDetalle, 3);
-        contenedorFormulario.add(usuarioDetalle, idUsuario, nombreUsuario, tipo, fechaSolicitud);
+        contenedorFormulario.add(usuarioDetalle, 3);
         contenedorFormulario.add(gridAplicaciones, 3);
         contenedorDerecha.add(gridPeticiones);
     }
@@ -175,7 +179,6 @@ public final class FrmPeticiones extends FrmMasterPantalla {
     @Override
     public void doCompentesEventos() {
         gridPeticiones.addItemClickListener(event -> {
-            Notification.show("Hola caracola", 14, Notification.Position.MIDDLE);
             peticionBean = event.getItem();
             usuario = peticionBean.getUsuario();
             peticionario = peticionBean.getPeticionario();
@@ -187,6 +190,15 @@ public final class FrmPeticiones extends FrmMasterPantalla {
             usuarioDetalle.setOpened(false);
             ArrayList<UsuarioPeticionAppBean> listaApp = new UsuarioDao().getListaAppPeticiones(peticionBean);
             gridAplicaciones.setItems(listaApp);
+        });
+        
+        gridAplicaciones.addItemClickListener(event -> {
+            UsuarioPeticionAppBean peticion = event.getItem();
+            FrmGrabarAplicacion grabaAplicacion = new FrmGrabarAplicacion(peticion);
+            grabaAplicacion.addDialogCloseActionListener(e -> {
+                grabaAplicacion.close();
+            });
+            grabaAplicacion.open();           
         });
     }
 

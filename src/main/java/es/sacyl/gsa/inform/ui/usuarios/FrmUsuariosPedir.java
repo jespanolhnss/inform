@@ -110,7 +110,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     private final Button excelBoton = new ObjetosComunes().getBoton("Excel", ButtonVariant.LUMO_LARGE, icon);
 
     private Map<AplicacionBean, RadioButtonGroup<AplicacionPerfilBean>> mapRadio = new HashMap<>();
-    private Map<Long, ArrayList<AplicacionPerfilBean>> mapAppPerfiles = new HashMap<>();
+    //private Map<Long, ArrayList<AplicacionPerfilBean>> mapAppPerfiles = new HashMap<>();
 
     public FrmUsuariosPedir() {
         super();
@@ -328,9 +328,9 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
             if (!nifUsuario.getValue().isEmpty() && nifUsuario.getValue() != null) {
                 usuarioBean = new UsuarioDao().getUsuarioPersigo(nifUsuario.getValue());
                 if (usuarioBean.getDni() != null) {
-                    usuarioBinder.readBean(usuarioBean);
-                    categoriaUsuario.setValue(usuarioBean.getCategoria());
                     doCompletaDatosPersigo();
+                    usuarioBinder.readBean(usuarioBean);
+                    categoriaUsuario.setValue(usuarioBean.getCategoria());                    
                 } else {
                     usuarioBean = new UsuarioDao().getPorDni(nifUsuario.getValue());
                     if (usuarioBean.getDni() != null) {

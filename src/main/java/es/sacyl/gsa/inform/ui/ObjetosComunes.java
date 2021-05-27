@@ -27,6 +27,7 @@ import es.sacyl.gsa.inform.bean.CentroBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
 import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.GfhBean;
+import es.sacyl.gsa.inform.bean.GruposPaginasGalenoBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.dao.AplicacionDao;
 import es.sacyl.gsa.inform.dao.AplicacionPerfilDao;
@@ -36,6 +37,7 @@ import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.GfhDao;
 import es.sacyl.gsa.inform.dao.JimenaDao;
+import es.sacyl.gsa.inform.dao.UsuarioDao;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -167,6 +169,20 @@ public class ObjetosComunes {
         checkboxGroup.setLabel("Aplicaciones");
         checkboxGroup.setItems(new AplicacionDao().getLista(null));
         checkboxGroup.setItemLabelGenerator(AplicacionBean::getNombre);
+
+        return checkboxGroup;
+    }
+    
+    /**
+     *
+     * @return
+     */
+    public CheckboxGroup<GruposPaginasGalenoBean> getGruposPaginasGalenoCheckboxGroup() {
+        CheckboxGroup<GruposPaginasGalenoBean> checkboxGroup;
+        checkboxGroup = new CheckboxGroup<GruposPaginasGalenoBean>();
+        checkboxGroup.setLabel("Grupos de Páginas");
+        checkboxGroup.setItems(new UsuarioDao().getGruposPaginasGaleno());
+        checkboxGroup.setItemLabelGenerator(GruposPaginasGalenoBean::getGrupo);
 
         return checkboxGroup;
     }
