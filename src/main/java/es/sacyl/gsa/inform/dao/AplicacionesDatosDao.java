@@ -61,7 +61,6 @@ public class AplicacionesDatosDao extends ConexionDao implements ConexionInterfa
     public boolean doGrabaDatos(DatoGenericoBean datoGenericoBean) {
         boolean actualizado = false;
         if (this.getPorId(datoGenericoBean.getId()) == null) {
-            datoGenericoBean.setId(getSiguienteId("aplicaciones"));
             actualizado = this.doInsertaDatos(datoGenericoBean);
         } else {
             actualizado = this.doActualizaDatos(datoGenericoBean);

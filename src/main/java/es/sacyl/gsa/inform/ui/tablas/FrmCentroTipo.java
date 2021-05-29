@@ -15,9 +15,7 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
-import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CentroTipoBean;
-import es.sacyl.gsa.inform.dao.AutonomiaDao;
 import es.sacyl.gsa.inform.dao.CentroTipoDao;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
@@ -33,16 +31,17 @@ import org.vaadin.klaudeta.PaginatedGrid;
  * @author 06551256M
  */
 public final class FrmCentroTipo extends FrmMasterPantalla {
- private final TextField id = new ObjetosComunes().getTextField("Id", null, 10, "150px", "50px");
+
+    private final TextField id = new ObjetosComunes().getTextField("Id", null, 10, "150px", "50px");
     private final TextField nombre = new ObjetosComunes().getTextField("Descripcioón", null, 10, "300px", "50px");
-     private final RadioButtonGroup<String>  estadoRadio = new ObjetosComunes().getEstadoRadio();
- 
+    private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
+
     private CentroTipoBean centroTipoBean = null;
     private final Binder<CentroTipoBean> centroTipoBinder = new Binder<>();
     private final PaginatedGrid<CentroTipoBean> centroTipoGrid = new PaginatedGrid<>();
     private ArrayList<CentroTipoBean> centroTipoArrayList = new ArrayList<>();
 
-     public FrmCentroTipo() {
+    public FrmCentroTipo() {
         super();
         this.centroTipoBean = new CentroTipoBean();
         doComponentesOrganizacion();
@@ -51,9 +50,10 @@ public final class FrmCentroTipo extends FrmMasterPantalla {
         doBinderPropiedades();
         doCompentesEventos();
         centroTipoBinder.readBean(centroTipoBean);
+        doControlBotones(null);
     }
-     
-      @Override
+
+    @Override
     public void doControlBotones(Object obj) {
         super.doControlBotones(obj);
         if (obj == null) {
@@ -65,7 +65,7 @@ public final class FrmCentroTipo extends FrmMasterPantalla {
             nombre.focus();
         }
     }
-    
+
     @Override
     public void doGrabar() {
         if (centroTipoBinder.writeBeanIfValid(centroTipoBean)) {
@@ -94,8 +94,7 @@ public final class FrmCentroTipo extends FrmMasterPantalla {
         this.setVisible(false);
     }
 
-
-   @Override
+    @Override
     public void doBorrar() {
         final ConfirmDialog dialog = new ConfirmDialog(
                 FrmMensajes.AVISOCONFIRMACIONACCION,
@@ -108,11 +107,11 @@ public final class FrmCentroTipo extends FrmMasterPantalla {
                 });
         dialog.open();
     }
+
     @Override
     public void doAyuda() {
     }
 
- 
     @Override
     public void doLimpiar() {
         centroTipoBean = new CentroTipoBean();
@@ -125,7 +124,7 @@ public final class FrmCentroTipo extends FrmMasterPantalla {
     public void doImprimir() {
     }
 
-   @Override
+    @Override
     public void doGrid() {
         centroTipoGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         centroTipoGrid.setHeightByRows(true);
@@ -135,19 +134,21 @@ public final class FrmCentroTipo extends FrmMasterPantalla {
         centroTipoGrid.addColumn(CentroTipoBean::getDescripcion).setAutoWidth(true).setHeader(new Html("<b>Nombre</b>"));
         doActualizaGrid();
     }
-   @Override
+
+    @Override
     public void doActualizaGrid() {
         centroTipoArrayList = new CentroTipoDao().getLista(buscador.getValue());
         centroTipoGrid.setItems(centroTipoArrayList);
     }
-     @Override
+
+    @Override
     public void doBinderPropiedades() {
         centroTipoBinder.forField(id)
                 .withNullRepresentation("")
                 .asRequired()
                 .withConverter(new StringToLongConverter(FrmMensajes.AVISONUMERO))
                 .bind(CentroTipoBean::getId, CentroTipoBean::setId);
-        
+
         centroTipoBinder.forField(nombre)
                 .withNullRepresentation("")
                 .asRequired()
@@ -155,7 +156,7 @@ public final class FrmCentroTipo extends FrmMasterPantalla {
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 250))
                 .bind(CentroTipoBean::getDescripcion, CentroTipoBean::setDescripcion);
 
-          centroTipoBinder.forField(estadoRadio)
+        centroTipoBinder.forField(estadoRadio)
                 .bind(CentroTipoBean::getEstadoString, CentroTipoBean::setEstado);
     }
 
@@ -163,10 +164,10 @@ public final class FrmCentroTipo extends FrmMasterPantalla {
     public void doComponenesAtributos() {
     }
 
-      @Override
+    @Override
     public void doComponentesOrganizacion() {
         this.titulo.setText("Centros Tipos");
-        this.contenedorFormulario.add(id, nombre,estadoRadio);
+        this.contenedorFormulario.add(id, nombre, estadoRadio);
         this.contenedorBuscadores.add(buscador);
         this.contenedorDerecha.removeAll();
         this.contenedorDerecha.add(contenedorBuscadores, centroTipoGrid);
@@ -174,7 +175,7 @@ public final class FrmCentroTipo extends FrmMasterPantalla {
 
     @Override
     public void doCompentesEventos() {
-          buscador.addValueChangeListener(event -> {
+        buscador.addValueChangeListener(event -> {
             doActualizaGrid();
         });
 
@@ -189,6 +190,5 @@ public final class FrmCentroTipo extends FrmMasterPantalla {
         }
         );
     }
-    
-    
+
 }

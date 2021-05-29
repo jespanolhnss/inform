@@ -1,28 +1,43 @@
 package es.sacyl.gsa.inform.ui.tablas;
 
+import com.vaadin.componentfactory.Tooltip;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToLongConverter;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.validator.StringLengthValidator;
+import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.LocalidadBean;
 import es.sacyl.gsa.inform.bean.ProveedorBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.dao.LocalidadDao;
 import es.sacyl.gsa.inform.dao.ProveedorDao;
+import es.sacyl.gsa.inform.dao.ProveedorDatosDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterPantalla;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
+import es.sacyl.gsa.inform.ui.recursos.FrmProveedorDatoGenerico;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.vaadin.klaudeta.PaginatedGrid;
@@ -31,11 +46,14 @@ import org.vaadin.klaudeta.PaginatedGrid;
  *
  * @author 06551256M
  */
-public class FrmProveedor extends FrmMasterPantalla {
+public final class FrmProveedor extends FrmMasterPantalla {
 
     // private final ComboBox<AutonomiaBean> autonomiaComboBuscador = new CombosUi().getAutonomiaCombo(AutonomiaBean.AUTONOMIADEFECTO, null);
     private final ComboBox<ProvinciaBean> provinciaComboBuscador = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null, null);
     private final ComboBox<LocalidadBean> localidadCombo = new CombosUi().getLocalidadCombo(null, null, ProvinciaBean.PROVINCIA_DEFECTO, null);
+
+    private final Button datosGenericosButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.INPUT.create());
+    private final Tooltip datosGenericosTooltip = new ObjetosComunes().getTooltip(datosGenericosButton, "Registra características del proveedor");
 
     private final TextField id = new ObjetosComunes().getTextField("Id");
     private final TextField nombre = new ObjetosComunes().getTextField("Nombre");
@@ -53,6 +71,12 @@ public class FrmProveedor extends FrmMasterPantalla {
     private final PaginatedGrid<ProveedorBean> proveedorGrid = new PaginatedGrid<>();
     private ArrayList<ProveedorBean> proveedorLista = new ArrayList<>();
 
+    private PaginatedGrid<DatoGenericoBean> datoGenericoGrid = new PaginatedGrid<>();
+    private final Tab datosTab = new Tab("Datos");
+    private final Tabs tabs = new Tabs(datosTab);
+    private final Map<Tab, Component> tabsToPages = new HashMap<>();
+    private final Div page1 = new Div();
+
     public FrmProveedor() {
         super();
         this.proveedorBean = new ProveedorBean();
@@ -60,18 +84,22 @@ public class FrmProveedor extends FrmMasterPantalla {
 
         doComponentesOrganizacion();
         doGrid();
+        doGridDatoGenerico();
         doComponenesAtributos();
         doBinderPropiedades();
         doCompentesEventos();
+        doControlBotones(null);
     }
 
     @Override
     public void doControlBotones(Object obj) {
         super.doControlBotones(obj);
         if (obj == null) {
+            datosGenericosButton.setEnabled(false);
             nombre.focus();
         } else {
             nombre.focus();
+            datosGenericosButton.setEnabled(true);
         }
     }
 
@@ -154,6 +182,30 @@ public class FrmProveedor extends FrmMasterPantalla {
         doActualizaGrid();
     }
 
+    public void doGridDatoGenerico() {
+        datoGenericoGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        datoGenericoGrid.setHeightByRows(true);
+        datoGenericoGrid.setPageSize(14);
+        //   datoGenericoGrid.addColumn(DatoGenericoBean::getId).setAutoWidth(true).setHeader(new Html("<b>Id</b>"));
+        datoGenericoGrid.addColumn(new ComponentRenderer<>(datoGenerico -> {
+            Image img = new Image("icons/unpixel.png", "img");
+            if (datoGenerico.getFicheroBlobs() != null) {
+                img = new Image("icons/pdf.png", "pdf");
+                img.addClickListener(event -> {
+                    Page page = new Page(getUI().get());
+                    page.open(datoGenerico.getPathRelativo(), "_blank");
+                });
+            }
+            return img;
+
+        })).setHeader("Pdf");
+        datoGenericoGrid.addColumn(DatoGenericoBean::getTipoDato).setAutoWidth(true).setHeader(new Html("<b>Tipo</b>"));
+        datoGenericoGrid.addColumn(DatoGenericoBean::getValorAncho25).setAutoWidth(true).setHeader(new Html("<b>Valor</b>"));
+
+        doActualizaGridDatos();
+
+    }
+
     @Override
     public void doActualizaGrid() {
         proveedorLista = new ProveedorDao().getLista(buscador.getValue());
@@ -211,17 +263,29 @@ public class FrmProveedor extends FrmMasterPantalla {
 
     @Override
     public void doComponenesAtributos() {
+        botonBorrar.setText("");
+        botonLimpiar.setText("");
+        botonAyuda.setText("");
+        botonGrabar.setText("");
+        botonCancelar.setText("");
+        botonImprimir.setText("");
         this.titulo.setText("Proveedores");
         buscador.setTitle("Dato a buscar");
     }
 
     @Override
     public void doComponentesOrganizacion() {
+        contenedorBotones.add(datosGenericosButton, datosGenericosTooltip);
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
                 new FormLayout.ResponsiveStep("50px", 2),
                 new FormLayout.ResponsiveStep("50px", 3),
                 new FormLayout.ResponsiveStep("50px", 4));
+
+        tabsToPages.put(datosTab, page1);
+
+        //   Div pages = new Div(page1, page2, page3);
+        page1.add(datoGenericoGrid);
 
         this.contenedorFormulario.add(id);
         this.contenedorFormulario.add(nombre, 3);
@@ -238,9 +302,11 @@ public class FrmProveedor extends FrmMasterPantalla {
         this.contenedorFormulario.add(provinciaCombo, 2);
         this.contenedorFormulario.add(localidadCombo, 2);
 
+        this.contenedorIzquierda.removeAll();
+        this.contenedorIzquierda.add(contenedorBotones, contenedorFormulario, tabs, page1);
+
         this.contenedorBuscadores.add(buscador, provinciaComboBuscador);
         this.contenedorDerecha.removeAll();
-
         this.contenedorDerecha.add(contenedorBuscadores, proveedorGrid);
     }
 
@@ -262,12 +328,57 @@ public class FrmProveedor extends FrmMasterPantalla {
             //   localidadCombo.setItems(new LocalidadDao().getLista(null, null, proveedorBean.getProvincia()));
             proveedorBinder.readBean(proveedorBean);
             doControlBotones(proveedorBinder);
+            doActualizaGridDatos();
+            page1.setVisible(true);
         }
         );
 
         provinciaCombo.addValueChangeListener(event -> {
             localidadCombo.setItems(new LocalidadDao().getLista(null, null, provinciaCombo.getValue()));
         });
+
+        datosGenericosButton.addClickListener(event -> {
+            doVentanaDatoGenerico(null);
+        });
+
+        /**
+         * Gestiona los clic en los tabs ocultando todos y mostrando el del
+         * click
+         */
+        tabs.addSelectedChangeListener(event -> {
+            tabsToPages.values().forEach(page -> page.setVisible(false));
+            Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+            selectedPage.setVisible(true);
+        });
+
+        datoGenericoGrid.addItemClickListener(event -> {
+            DatoGenericoBean datoGenericoBean = event.getItem();
+            doVentanaDatoGenerico(datoGenericoBean);
+        }
+        );
     }
 
+    public void doVentanaDatoGenerico(DatoGenericoBean datoGenericoBean) {
+        FrmProveedorDatoGenerico frmProveedorDatoGenerico = new FrmProveedorDatoGenerico(proveedorBean, datoGenericoBean);
+        frmProveedorDatoGenerico.addDialogCloseActionListener(event1 -> {
+            proveedorBean.setListaDatos(frmProveedorDatoGenerico.getDatoGenericoBeanArray());
+            doActualizaGridDatos();
+            page1.setVisible(true);
+        });
+
+        frmProveedorDatoGenerico.addDetachListener(event1 -> {
+            proveedorBean.setListaDatos(frmProveedorDatoGenerico.getDatoGenericoBeanArray());
+            doActualizaGridDatos();
+            page1.setVisible(true);
+        });
+        frmProveedorDatoGenerico.open();
+    }
+
+    public void doActualizaGridDatos() {
+
+        ArrayList<DatoGenericoBean> listaDatosGenerico = new ProveedorDatosDao().getLista(null, proveedorBean);
+
+        datoGenericoGrid.setItems(listaDatosGenerico);
+        datosTab.setLabel("Caracterísitcas (" + Integer.toString(listaDatosGenerico.size()) + ")");
+    }
 }

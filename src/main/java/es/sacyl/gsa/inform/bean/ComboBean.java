@@ -37,6 +37,8 @@ public class ComboBean implements Serializable {
     public final static String DWAREASINDICADORES = "DWAREASINDICADORES";
     public final static String DWTIPOINDICADOR = "DWTIPOINDICADOR";
 
+    public final static String PROVEEDORDATOGENERICO = "PROVEEDORDATOGENERICO";
+
     public Long getId() {
         return id;
     }

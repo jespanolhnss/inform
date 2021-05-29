@@ -1,6 +1,7 @@
 package es.sacyl.gsa.inform.bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  *
@@ -21,7 +22,8 @@ public class ProveedorBean extends MasterBean implements Serializable {
     // esta atributo no es de bbdd
     private AutonomiaBean autonomia;
 
-    //   nombre,direccion,codpostal,telefonos,mail,localidad,provincia;
+    private ArrayList<DatoGenericoBean> listaDatos = new ArrayList<>();
+
     public ProveedorBean() {
         super();
     }
@@ -94,6 +96,14 @@ public class ProveedorBean extends MasterBean implements Serializable {
 
     public void setAutonomia(AutonomiaBean autonomia) {
         this.autonomia = autonomia;
+    }
+
+    public ArrayList<DatoGenericoBean> getListaDatos() {
+        return listaDatos;
+    }
+
+    public void setListaDatos(ArrayList<DatoGenericoBean> listaDatos) {
+        this.listaDatos = listaDatos;
     }
 
 }

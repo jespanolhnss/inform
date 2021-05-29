@@ -177,15 +177,13 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
 
     @Override
     public void doLimpiar() {
-
+        viajeBean = new ViajeBean();
         viajesBinder.readBean(null);
         salida.setValue(LocalDateTime.now());
         llegada.setValue(Utilidades.getFechaHoraLas15horas());
         viajeCentroGrid.setItems(new ArrayList<ViajeCentroBean>());
-        doActualizaGridCentros(viajeBean);
 
         viajeTecnicoGrid.setItems(new ArrayList<UsuarioBean>());
-        doActualizaGridTecnicos(viajeBean);
     }
 
     @Override

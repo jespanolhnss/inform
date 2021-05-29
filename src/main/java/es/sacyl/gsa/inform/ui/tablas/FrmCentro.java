@@ -141,6 +141,7 @@ public final class FrmCentro extends FrmMasterPantalla {
         doComponenesAtributos();
         doBinderPropiedades();
         doCompentesEventos();
+        doControlBotones(null);
     }
 
     @Override

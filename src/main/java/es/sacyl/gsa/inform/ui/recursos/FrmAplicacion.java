@@ -1,5 +1,6 @@
 package es.sacyl.gsa.inform.ui.recursos;
 
+import com.vaadin.componentfactory.Tooltip;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
@@ -63,9 +64,14 @@ import org.vaadin.klaudeta.PaginatedGrid;
 @CssImport("./styles/styles.css")
 public final class FrmAplicacion extends FrmMasterPantalla {
 
-    private final Button botonPerfiles = new ObjetosComunes().getBoton(null, null, VaadinIcon.CLIPBOARD_USER.create());
+    private final Button perfilesBoton = new ObjetosComunes().getBoton(null, null, VaadinIcon.CLIPBOARD_USER.create());
+    private final Tooltip perfilesTooltip = new ObjetosComunes().getTooltip(perfilesBoton, "Asocia perfiles de usuario a la aplicación");
+
     private final Button equiposButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.DESKTOP.create());
+    private final Tooltip equiposTooltip = new ObjetosComunes().getTooltip(equiposButton, "Asocia ordenadores que tengan instalada esta aplicación");
+
     private final Button datosGenericosButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.INPUT.create());
+    private final Tooltip datosGenericosTooltip = new ObjetosComunes().getTooltip(datosGenericosButton, "Registra características de la apliación");
 
     private final ComboBox<ProveedorBean> proveedorComboBuscador = new CombosUi().getProveedorCombo(null, null);
     private final ComboBox<GfhBean> gfhcomboBuscador = new CombosUi().getServicioCombo(null, null);
@@ -125,11 +131,11 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         if (obj == null) {
             nombre.focus();
             datosGenericosButton.setEnabled(false);
-            botonPerfiles.setEnabled(false);
+            perfilesBoton.setEnabled(false);
             equiposButton.setEnabled(false);
         } else {
             datosGenericosButton.setEnabled(true);
-            botonPerfiles.setEnabled(true);
+            perfilesBoton.setEnabled(true);
             equiposButton.setEnabled(true);
         }
     }
@@ -410,6 +416,7 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         botonLimpiar.setText("");
         botonBorrar.setText("");
         botonCancelar.setText("");
+        botonGrabar.setText("");
 
         proveedorComboBuscador.setValue(null);
         gfhcomboBuscador.setValue(null);
@@ -432,7 +439,8 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         this.titulo.setText("Aplicaciones");
         botonImprimir.setText("");
 
-        contenedorBotones.add(botonPerfiles, equiposButton, datosGenericosButton, botonImprimir);
+        contenedorBotones.add(perfilesBoton, perfilesTooltip, equiposButton, equiposTooltip, datosGenericosButton, datosGenericosTooltip, botonImprimir, tooltipImprimir);
+
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
                 new FormLayout.ResponsiveStep("50px", 2),
@@ -508,7 +516,7 @@ public final class FrmAplicacion extends FrmMasterPantalla {
             doVentanaPerfil(aplicacionPerfilBean);
         }
         );
-        botonPerfiles.addClickListener(event -> {
+        perfilesBoton.addClickListener(event -> {
             AplicacionPerfilBean aplicacionPerfilBean = new AplicacionPerfilBean();
             aplicacionPerfilBean.setAplicacion(aplicacionBean);
             doVentanaPerfil(aplicacionPerfilBean);
@@ -529,21 +537,7 @@ public final class FrmAplicacion extends FrmMasterPantalla {
         });
 
         datosGenericosButton.addClickListener(event -> {
-            /*
-            FrmAplicacionDatoGenerico frmAplicacionDatoGenerico = new FrmAplicacionDatoGenerico(aplicacionBean);
-            frmAplicacionDatoGenerico.addDialogCloseActionListener(event1 -> {
-                aplicacionBean.setListaDatosGenerico(frmAplicacionDatoGenerico.getDatoGenericoBeanArray());
-                doActualizaGridDatos();
-                page1.setVisible(true);
-            });
 
-            frmAplicacionDatoGenerico.addDetachListener(event1 -> {
-                aplicacionBean.setListaDatosGenerico(frmAplicacionDatoGenerico.getDatoGenericoBeanArray());
-                doActualizaGridDatos();
-                page1.setVisible(true);
-            });
-            frmAplicacionDatoGenerico.open();
-             */
             doVentanaDatoGenerico(null);
         });
 

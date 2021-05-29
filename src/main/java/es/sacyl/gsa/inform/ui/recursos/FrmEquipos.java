@@ -1,5 +1,6 @@
 package es.sacyl.gsa.inform.ui.recursos;
 
+import com.vaadin.componentfactory.Tooltip;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
@@ -33,6 +34,7 @@ import es.sacyl.gsa.inform.bean.ParametroBean;
 import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.bean.UbicacionBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
+import es.sacyl.gsa.inform.ctrl.EquipoCtrl;
 import es.sacyl.gsa.inform.ctrl.IpCtrl;
 import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.ComboDao;
@@ -82,8 +84,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPODEFECTO, null, null);
     private final ComboBox<String> equipoTipoComboBuscador = new CombosUi().getEquipoTipoCombo(null, 50);
     private final ComboBox<String> equipoMarcaComboBuscador = new CombosUi().getGrupoRamaComboValor(ComboBean.TIPOEQUIPOMARCA, equipoTipoComboBuscador.getValue(), null, "Marca");
+
     private final Button excelButton = new ObjetosComunes().getExcelBoton();
+    private final Tooltip excelTooltip = new ObjetosComunes().getTooltip(excelButton, "Descarga a excel los datos seleccionados");
     private final Button etiquetaListaButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.BARCODE.create());
+    private final Tooltip etiquetaListaTooltip = new ObjetosComunes().getTooltip(etiquetaListaButton, "Genera una etiqueta para la lista de equipos seleccionados");
 
     private final Button ayudaUbicacion = new ObjetosComunes().getBotonMini();
     private final Button ayudaIp = new ObjetosComunes().getBotonMini();
@@ -91,10 +96,14 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final Button ayudaModelo = new ObjetosComunes().getBotonMini();
     private final Button ayudaInventario = new ObjetosComunes().getBotonMini(VaadinIcon.PLUS.create());
     //private final Button nuevoInventario = new ObjetosComunes().getBotonMini(VaadinIcon.PLUS.create());
-    private final Button aplicacionButton = new ObjetosComunes().getBoton("App", null, VaadinIcon.FILE_TABLE.create());
-    private final Button datosGenericosButton = new ObjetosComunes().getBoton("Dat", null, VaadinIcon.TABLE.create());
+    private final Button aplicacionButton = new ObjetosComunes().getBoton("", null, VaadinIcon.FILE_TABLE.create());
+    private final Tooltip aplicacionTooltip = new ObjetosComunes().getTooltip(aplicacionButton, "Asocia aplicaciones con este equipo.");
+
+    private final Button datosGenericosButton = new ObjetosComunes().getBoton("", null, VaadinIcon.TABLE.create());
+    private final Tooltip datosGenericosTooltip = new ObjetosComunes().getTooltip(datosGenericosButton, "Registra características del equipo");
 
     private final Button etiquetaButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.BARCODE.create());
+    private final Tooltip etiquetaTooltip = new ObjetosComunes().getTooltip(etiquetaButton, "Imprime etiqueta del equipo seleccionado");
 
     private final TextField id = new ObjetosComunes().getId();
     private final ComboBox<String> equipoTipoCombo = new CombosUi().getEquipoTipoCombo(null, 70);
@@ -471,6 +480,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
         botonBorrar.setText("");
         botonLimpiar.setText("");
         botonAyuda.setText("");
+        botonGrabar.setText("");
+        botonCancelar.setText("");
+        botonImprimir.setText("");
+        excelButton.setText("");
+
         autonomiaComboBuscador.setVisible(Boolean.FALSE);
         ubicacionCombo.setLabel("Ubicación");
         ubicacionCombo.setMaxWidth("450px");
@@ -517,7 +531,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     @Override
     public void doComponentesOrganizacion() {
-        contenedorBotones.add(aplicacionButton, datosGenericosButton, etiquetaButton);
+        contenedorBotones.add(aplicacionButton, aplicacionTooltip, datosGenericosButton, datosGenericosTooltip, etiquetaButton, etiquetaTooltip);
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
                 new FormLayout.ResponsiveStep("50px", 2),
@@ -540,7 +554,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         buscador.setPlaceholder("Valor a buscar");
         buscador.setWidth("200px");
         contenedorBuscadores.add(autonomiaComboBuscador, provinciaComboBuscador, centroTipoComboBuscador, centroComboBuscador);
-        contenedorBuscadores1.add(equipoTipoComboBuscador, equipoMarcaComboBuscador, botonImprimir, excelButton, etiquetaListaButton);
+        contenedorBuscadores1.add(equipoTipoComboBuscador, equipoMarcaComboBuscador, botonImprimir, tooltipImprimir, excelButton, excelTooltip, etiquetaListaButton, etiquetaListaTooltip);
         contenedorBuscadores2.add(buscador);
 
         contenedorDerecha.add(this.contenedorBuscadores, this.contenedorBuscadores1, contenedorBuscadores1, equipoGrid);
@@ -722,7 +736,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
          */
         ayudaInventario.addClickListener(evet
                 -> {
-            inventario.setValue(new EquipoDao().getSiguienteInventario());
+            //   inventario.setValue(new EquipoDao().getSiguienteInventario());
+            inventario.setValue(new EquipoCtrl().getSiguienteNumeroInventario().toString());
         }
         );
 

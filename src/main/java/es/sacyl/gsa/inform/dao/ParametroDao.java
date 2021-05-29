@@ -195,6 +195,30 @@ public class ParametroDao extends ConexionDao implements Serializable, ConexionI
         return insertadoBoolean;
     }
 
+    public boolean doActualizaValor(ParametroBean parametroBean) {
+        Connection connection = null;
+        Boolean insertadoBoolean = false;
+        try {
+            connection = super.getConexionBBDD();
+            sql = " UPDATE   parametros  SET   valor='" + parametroBean.getValor() + "'"
+                    + " WHERE codigo='" + parametroBean.getCodigo() + "'";
+            try (Statement statement = connection.createStatement()) {
+                insertadoBoolean = statement.execute(sql);
+                insertadoBoolean = true;
+                statement.close();
+            }
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return insertadoBoolean;
+    }
+
     /**
      *
      * @param texto

@@ -56,6 +56,7 @@ public final class FrmCombos extends FrmMasterPantalla {
         doComponenesAtributos();
         doBinderPropiedades();
         doCompentesEventos();
+        doControlBotones(null);
     }
 
     @Override

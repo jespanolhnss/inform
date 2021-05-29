@@ -44,6 +44,7 @@ public final class FrmFuncionalidad extends FrmMasterPantalla {
         doComponenesAtributos();
         doBinderPropiedades();
         doCompentesEventos();
+        doControlBotones(null);
 
     }
 

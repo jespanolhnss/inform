@@ -55,6 +55,7 @@ public final class FrmAutonomias extends FrmMasterPantalla {
         doComponenesAtributos();
         doBinderPropiedades();
         doCompentesEventos();
+        doControlBotones(null);
     }
 
     @Override

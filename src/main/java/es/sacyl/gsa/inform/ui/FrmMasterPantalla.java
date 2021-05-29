@@ -5,6 +5,7 @@
  */
 package es.sacyl.gsa.inform.ui;
 
+import com.vaadin.componentfactory.Tooltip;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
@@ -23,6 +24,10 @@ public abstract class FrmMasterPantalla extends HorizontalLayout {
      * Botones generales para todas las pantallas
      */
     protected Button botonGrabar, botonBorrar, botonAyuda, botonLimpiar, botonImprimir, botonCancelar;
+    /**
+     * Bocadillos para cada boton
+     */
+    protected Tooltip tooltipGrabar, tooltipBorrar, tooltipAyuda, tooltipLimpiar, tooltipImprimir, tooltipCancelar;
     /**
      * El título de la pantalla
      */
@@ -43,17 +48,23 @@ public abstract class FrmMasterPantalla extends HorizontalLayout {
         /**
          * Crea los botones
          */
-        botonGrabar = new ObjetosComunes().getBoton("Graba", null, VaadinIcon.CHECK_CIRCLE.create());
+        botonGrabar = new ObjetosComunes().getBoton("", null, VaadinIcon.CHECK_CIRCLE.create());
+        tooltipGrabar = new ObjetosComunes().getTooltip(botonGrabar, "Graba los datos actuales en la base de datos");
 
-        botonBorrar = new ObjetosComunes().getBoton("Borra", null, VaadinIcon.MINUS_CIRCLE.create());
+        botonBorrar = new ObjetosComunes().getBoton("", null, VaadinIcon.MINUS_CIRCLE.create());
+        tooltipBorrar = new ObjetosComunes().getTooltip(botonBorrar, "Borra de la base de datos  los datos actuales");
 
-        botonAyuda = new ObjetosComunes().getBoton("Ayuda", null, VaadinIcon.QUESTION_CIRCLE.create());
+        botonAyuda = new ObjetosComunes().getBoton("", null, VaadinIcon.QUESTION_CIRCLE.create());
+        tooltipAyuda = new ObjetosComunes().getTooltip(botonAyuda, "Ayuda sobre los campos de pantalla");
 
-        botonCancelar = new ObjetosComunes().getBoton("Cancela", null, VaadinIcon.CLOSE_CIRCLE.create());
+        botonCancelar = new ObjetosComunes().getBoton("", null, VaadinIcon.CLOSE_CIRCLE.create());
+        tooltipCancelar = new ObjetosComunes().getTooltip(botonCancelar, "Cancela la acción y cierra la ventan");
 
-        botonLimpiar = new ObjetosComunes().getBoton("Limpia", null, VaadinIcon.PAINTBRUSH.create());
+        botonLimpiar = new ObjetosComunes().getBoton("", null, VaadinIcon.PAINTBRUSH.create());
+        tooltipLimpiar = new ObjetosComunes().getTooltip(botonLimpiar, "Limpia los campos del formulario");
 
-        botonImprimir = new ObjetosComunes().getBoton("Imprime", null, VaadinIcon.PRINT.create());
+        botonImprimir = new ObjetosComunes().getBoton("", null, VaadinIcon.PRINT.create());
+        tooltipImprimir = new ObjetosComunes().getTooltip(botonImprimir, "Imprime la ficha actual");
 
         titulo = new H4();
 
@@ -118,7 +129,8 @@ public abstract class FrmMasterPantalla extends HorizontalLayout {
         /**
          * Añade los objetos botones al contenedor de botones
          */
-        this.contenedorBotones.add(botonGrabar, botonBorrar, botonAyuda, botonLimpiar, botonCancelar);
+        this.contenedorBotones.add(botonGrabar, tooltipGrabar, botonBorrar, tooltipBorrar, botonAyuda, tooltipAyuda,
+                botonLimpiar, tooltipLimpiar, botonCancelar, tooltipCancelar);
         /**
          * Añade a la pantalla (es un HorizontalLayout) el contendor izquierda y
          * el contendor derecha

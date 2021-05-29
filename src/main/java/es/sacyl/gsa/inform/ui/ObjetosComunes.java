@@ -1,5 +1,8 @@
 package es.sacyl.gsa.inform.ui;
 
+import com.vaadin.componentfactory.Tooltip;
+import com.vaadin.componentfactory.TooltipAlignment;
+import com.vaadin.componentfactory.TooltipPosition;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -9,6 +12,8 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H5;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -172,7 +177,7 @@ public class ObjetosComunes {
 
         return checkboxGroup;
     }
-    
+
     /**
      *
      * @return
@@ -626,5 +631,18 @@ public class ObjetosComunes {
         card.setHeight("200px");
         return card;
 
+    }
+
+    public Tooltip getTooltip(Button boton, String texto) {
+        Tooltip tooltip = new Tooltip();
+
+        tooltip.attachToComponent(boton);
+
+        tooltip.setPosition(TooltipPosition.BOTTOM);
+        tooltip.setAlignment(TooltipAlignment.LEFT);
+
+        tooltip.add(new H5("Información de acción"));
+        tooltip.add(new Paragraph(texto));
+        return tooltip;
     }
 }
