@@ -190,7 +190,7 @@ public class AplicacionesDatosDao extends ConexionDao implements ConexionInterfa
             connection = super.getConexionBBDD();
             sql = " DELETE    aplicacionesdatos  WHERE id=?  ";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setInt(1, datoGenericoBean.getEstado());
+                statement.setLong(1, datoGenericoBean.getId());
                 insertadoBoolean = statement.executeUpdate() > 0;
                 statement.close();
             }

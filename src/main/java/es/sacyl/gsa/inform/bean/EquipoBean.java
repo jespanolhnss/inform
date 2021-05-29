@@ -27,6 +27,7 @@ public class EquipoBean extends MasterBean implements Serializable {
     private ArrayList<EquipoAplicacionBean> aplicacinesArrayList = new ArrayList<>();
 
     private ArrayList<DatoGenericoBean> datosGenericoBeans = new ArrayList<>();
+    private ArrayList<DatoGenericoBean> docuTecnicaBeans = new ArrayList<>();
 
     public static String TIPOCPU = "Cpu";
     public static String TIPOTELEFONO = "Teléfono";
@@ -153,6 +154,14 @@ public class EquipoBean extends MasterBean implements Serializable {
 
     public void setDatosGenericoBeans(ArrayList<DatoGenericoBean> datosGenericoBeans) {
         this.datosGenericoBeans = datosGenericoBeans;
+    }
+
+    public ArrayList<DatoGenericoBean> getDocuTecnicaBeans() {
+        return docuTecnicaBeans;
+    }
+
+    public void setDocuTecnicaBeans(ArrayList<DatoGenericoBean> docuTecnicaBeans) {
+        this.docuTecnicaBeans = docuTecnicaBeans;
     }
 
     public String getIpsCadena() {

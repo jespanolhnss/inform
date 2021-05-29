@@ -105,6 +105,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final Button etiquetaButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.BARCODE.create());
     private final Tooltip etiquetaTooltip = new ObjetosComunes().getTooltip(etiquetaButton, "Imprime etiqueta del equipo seleccionado");
 
+    private final Button documentosButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.PAPERPLANE.create());
+    private final Tooltip documentosTooltip = new ObjetosComunes().getTooltip(documentosButton, "Documentación técnica asociada al tipo de equipos");
+
     private final TextField id = new ObjetosComunes().getId();
     private final ComboBox<String> equipoTipoCombo = new CombosUi().getEquipoTipoCombo(null, 70);
     private final ComboBox<String> equipoMarcaCombo = new CombosUi().getGrupoRamaComboValor(ComboBean.TIPOEQUIPOMARCA, equipoTipoCombo.getValue(), null, "Marca");
@@ -138,13 +141,13 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     private final PaginatedGrid<EquipoAplicacionBean> equipoAplicacionGrid = new PaginatedGrid<>();
     private final PaginatedGrid<DatoGenericoBean> datosGenericosGrid = new GridUi().getDatosGenericosGridPaginado();
-
+    private PaginatedGrid<DatoGenericoBean> docTecanicaGrid = new PaginatedGrid<>();
     // componentes para gestionar los tabs de la parte inferior
     private final Tab datosGenericosTab = new Tab("Datos");
     private final Tab aplicacionesTab = new Tab("Aplicaciones");
-    private final Tab intervencinesTab = new Tab("Intervenciones");
+    private final Tab documentosTab = new Tab("Documentos");
 
-    private final Tabs tabs = new Tabs(datosGenericosTab, aplicacionesTab, intervencinesTab);
+    private final Tabs tabs = new Tabs(datosGenericosTab, aplicacionesTab, documentosTab);
     private final Map<Tab, Component> tabsToPages = new HashMap<>();
     private final Div page1 = new Div();
     private final Div page2 = new Div();
@@ -177,9 +180,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
             aplicacionesTab.setEnabled(false);
             page1.setVisible(false);
             etiquetaButton.setEnabled(false);
+            documentosButton.setEnabled(false);
         } else {
             datosGenericosButton.setEnabled(true);
             etiquetaButton.setEnabled(true);
+            documentosButton.setEnabled(true);
             if (obj.getTipo().equals(EquipoBean.TIPOCPU)) {
                 aplicacionButton.setEnabled(true);
                 aplicacionesTab.setEnabled(true);
@@ -368,6 +373,13 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     }
 
+    public void doGridDocTecnia() {
+        docTecanicaGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        docTecanicaGrid.setHeightByRows(true);
+        docTecanicaGrid.addColumn(DatoGenericoBean::getTipoDato).setAutoWidth(true).setHeader(new Html("<b>Aplicación</b>")).setWidth("70px");
+        docTecanicaGrid.addColumn(DatoGenericoBean::getValor).setAutoWidth(true).setHeader(new Html("<b>Fecha</b>")).setWidth("70px");
+    }
+
     private Button createRemoveButton(PaginatedGrid<EquipoAplicacionBean> grid, EquipoAplicacionBean item) {
         @SuppressWarnings("unchecked")
         Button button = new Button(VaadinIcon.MINUS_CIRCLE.create(), clickEvent -> {
@@ -407,6 +419,14 @@ public final class FrmEquipos extends FrmMasterPantalla {
         datosGenericosGrid.setHeightByRows(true);
         if (equipoBean.getDatosGenericoBeans().size() > 0) {
             datosGenericosGrid.setPageSize(equipoBean.getDatosGenericoBeans().size());
+        }
+    }
+
+    public void doActualizaGridDocTecnica() {
+        docTecanicaGrid.setItems(equipoBean.getDocuTecnicaBeans());
+        docTecanicaGrid.setHeightByRows(true);
+        if (equipoBean.getDocuTecnicaBeans().size() > 0) {
+            docTecanicaGrid.setPageSize(equipoBean.getDocuTecnicaBeans().size());
         }
     }
 
@@ -522,7 +542,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         datosGenericosTab.setVisible(true);
         aplicacionesTab.setVisible(true);
-        intervencinesTab.setVisible(true);
+        documentosTab.setVisible(true);
 
         page1.setVisible(false);
         page2.setVisible(false);
@@ -531,7 +551,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     @Override
     public void doComponentesOrganizacion() {
-        contenedorBotones.add(aplicacionButton, aplicacionTooltip, datosGenericosButton, datosGenericosTooltip, etiquetaButton, etiquetaTooltip);
+        contenedorBotones.add(aplicacionButton, aplicacionTooltip, datosGenericosButton, datosGenericosTooltip, etiquetaButton, etiquetaTooltip,
+                documentosButton, documentosTooltip);
+
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("50px", 1),
                 new FormLayout.ResponsiveStep("50px", 2),
@@ -546,7 +568,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         tabsToPages.put(datosGenericosTab, page1);
         tabsToPages.put(aplicacionesTab, page2);
-        tabsToPages.put(intervencinesTab, page3);
+        tabsToPages.put(documentosTab, page3);
 
         contenedorIzquierda.add(tabs, page1, page2, page3);
 
@@ -804,6 +826,20 @@ public final class FrmEquipos extends FrmMasterPantalla {
         }
         );
 
+        documentosButton.addClickListener(event
+                -> {
+            FrmEquipoDocTecnica frmEquipoDocTecnica = new FrmEquipoDocTecnica(equipoBean);
+            frmEquipoDocTecnica.addDialogCloseActionListener(eventAyuda -> {
+                // equipoBean.setDatosGenericoBeans(frmEquipoDocTecnica.get());
+                doActualizaGridDocTecnica();
+            });
+            frmEquipoDocTecnica.addDetachListener(eventAyuda -> {
+                // equipoBean.setDatosGenericoBeans(frmEquipoDocTecnica.getDatosGenericoBeans());
+                doActualizaGridDocTecnica();
+            });
+            frmEquipoDocTecnica.open();
+        }
+        );
         /**
          * Gestiona los clic en los tabs ocultando todos y mostrando el del
          * click

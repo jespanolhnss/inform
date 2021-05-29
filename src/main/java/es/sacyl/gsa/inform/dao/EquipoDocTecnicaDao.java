@@ -1,12 +1,11 @@
 package es.sacyl.gsa.inform.dao;
 
-import es.sacyl.gsa.inform.bean.DatoGenericoBean;
-import es.sacyl.gsa.inform.bean.ProveedorBean;
+import es.sacyl.gsa.inform.bean.EquipoBean;
+import es.sacyl.gsa.inform.bean.EquipoDocTecnica;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,22 +21,23 @@ import org.apache.logging.log4j.Logger;
  *
  * @author 06551256M
  */
-public class ProveedorDatosDao extends ConexionDao implements ConexionInterface<DatoGenericoBean> {
+public class EquipoDocTecnicaDao extends ConexionDao implements ConexionInterface<EquipoDocTecnica> {
 
-    private static final Logger LOGGER = LogManager.getLogger(AplicacionesDatosDao.class);
+    private static final Logger LOGGER = LogManager.getLogger(EquipoDocTecnicaDao.class);
     private static final long serialVersionUID = 1L;
 
     @Override
-    public DatoGenericoBean getRegistroResulset(ResultSet rs) {
+    public EquipoDocTecnica getRegistroResulset(ResultSet rs) {
         return getRegistroResulset(rs, null);
     }
 
-    public static DatoGenericoBean getRegistroResulset(ResultSet rs, ProveedorBean proveedorBean) {
-        DatoGenericoBean dato = null;
+    public static EquipoDocTecnica getRegistroResulset(ResultSet rs, EquipoBean equipoBeean) {
+        EquipoDocTecnica dato = null;
         try {
-            dato = new DatoGenericoBean();
+            dato = new EquipoDocTecnica();
             dato.setId(rs.getLong("id"));
-            dato.setIdProveedor(rs.getLong("idproveedor"));
+            dato.setTipoEquipo(rs.getString("tipoequipo"));
+            dato.setMarca(rs.getString("marca"));
             dato.setValor(rs.getString("valor"));
             dato.setTipoDato(rs.getString("tipodato"));
 
@@ -48,11 +48,13 @@ public class ProveedorDatosDao extends ConexionDao implements ConexionInterface<
                 dato.setImageBytes(bytes);
                 dato.setFicheroBlobs(blob);
                 dato.setNombreFichero(dato.getId().toString() + "appdato.pdf");
+
                 switch (dato.getExtensionFichero()) {
                     case ".pdf":
                         Utilidades.bloBtoFile(blob, Constantes.PDFPATHABSOLUTO + dato.getNombreFichero()); // image = new Image(Constantes.PDFPATHRELATIVO + Utilidades.getMinitauraDeUnPdf(nombre, blob), centroFicheroBean.getNombre());
                         LOGGER.debug("Fichero path absoluto fichero pdf " + Constantes.PDFPATHABSOLUTO + dato.getNombreFichero());
                         break;
+
                     default:
                         break;
                 }
@@ -65,18 +67,13 @@ public class ProveedorDatosDao extends ConexionDao implements ConexionInterface<
     }
 
     @Override
-    public DatoGenericoBean getPorCodigo(String codigo) {
-        return null;
-    }
-
-    @Override
-    public DatoGenericoBean getPorId(Long id) {
+    public EquipoDocTecnica getPorId(Long id) {
         Connection connection = null;
-        DatoGenericoBean dato = null;
+        EquipoDocTecnica dato = null;
         if (id != 0) {
             try {
                 connection = super.getConexionBBDD();
-                sql = "SELECT * FROM proveedoresdatos WHERE id=" + id;
+                sql = "SELECT * FROM equiposdocumentos WHERE id=" + id;
                 try (Statement statement = connection.createStatement()) {
                     ResultSet resulSet = statement.executeQuery(sql);
                     if (resulSet.next()) {
@@ -97,41 +94,46 @@ public class ProveedorDatosDao extends ConexionDao implements ConexionInterface<
     }
 
     @Override
-    public boolean doGrabaDatos(DatoGenericoBean datoGenericoBean) {
+    public boolean doGrabaDatos(EquipoDocTecnica equipoDocTecnica) {
         boolean actualizado = false;
-        if (this.getPorId(datoGenericoBean.getId()) == null) {
-            actualizado = this.doInsertaDatos(datoGenericoBean);
+        if (this.getPorId(equipoDocTecnica.getId()) == null) {
+            actualizado = this.doInsertaDatos(equipoDocTecnica);
         } else {
-            actualizado = this.doActualizaDatos(datoGenericoBean);
+            actualizado = this.doActualizaDatos(equipoDocTecnica);
         }
         return actualizado;
     }
 
     @Override
-    public boolean doInsertaDatos(DatoGenericoBean datoGenericoBean) {
+    public boolean doInsertaDatos(EquipoDocTecnica equipoDocTecnica) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            datoGenericoBean.setId(this.getSiguienteId("proveedoresdatos"));
-            sql = " INSERT INTO  proveedoresdatos  "
-                    + "( id,idproveedor,tipodato,valor,estado,fechacambio,usucambio ) "
+            equipoDocTecnica.setId(this.getSiguienteId("aplicacionesdatos"));
+            sql = " INSERT INTO  equiposdocumentos  "
+                    + "( id,tipodato,valor,estado,fechacambio,usucambio,marca,modelo,tipoequipo ) "
                     + " VALUES "
-                    + "(?,?,?,?,?,?,?)";
+                    + "(?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setLong(1, datoGenericoBean.getId());
-            statement.setLong(2, datoGenericoBean.getIdProveedor());
+            statement.setLong(1, equipoDocTecnica.getId());
 
-            statement.setString(3, datoGenericoBean.getTipoDato());
-            statement.setString(4, datoGenericoBean.getValor());
+            statement.setString(2, equipoDocTecnica.getTipoDato());
+            statement.setString(3, equipoDocTecnica.getValor());
 
-            if (datoGenericoBean.getEstado() != null) {
-                statement.setInt(5, datoGenericoBean.getEstado());
+            if (equipoDocTecnica.getEstado() != null) {
+                statement.setInt(4, equipoDocTecnica.getEstado());
             } else {
-                statement.setNull(5, Types.INTEGER);
+                statement.setNull(4, Types.INTEGER);
             }
-            statement.setLong(6, Utilidades.getFechaLong(datoGenericoBean.getFechacambio()));
-            statement.setLong(7, datoGenericoBean.getUsucambio().getId());
+
+            statement.setLong(5, Utilidades.getFechaLong(equipoDocTecnica.getFechacambio()));
+            statement.setLong(6, equipoDocTecnica.getUsucambio().getId());
+
+            statement.setString(7, equipoDocTecnica.getMarca());
+            statement.setString(8, equipoDocTecnica.getModelo());
+            statement.setString(9, equipoDocTecnica.getTipoEquipo());
+
             insertadoBoolean = statement.executeUpdate() > 0;
             insertadoBoolean = true;
             statement.close();
@@ -147,26 +149,25 @@ public class ProveedorDatosDao extends ConexionDao implements ConexionInterface<
     }
 
     @Override
-    public boolean doActualizaDatos(DatoGenericoBean datoGenericoBean) {
+    public boolean doActualizaDatos(EquipoDocTecnica equipoDocTecnica) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " update    proveedoresdatos SET  "
+            sql = " update    equiposdocumentos SET  "
                     + "tipodato=?,valor=?,estado=?,fechacambio=?,usucambio=? "
                     + " WHERE id=? ";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, datoGenericoBean.getTipoDato());
-            statement.setString(2, datoGenericoBean.getValor());
-            if (datoGenericoBean.getEstado() != null) {
-                statement.setInt(3, datoGenericoBean.getEstado());
+            statement.setString(1, equipoDocTecnica.getTipoDato());
+            statement.setString(2, equipoDocTecnica.getValor());
+            if (equipoDocTecnica.getEstado() != null) {
+                statement.setInt(3, equipoDocTecnica.getEstado());
             } else {
                 statement.setNull(3, Types.CHAR);
             }
-
-            statement.setLong(4, Utilidades.getFechaLong(datoGenericoBean.getFechacambio()));
-            statement.setLong(5, datoGenericoBean.getUsucambio().getId());
-            statement.setLong(6, datoGenericoBean.getId());
+            statement.setLong(4, Utilidades.getFechaLong(equipoDocTecnica.getFechacambio()));
+            statement.setLong(5, equipoDocTecnica.getUsucambio().getId());
+            statement.setLong(6, equipoDocTecnica.getId());
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
             insertadoBoolean = true;
@@ -182,14 +183,14 @@ public class ProveedorDatosDao extends ConexionDao implements ConexionInterface<
     }
 
     @Override
-    public boolean doBorraDatos(DatoGenericoBean datoGenericoBean) {
+    public boolean doBorraDatos(EquipoDocTecnica equipoDocTecnica) {
         Connection connection = null;
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " DELETE    proveedoresdatos  WHERE id=?  ";
+            sql = " DELETE    equiposdocumentos  WHERE id=?  ";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setLong(1, datoGenericoBean.getId());
+                statement.setLong(1, equipoDocTecnica.getId());
                 insertadoBoolean = statement.executeUpdate() > 0;
                 statement.close();
             }
@@ -204,22 +205,60 @@ public class ProveedorDatosDao extends ConexionDao implements ConexionInterface<
         return insertadoBoolean;
     }
 
+    public boolean doActualizaDatosFichero(EquipoDocTecnica equipoDocTecnica) {
+        Connection connection = null;
+        Boolean insertadoBoolean = false;
+        try {
+            connection = super.getConexionBBDD();
+            sql = " update    equiposdocumentos SET  "
+                    + "tipodato=?,valor=?,fichero=?,estado=?,fechacambio=?,usucambio=? "
+                    + " WHERE id=? ";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, equipoDocTecnica.getTipoDato());
+            statement.setString(2, equipoDocTecnica.getValor());
+            String ficheroAbsoluto = equipoDocTecnica.getPathAbsoluto();
+            File file = Utilidades.iStoFile(equipoDocTecnica.getStreamInputStream(), ficheroAbsoluto);
+            FileInputStream in = new FileInputStream(file);
+            statement.setBinaryStream(3, in, (int) file.length());
+
+            if (equipoDocTecnica.getEstado() != null) {
+                statement.setInt(4, equipoDocTecnica.getEstado());
+            } else {
+                statement.setNull(4, Types.CHAR);
+            }
+            statement.setLong(5, Utilidades.getFechaLong(equipoDocTecnica.getFechacambio()));
+            statement.setLong(6, equipoDocTecnica.getUsucambio().getId());
+            statement.setLong(7, equipoDocTecnica.getId());
+            insertadoBoolean = statement.executeUpdate() > 0;
+            statement.close();
+            insertadoBoolean = true;
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return insertadoBoolean;
+    }
+
     @Override
-    public ArrayList<DatoGenericoBean> getLista(String texto) {
+    public ArrayList<EquipoDocTecnica> getLista(String texto) {
         return getLista(null, null);
     }
 
-    public ArrayList<DatoGenericoBean> getLista(String texto, ProveedorBean proveedorBean) {
+    public ArrayList<EquipoDocTecnica> getLista(String texto, EquipoBean equipoBean) {
         Connection connection = null;
-        ArrayList<DatoGenericoBean> lista = new ArrayList<>();
+        ArrayList<EquipoDocTecnica> lista = new ArrayList<>();
         String sqlDato = "";
         try {
             connection = this.getConexionBBDD();
-            sqlDato = "SELECT * FROM proveedoresdatos WHERE idproveedor=" + proveedorBean.getId();
+            sqlDato = "SELECT * FROM equiposdocumentos WHERE idquipo=" + equipoBean.getId();
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sqlDato);
                 while (resulSet.next()) {
-                    DatoGenericoBean dato = getRegistroResulset(resulSet, proveedorBean);
+                    EquipoDocTecnica dato = getRegistroResulset(resulSet, equipoBean);
                     lista.add(dato);
                 }
                 statement.close();
@@ -235,41 +274,8 @@ public class ProveedorDatosDao extends ConexionDao implements ConexionInterface<
         return lista;
     }
 
-    public boolean doActualizaDatosFichero(DatoGenericoBean datoGenericoBean) {
-        Connection connection = null;
-        Boolean insertadoBoolean = false;
-        try {
-            connection = super.getConexionBBDD();
-            sql = " update    proveedoresdatos SET  "
-                    + "tipodato=?,valor=?,fichero=?,estado=?,fechacambio=?,usucambio=? "
-                    + " WHERE id=? ";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, datoGenericoBean.getTipoDato());
-            statement.setString(2, datoGenericoBean.getValor());
-            String ficheroAbsoluto = datoGenericoBean.getPathAbsoluto();
-            File file = Utilidades.iStoFile(datoGenericoBean.getStreamInputStream(), ficheroAbsoluto);
-            FileInputStream in = new FileInputStream(file);
-            statement.setBinaryStream(3, in, (int) file.length());
-            if (datoGenericoBean.getEstado() != null) {
-                statement.setInt(4, datoGenericoBean.getEstado());
-            } else {
-                statement.setNull(4, Types.CHAR);
-            }
-            statement.setLong(5, Utilidades.getFechaLong(datoGenericoBean.getFechacambio()));
-            statement.setLong(6, datoGenericoBean.getUsucambio().getId());
-            statement.setLong(7, datoGenericoBean.getId());
-            insertadoBoolean = statement.executeUpdate() > 0;
-            statement.close();
-            insertadoBoolean = true;
-            LOGGER.debug(sql);
-        } catch (SQLException e) {
-            LOGGER.error(sql + Utilidades.getStackTrace(e));
-        } catch (FileNotFoundException e) {
-            LOGGER.error(Utilidades.getStackTrace(e));
-        } finally {
-            this.doCierraConexion(connection);
-        }
-        return insertadoBoolean;
+    @Override
+    public EquipoDocTecnica getPorCodigo(String codigo) {
+        return null;
     }
-
 }
