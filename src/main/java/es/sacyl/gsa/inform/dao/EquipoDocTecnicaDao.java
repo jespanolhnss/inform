@@ -73,7 +73,7 @@ public class EquipoDocTecnicaDao extends ConexionDao implements ConexionInterfac
         if (id != 0) {
             try {
                 connection = super.getConexionBBDD();
-                sql = "SELECT * FROM equiposdocumentos WHERE id=" + id;
+                sql = "SELECT * FROM equposdocumentos WHERE id=" + id;
                 try (Statement statement = connection.createStatement()) {
                     ResultSet resulSet = statement.executeQuery(sql);
                     if (resulSet.next()) {
@@ -110,11 +110,11 @@ public class EquipoDocTecnicaDao extends ConexionDao implements ConexionInterfac
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            equipoDocTecnica.setId(this.getSiguienteId("aplicacionesdatos"));
-            sql = " INSERT INTO  equiposdocumentos  "
+            equipoDocTecnica.setId(this.getSiguienteId("equposdocumentos"));
+            sql = " INSERT INTO  equposdocumentos  "
                     + "( id,tipodato,valor,estado,fechacambio,usucambio,marca,modelo,tipoequipo ) "
                     + " VALUES "
-                    + "(?,?,?,?,?,?,?,?,?,?)";
+                    + "(?,?,?,?,?,?,?,?,?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setLong(1, equipoDocTecnica.getId());
 
@@ -154,7 +154,7 @@ public class EquipoDocTecnicaDao extends ConexionDao implements ConexionInterfac
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " update    equiposdocumentos SET  "
+            sql = " update    equposdocumentos SET  "
                     + "tipodato=?,valor=?,estado=?,fechacambio=?,usucambio=? "
                     + " WHERE id=? ";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -188,7 +188,7 @@ public class EquipoDocTecnicaDao extends ConexionDao implements ConexionInterfac
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " DELETE    equiposdocumentos  WHERE id=?  ";
+            sql = " DELETE    equposdocumentos  WHERE id=?  ";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setLong(1, equipoDocTecnica.getId());
                 insertadoBoolean = statement.executeUpdate() > 0;
@@ -210,7 +210,7 @@ public class EquipoDocTecnicaDao extends ConexionDao implements ConexionInterfac
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " update    equiposdocumentos SET  "
+            sql = " update    equposdocumentos SET  "
                     + "tipodato=?,valor=?,fichero=?,estado=?,fechacambio=?,usucambio=? "
                     + " WHERE id=? ";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -248,13 +248,24 @@ public class EquipoDocTecnicaDao extends ConexionDao implements ConexionInterfac
         return getLista(null, null);
     }
 
+    /**
+     *
+     * @param texto
+     * @param equipoBean
+     * @return Los documentos se asocian por tipo,marca,modelo
+     */
     public ArrayList<EquipoDocTecnica> getLista(String texto, EquipoBean equipoBean) {
         Connection connection = null;
         ArrayList<EquipoDocTecnica> lista = new ArrayList<>();
         String sqlDato = "";
         try {
             connection = this.getConexionBBDD();
-            sqlDato = "SELECT * FROM equiposdocumentos WHERE idquipo=" + equipoBean.getId();
+            sqlDato = "SELECT * FROM equposdocumentos WHERE "
+                    + "tipoequipo='" + equipoBean.getTipo() + "'"
+                    + " AND marca='" + equipoBean.getMarca() + "'";
+            if (equipoBean.getModelo() != null) {
+                sqlDato = sqlDato.concat(" AND modelo='" + equipoBean.getModelo() + "'");
+            }
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sqlDato);
                 while (resulSet.next()) {

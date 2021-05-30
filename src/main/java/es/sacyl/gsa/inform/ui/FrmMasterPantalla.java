@@ -51,7 +51,7 @@ public abstract class FrmMasterPantalla extends HorizontalLayout {
         botonGrabar = new ObjetosComunes().getBoton("", null, VaadinIcon.CHECK_CIRCLE.create());
         tooltipGrabar = new ObjetosComunes().getTooltip(botonGrabar, "Graba los datos actuales en la base de datos");
 
-        botonBorrar = new ObjetosComunes().getBoton("", null, VaadinIcon.MINUS_CIRCLE.create());
+        botonBorrar = new ObjetosComunes().getBoton("", null, VaadinIcon.ERASER.create());
         tooltipBorrar = new ObjetosComunes().getTooltip(botonBorrar, "Borra de la base de datos  los datos actuales");
 
         botonAyuda = new ObjetosComunes().getBoton("", null, VaadinIcon.QUESTION_CIRCLE.create());

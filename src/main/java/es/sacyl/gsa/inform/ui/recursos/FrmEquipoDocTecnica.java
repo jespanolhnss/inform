@@ -13,6 +13,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -21,13 +22,13 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToLongConverter;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.internal.MessageDigestUtil;
 import com.vaadin.flow.server.StreamResource;
 import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
 import es.sacyl.gsa.inform.bean.EquipoDocTecnica;
-import es.sacyl.gsa.inform.dao.AplicacionesDatosDao;
 import es.sacyl.gsa.inform.dao.EquipoDocTecnicaDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
@@ -188,6 +189,18 @@ public final class FrmEquipoDocTecnica extends FrmMasterVentana {
         equipoDocTecnicaGrid.addColumn(EquipoDocTecnica::getTipoDato).setAutoWidth(true).setHeader(new Html("<b>Tipo</b>"));
         equipoDocTecnicaGrid.addColumn(EquipoDocTecnica::getValor).setAutoWidth(true).setHeader(new Html("<b>Valor</b>"));
         equipoDocTecnicaGrid.setClassName("error_row");
+        equipoDocTecnicaGrid.addColumn(new ComponentRenderer<>(datoGenerico -> {
+            Image img = new Image("icons/unpixel.png", "img");
+            if (datoGenerico.getFicheroBlobs() != null) {
+                img = new Image("icons/pdf.png", "pdf");
+                img.addClickListener(event -> {
+                    Page page = new Page(getUI().get());
+                    page.open(datoGenerico.getPathRelativo(), "_blank");
+                });
+            }
+            return img;
+
+        })).setHeader("Pdf");
         equipoDocTecnicaGrid.setClassNameGenerator(auto -> {
             if (auto.getEstado() == 0) {
                 //    return "my-style-2";
@@ -233,6 +246,7 @@ public final class FrmEquipoDocTecnica extends FrmMasterVentana {
         fechaCambio.setEnabled(false);
         tecnicoapellidosNombre.setEnabled(false);
         upload.setVisible(false);
+        tipoDatosComboBox.setPlaceholder("Elige tipo de documento");
     }
 
     @Override
@@ -354,7 +368,16 @@ public final class FrmEquipoDocTecnica extends FrmMasterVentana {
         equipoDocTecnica.setNombreFicheroMiniatura(equipoDocTecnica.getNombreFicheroNoExtension() + Constantes.MINIATURAEXTENSION);
         equipoDocTecnica.setValoresAut();
 
-        new AplicacionesDatosDao().doActualizaDatosFichero(equipoDocTecnica);
+        new EquipoDocTecnicaDao().doActualizaDatosFichero(equipoDocTecnica);
 
     }
+
+    public ArrayList<EquipoDocTecnica> getEquipoDocTecnicaArray() {
+        return equipoDocTecnicaArray;
+    }
+
+    public void setEquipoDocTecnicaArray(ArrayList<EquipoDocTecnica> equipoDocTecnicaArray) {
+        this.equipoDocTecnicaArray = equipoDocTecnicaArray;
+    }
+
 }

@@ -71,6 +71,10 @@ public class DatoGenericoBean extends MasterBean implements Serializable {
         return valor;
     }
 
+    public String getValor35() {
+        return getValorAncho(35);
+    }
+
     public String getValorAncho(int ancho) {
         if (valor != null) {
             if (valor.length() < ancho) {

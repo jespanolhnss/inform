@@ -8,6 +8,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -20,6 +21,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.converter.StringToLongConverter;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import es.sacyl.gsa.inform.bean.AutonomiaBean;
 import es.sacyl.gsa.inform.bean.CentroBean;
@@ -28,6 +30,7 @@ import es.sacyl.gsa.inform.bean.ComboBean;
 import es.sacyl.gsa.inform.bean.DatoGenericoBean;
 import es.sacyl.gsa.inform.bean.EquipoAplicacionBean;
 import es.sacyl.gsa.inform.bean.EquipoBean;
+import es.sacyl.gsa.inform.bean.EquipoDocTecnica;
 import es.sacyl.gsa.inform.bean.GfhBean;
 import es.sacyl.gsa.inform.bean.IpBean;
 import es.sacyl.gsa.inform.bean.ParametroBean;
@@ -41,6 +44,7 @@ import es.sacyl.gsa.inform.dao.ComboDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.EquipoAplicacionDao;
 import es.sacyl.gsa.inform.dao.EquipoDao;
+import es.sacyl.gsa.inform.dao.EquipoDocTecnicaDao;
 import es.sacyl.gsa.inform.dao.GalenoDao;
 import es.sacyl.gsa.inform.dao.IpDao;
 import es.sacyl.gsa.inform.dao.ParametroDao;
@@ -95,7 +99,6 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final Button ayudaUsuario = new ObjetosComunes().getBotonMini();
     private final Button ayudaModelo = new ObjetosComunes().getBotonMini();
     private final Button ayudaInventario = new ObjetosComunes().getBotonMini(VaadinIcon.PLUS.create());
-    //private final Button nuevoInventario = new ObjetosComunes().getBotonMini(VaadinIcon.PLUS.create());
     private final Button aplicacionButton = new ObjetosComunes().getBoton("", null, VaadinIcon.FILE_TABLE.create());
     private final Tooltip aplicacionTooltip = new ObjetosComunes().getTooltip(aplicacionButton, "Asocia aplicaciones con este equipo.");
 
@@ -105,7 +108,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final Button etiquetaButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.BARCODE.create());
     private final Tooltip etiquetaTooltip = new ObjetosComunes().getTooltip(etiquetaButton, "Imprime etiqueta del equipo seleccionado");
 
-    private final Button documentosButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.PAPERPLANE.create());
+    private final Button documentosButton = new ObjetosComunes().getBoton(null, null, VaadinIcon.FILE_TEXT.create());
     private final Tooltip documentosTooltip = new ObjetosComunes().getTooltip(documentosButton, "Documentación técnica asociada al tipo de equipos");
 
     private final TextField id = new ObjetosComunes().getId();
@@ -113,7 +116,6 @@ public final class FrmEquipos extends FrmMasterPantalla {
     private final ComboBox<String> equipoMarcaCombo = new CombosUi().getGrupoRamaComboValor(ComboBean.TIPOEQUIPOMARCA, equipoTipoCombo.getValue(), null, "Marca");
 
     private final TextField inventario = new ObjetosComunes().getTextField("Inventario");
-    //  private final TextField marca = new ObjetosComunes().getTextField("Marca");
     private final TextField modelo = new ObjetosComunes().getTextField("Modelo");
     private final TextField numeroSerie = new ObjetosComunes().getTextField("N.Serie");
     private final TextField macAdress = new ObjetosComunes().getMacAdress();
@@ -141,7 +143,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
     private final PaginatedGrid<EquipoAplicacionBean> equipoAplicacionGrid = new PaginatedGrid<>();
     private final PaginatedGrid<DatoGenericoBean> datosGenericosGrid = new GridUi().getDatosGenericosGridPaginado();
-    private PaginatedGrid<DatoGenericoBean> docTecanicaGrid = new PaginatedGrid<>();
+    private PaginatedGrid<EquipoDocTecnica> equipoDocTecnicaGrid = new PaginatedGrid<>();
     // componentes para gestionar los tabs de la parte inferior
     private final Tab datosGenericosTab = new Tab("Datos");
     private final Tab aplicacionesTab = new Tab("Aplicaciones");
@@ -157,8 +159,9 @@ public final class FrmEquipos extends FrmMasterPantalla {
         super();
         equipoBinder.readBean(equipoBean);
         doComponentesOrganizacion();
-        doGrid();
+
         doGripEquipoAplicacion();
+        doGridDocTecnia();
         doComponenesAtributos();
         doBinderPropiedades();
         doCompentesEventos();
@@ -166,6 +169,8 @@ public final class FrmEquipos extends FrmMasterPantalla {
         doActualizaComboCentro();
         equipoTipoCombo.setValue("");
         equipoTipoComboBuscador.setValue(ComboBean.TIPOEQUIPOCPU);
+        doGrid();
+
     }
 
     /**
@@ -328,33 +333,31 @@ public final class FrmEquipos extends FrmMasterPantalla {
     public void doImprimir() {
     }
 
+    /**
+     * En función del tipo de equipo adapta el grid se redibuja cuando cambia el
+     * combo de tipo
+     */
     @Override
     public void doGrid() {
+        equipoGrid.removeAllColumns();
+
         if (equipoTipoComboBuscador.getValue().equals(ComboBean.TIPOEQUIPOIMPRESORA)) {
-            equipoGrid.removeAllColumns();
             equipoGrid.addColumn(EquipoBean::getIpsCadena).setAutoWidth(true).setHeader(new Html("<b>Ip</b>"));
             equipoGrid.addColumn(EquipoBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Est</b>")).setWidth("20px");
             equipoGrid.addColumn(EquipoBean::getNumeroSerie).setAutoWidth(true).setHeader(new Html("<b>SN</b>")).setWidth("70px");
-            equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
-            equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
 
-        } else if (equipoTipoComboBuscador.getValue().equals(ComboBean.TIPOEQUIPOPC)) {
-            equipoGrid.removeAllColumns();
+        } else if (equipoTipoComboBuscador.getValue().equals(ComboBean.TIPOEQUIPOCPU)) {
             equipoGrid.addColumn(EquipoBean::getIpsCadena).setAutoWidth(true).setHeader(new Html("<b>Ip</b>"));
             equipoGrid.addColumn(EquipoBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Est</b>")).setWidth("20px");
-            equipoGrid.addColumn(EquipoBean::getIpsCadena).setAutoWidth(true).setHeader(new Html("<b>Ip</b>"));
             equipoGrid.addColumn(EquipoBean::getInventario).setAutoWidth(true).setHeader(new Html("<b>Invent</b>")).setWidth("70px");
-            equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
-            equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
 
         } else {
-            equipoGrid.removeAllColumns();
             equipoGrid.addColumn(EquipoBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Est</b>")).setWidth("20px");
-
             equipoGrid.addColumn(EquipoBean::getInventario).setAutoWidth(true).setHeader(new Html("<b>Invent</b>")).setWidth("70px");
-            equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
-            equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
+
         }
+        equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
+        equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
         //    doActualizaGrid();
 
     }
@@ -374,10 +377,22 @@ public final class FrmEquipos extends FrmMasterPantalla {
     }
 
     public void doGridDocTecnia() {
-        docTecanicaGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        docTecanicaGrid.setHeightByRows(true);
-        docTecanicaGrid.addColumn(DatoGenericoBean::getTipoDato).setAutoWidth(true).setHeader(new Html("<b>Aplicación</b>")).setWidth("70px");
-        docTecanicaGrid.addColumn(DatoGenericoBean::getValor).setAutoWidth(true).setHeader(new Html("<b>Fecha</b>")).setWidth("70px");
+        equipoDocTecnicaGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        equipoDocTecnicaGrid.setHeightByRows(true);
+        equipoDocTecnicaGrid.addColumn(EquipoDocTecnica::getTipoDato).setAutoWidth(true).setHeader(new Html("<b>Dato</b>")).setWidth("70px");
+        equipoDocTecnicaGrid.addColumn(EquipoDocTecnica::getValor35).setAutoWidth(true).setHeader(new Html("<b>Valor</b>")).setWidth("70px");
+        equipoDocTecnicaGrid.addColumn(new ComponentRenderer<>(datoGenerico -> {
+            Image img = new Image("icons/unpixel.png", "img");
+            if (datoGenerico.getFicheroBlobs() != null) {
+                img = new Image("icons/pdf.png", "pdf");
+                img.addClickListener(event -> {
+                    Page page = new Page(getUI().get());
+                    page.open(datoGenerico.getPathRelativo(), "_blank");
+                });
+            }
+            return img;
+
+        })).setHeader("Pdf");
     }
 
     private Button createRemoveButton(PaginatedGrid<EquipoAplicacionBean> grid, EquipoAplicacionBean item) {
@@ -412,6 +427,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         if (equipoAplicacionArrayList.size() > 0) {
             equipoAplicacionGrid.setPageSize(equipoAplicacionArrayList.size());
         }
+        aplicacionesTab.setLabel("Aplicaciones (" + equipoAplicacionArrayList.size() + ")");
     }
 
     public void doActualizaGridDatosGenericos() {
@@ -420,14 +436,17 @@ public final class FrmEquipos extends FrmMasterPantalla {
         if (equipoBean.getDatosGenericoBeans().size() > 0) {
             datosGenericosGrid.setPageSize(equipoBean.getDatosGenericoBeans().size());
         }
+
     }
 
     public void doActualizaGridDocTecnica() {
-        docTecanicaGrid.setItems(equipoBean.getDocuTecnicaBeans());
-        docTecanicaGrid.setHeightByRows(true);
+        equipoDocTecnicaGrid.setItems(equipoBean.getDocuTecnicaBeans());
+        equipoDocTecnicaGrid.setHeightByRows(true);
         if (equipoBean.getDocuTecnicaBeans().size() > 0) {
-            docTecanicaGrid.setPageSize(equipoBean.getDocuTecnicaBeans().size());
+            equipoDocTecnicaGrid.setPageSize(equipoBean.getDocuTecnicaBeans().size());
+
         }
+        documentosTab.setLabel("Documentos (" + equipoBean.getDocuTecnicaBeans().size() + ")");
     }
 
     @Override
@@ -564,7 +583,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         page1.add(datosGenericosGrid);
         page2.add(equipoAplicacionGrid);
-        //  page3.add(equipoAplicacionGrid);
+        page3.add(equipoDocTecnicaGrid);
 
         tabsToPages.put(datosGenericosTab, page1);
         tabsToPages.put(aplicacionesTab, page2);
@@ -643,6 +662,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
 
         equipoTipoComboBuscador.addValueChangeListener(event -> {
             equipoMarcaComboBuscador.setItems(new ComboDao().getListaGruposRamaValor(ComboBean.TIPOEQUIPOMARCA, event.getValue(), 100));
+            doGrid();
             doActualizaGrid();
         });
 
@@ -830,11 +850,11 @@ public final class FrmEquipos extends FrmMasterPantalla {
                 -> {
             FrmEquipoDocTecnica frmEquipoDocTecnica = new FrmEquipoDocTecnica(equipoBean);
             frmEquipoDocTecnica.addDialogCloseActionListener(eventAyuda -> {
-                // equipoBean.setDatosGenericoBeans(frmEquipoDocTecnica.get());
+                equipoBean.setDocuTecnicaBeans(frmEquipoDocTecnica.getEquipoDocTecnicaArray());
                 doActualizaGridDocTecnica();
             });
             frmEquipoDocTecnica.addDetachListener(eventAyuda -> {
-                // equipoBean.setDatosGenericoBeans(frmEquipoDocTecnica.getDatosGenericoBeans());
+                equipoBean.setDocuTecnicaBeans(frmEquipoDocTecnica.getEquipoDocTecnicaArray());
                 doActualizaGridDocTecnica();
             });
             frmEquipoDocTecnica.open();
@@ -1064,20 +1084,17 @@ public final class FrmEquipos extends FrmMasterPantalla {
             // lee el registro para incluir la ubicación y las ips
             this.equipoBean = new EquipoDao().getPorId(equipoBeanParam.getId(), equipoBeanParam.getCentro(), equipoBeanParam.getServicio(), null);
             equipoBinder.readBean(equipoBean);
-            /*
-            if (equipoBean.getUbicacion() != null && !this.equipoBean.getUbicacion().getId().equals(new Long(0))) {
-                Long id = this.equipoBean.getUbicacion().getId();
-                equipoBean.setUbicacion(new UbicacionDao().getPorId(id, centroCombo.getValue()));
-            }
-             */
-            //   equipoBean.setListaIps(new IpDao().getLista(null, null, equipoBean, null, null));
+
             ip.setValue(equipoBean.getIpsCadena());
             // Estos datos sólo los carga cuando hace clic en el grid
             equipoBean.setDatosGenericoBeans(new EquipoDao().getListaDatosGenericos(equipoBean));
+            equipoBean.setDocuTecnicaBeans(new EquipoDocTecnicaDao().getLista(null, equipoBean));
+            equipoBean.setAplicacinesArrayList(new EquipoAplicacionDao().getLista(null, equipoBean, null));
 
             doControlBotones(equipoBean);
             doActualizaGridAplicacion();
             doActualizaGridDatosGenericos();
+            doActualizaGridDocTecnica();
             if (equipoBean.getUsuario() != null && equipoBean.getUsuario().getDni() != null) {
                 dni.setValue(equipoBean.getUsuario().getDni());
             } else {

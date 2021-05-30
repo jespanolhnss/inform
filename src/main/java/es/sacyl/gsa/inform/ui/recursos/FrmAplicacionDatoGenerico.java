@@ -62,7 +62,7 @@ public final class FrmAplicacionDatoGenerico extends FrmMasterVentana {
     private HorizontalLayout filaFicheros = new HorizontalLayout();
     private int contadorFicheros = 0;
     private final MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
-    private final Upload upload = new Upload(buffer);
+    private Upload upload = new Upload(buffer);
     private final Div output = new Div();
 
     private final TextField tecnicoapellidosNombre = new ObjetosComunes().getTextField("Técnico", "", 50, "200px", "80px");
@@ -174,6 +174,7 @@ public final class FrmAplicacionDatoGenerico extends FrmMasterVentana {
         datoGenericoBean.setIdDatoAplicacion(aplicacionBean.getId());
         fechaCambio.clear();
         tecnicoapellidosNombre.clear();
+        upload = new Upload(buffer);
 
     }
 
