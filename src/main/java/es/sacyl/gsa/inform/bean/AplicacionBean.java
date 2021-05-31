@@ -12,7 +12,6 @@ public class AplicacionBean extends MasterBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    //id,nombre,proveedor,ambito,gestionusuarios,descripcion,servicio,fechainstalacion,estado,usucambio,fechacambio
     private String nombre;
     private ProveedorBean proveedor;
     private String ambito;

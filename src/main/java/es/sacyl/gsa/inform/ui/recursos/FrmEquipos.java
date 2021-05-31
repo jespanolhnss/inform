@@ -168,7 +168,7 @@ public final class FrmEquipos extends FrmMasterPantalla {
         doControlBotones(null);
         doActualizaComboCentro();
         equipoTipoCombo.setValue("");
-        equipoTipoComboBuscador.setValue(ComboBean.TIPOEQUIPOCPU);
+        equipoTipoComboBuscador.setValue(EquipoBean.TIPOCPU);
         doGrid();
 
     }
@@ -341,12 +341,12 @@ public final class FrmEquipos extends FrmMasterPantalla {
     public void doGrid() {
         equipoGrid.removeAllColumns();
 
-        if (equipoTipoComboBuscador.getValue().equals(ComboBean.TIPOEQUIPOIMPRESORA)) {
+        if (equipoTipoComboBuscador.getValue().equals(EquipoBean.TIPOIMPRESORA)) {
             equipoGrid.addColumn(EquipoBean::getIpsCadena).setAutoWidth(true).setHeader(new Html("<b>Ip</b>"));
             equipoGrid.addColumn(EquipoBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Est</b>")).setWidth("20px");
             equipoGrid.addColumn(EquipoBean::getNumeroSerie).setAutoWidth(true).setHeader(new Html("<b>SN</b>")).setWidth("70px");
 
-        } else if (equipoTipoComboBuscador.getValue().equals(ComboBean.TIPOEQUIPOCPU)) {
+        } else if (equipoTipoComboBuscador.getValue().equals(EquipoBean.TIPOCPU)) {
             equipoGrid.addColumn(EquipoBean::getIpsCadena).setAutoWidth(true).setHeader(new Html("<b>Ip</b>"));
             equipoGrid.addColumn(EquipoBean::getEstado).setAutoWidth(true).setHeader(new Html("<b>Est</b>")).setWidth("20px");
             equipoGrid.addColumn(EquipoBean::getInventario).setAutoWidth(true).setHeader(new Html("<b>Invent</b>")).setWidth("70px");
@@ -358,7 +358,6 @@ public final class FrmEquipos extends FrmMasterPantalla {
         }
         equipoGrid.addColumn(EquipoBean::getMarca).setAutoWidth(true).setHeader(new Html("<b>Marca</b>"));
         equipoGrid.addColumn(EquipoBean::getModelo).setAutoWidth(true).setHeader(new Html("<b>Modelo</b>"));
-        //    doActualizaGrid();
 
     }
 

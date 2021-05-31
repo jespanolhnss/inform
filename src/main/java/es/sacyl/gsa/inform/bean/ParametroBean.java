@@ -6,6 +6,7 @@
 package es.sacyl.gsa.inform.bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  *
@@ -47,6 +48,29 @@ public class ParametroBean implements Serializable {
     public static String VALORDEFECTO_TIPOCENTRO = "valordefecto.tipocentro";
 
     public static String INVENTIARIO_SIGUIENTEVALOR = "inventario.siguientevalor";
+
+    public static ArrayList<String> TODOSLISPARAMETROS = new ArrayList<String>() {
+        {
+            add(ParametroBean.MAIL_USER);
+            add(ParametroBean.MAIL_SENDER);
+            add(ParametroBean.MAIL_PORT);
+            add(ParametroBean.MAIL_PASSWORD);
+            add(ParametroBean.MAIL_HOST);
+            add(ParametroBean.MAIL_AUTH);
+            add(ParametroBean.MAIL_LDAP_DESTINOLOPD);
+            add(ParametroBean.URL_CONEXION_FARMCIA);
+            add(ParametroBean.URL_CONEXION_TURNOS);
+            add(ParametroBean.URL_CONEXION_GACELA);
+            add(ParametroBean.URL_CONEXION_JIMENA);
+            add(ParametroBean.URL_CONEXION_GALENO);
+            add(ParametroBean.URL_CONEXION_CLINICA);
+            add(ParametroBean.URL_INSTANCIASERVIDOR);
+            add(ParametroBean.USR_INFORMATICOS);
+            add(ParametroBean.PRINT_ETIQUETAS);
+            add(ParametroBean.VALORDEFECTO_TIPOCENTRO);
+            add(ParametroBean.INVENTIARIO_SIGUIENTEVALOR);
+        }
+    };
 
     public Long getId() {
         return id;

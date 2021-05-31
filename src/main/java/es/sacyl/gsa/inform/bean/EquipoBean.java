@@ -31,6 +31,7 @@ public class EquipoBean extends MasterBean implements Serializable {
 
     public static String TIPOCPU = "Cpu";
     public static String TIPOTELEFONO = "Teléfono";
+    public final static String TIPOIMPRESORA = "Impresora";
 
     public EquipoBean() {
         super();

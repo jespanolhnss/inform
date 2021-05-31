@@ -226,7 +226,7 @@ public class ComboDao extends ConexionDao implements Serializable, ConexionInter
             if (rama != null) {
                 sql = sql.concat(" AND  UPPER(rama) like'%" + rama.toUpperCase() + "%'");
             }
-            sql = sql.concat("ORDER BY descripcion  ");
+            sql = sql.concat("ORDER BY grupo,rama,valor  ");
             LOGGER.debug(sql);
             try (Statement statement = connection.createStatement()) {
                 ResultSet resulSet = statement.executeQuery(sql);

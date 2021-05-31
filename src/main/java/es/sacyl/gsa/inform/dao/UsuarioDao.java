@@ -12,6 +12,7 @@ import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.bean.UsuarioGalenoBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionAppBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
+import es.sacyl.gsa.inform.ctrl.ParametrosCargados;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Utilidades;
 import java.io.Serializable;
@@ -664,7 +665,17 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
     public ArrayList<UsuarioBean> getInformaticos() {
 
         ArrayList<UsuarioBean> listaUsuarios = new ArrayList<>();
-        String dnis = new ParametroDao().getPorCodigo(ParametroBean.USR_INFORMATICOS).getValor();
+        String dnis = null;
+        ParametrosCargados param = ParametrosCargados.getParametrosCargados();
+
+        //     int posicion = param.getParametrosValores().indexOf(ParametroBean.USR_INFORMATICOS);
+        ParametroBean parametro = param.getParametrosValores().get(ParametroBean.USR_INFORMATICOS);
+        if (parametro != null) {
+            dnis = parametro.getValor();
+        } else {
+            dnis = new ParametroDao().getPorCodigo(ParametroBean.USR_INFORMATICOS).getValor();
+        }
+        //    String dnis = new ParametrosCargados().getParametrosValores().indexOf(ParametroBean.USR_INFORMATICOS)
         String[] dni = dnis.split(",");
         for (String undni : dni) {
             UsuarioBean usu = getUsuarioDni(undni, Boolean.FALSE);
@@ -996,13 +1007,13 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         }
         return lista;
     }
-    
+
     public ArrayList<GruposPaginasGalenoBean> getGruposPaginasGaleno() {
         Connection connection = null;
         ArrayList<GruposPaginasGalenoBean> lista = new ArrayList<>();
         String select;
         select = "select id, grupo from galeno_grupospg";
-        
+
         try {
             connection = super.getConexionBBDD();
             Statement statement = connection.createStatement();
@@ -1093,51 +1104,51 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         }
         return lista;
     }
-    
+
     public boolean doGrabaAplicacion(UsuarioGalenoBean aplicacionBean, Map< Long, ArrayList<AplicacionPerfilBean>> listaMap) {
         GalenoDao galenoDao = new GalenoDao();
         Connection connection = null;
         boolean insertado = false;
 
-            try {
-                connection = galenoDao.conecta();
-                String insertarUsuario;
-                insertarUsuario = "insert into galeno_usuarios "
-                        + "(usuario,nombre,apellido1,apellido2) "
-                        + "values (?,?,?,?)";
-                PreparedStatement statement = connection.prepareStatement(insertarUsuario);
-                if (aplicacionBean.getDni() != null) {
-                    statement.setString(1, aplicacionBean.getDni());                    
-                } else {
-                    statement.setNull(1, Types.CHAR);
-                }                
-                if (aplicacionBean.getNombre() != null) {
-                    statement.setString(2, aplicacionBean.getNombre());
-                } else {
-                    statement.setNull(2, Types.CHAR);
-                }
-                if (aplicacionBean.getApellido1() != null) {
-                    statement.setString(3, aplicacionBean.getApellido1());
-                } else {
-                    statement.setNull(3, Types.CHAR);
-                }
-                if (aplicacionBean.getApellido2() != null) {
-                    statement.setString(4, aplicacionBean.getApellido2());
-                } else {
-                    statement.setNull(4, Types.CHAR);
-                }
-                insertado = statement.executeUpdate() > 0;
-                insertado = true;
-                statement.close();
-                logger.debug(insertarUsuario);
-            } catch (SQLException e) {
-                logger.error(Utilidades.getStackTrace(e));
-                logger.error(ConexionDao.ERROR_BBDD_SQL, e);
-            } catch (Exception e) {
-                logger.error(Utilidades.getStackTrace(e));
-            } finally {
-                this.doCierraConexion(connection);
-            }       
+        try {
+            connection = galenoDao.conecta();
+            String insertarUsuario;
+            insertarUsuario = "insert into galeno_usuarios "
+                    + "(usuario,nombre,apellido1,apellido2) "
+                    + "values (?,?,?,?)";
+            PreparedStatement statement = connection.prepareStatement(insertarUsuario);
+            if (aplicacionBean.getDni() != null) {
+                statement.setString(1, aplicacionBean.getDni());
+            } else {
+                statement.setNull(1, Types.CHAR);
+            }
+            if (aplicacionBean.getNombre() != null) {
+                statement.setString(2, aplicacionBean.getNombre());
+            } else {
+                statement.setNull(2, Types.CHAR);
+            }
+            if (aplicacionBean.getApellido1() != null) {
+                statement.setString(3, aplicacionBean.getApellido1());
+            } else {
+                statement.setNull(3, Types.CHAR);
+            }
+            if (aplicacionBean.getApellido2() != null) {
+                statement.setString(4, aplicacionBean.getApellido2());
+            } else {
+                statement.setNull(4, Types.CHAR);
+            }
+            insertado = statement.executeUpdate() > 0;
+            insertado = true;
+            statement.close();
+            logger.debug(insertarUsuario);
+        } catch (SQLException e) {
+            logger.error(Utilidades.getStackTrace(e));
+            logger.error(ConexionDao.ERROR_BBDD_SQL, e);
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
 
         return insertado;
 

@@ -23,10 +23,6 @@ public class ComboBean implements Serializable {
     public final static String TIPOEQUIPODATOS = "TIPOEQUIPODATOS";
     public final static String TIPOEQUIPOMARCAMODELO = "TIPOEQUIPOMARCAMODELO";
 
-    public final static String TIPOEQUIPOIMPRESORA = "Impresora";
-    //public final static String TIPOEQUIPOPC = "Pc";
-    public final static String TIPOEQUIPOCPU = "Cpu";
-
     public final static String EQUIPODOCTECNICOTIPO = "EQUIPODOCTECNICOTIPO";
 
     public final static String APPAMBITO = "APPAMBITO";
