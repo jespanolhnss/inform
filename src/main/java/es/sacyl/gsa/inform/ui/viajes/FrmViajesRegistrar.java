@@ -57,7 +57,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
     private final ComboBox<ProvinciaBean> provinciaComboBuscador = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null, AutonomiaBean.AUTONOMIADEFECTO);
     private final ComboBox<CentroTipoBean> centroTipoComboBuscador = new CombosUi().getCentroTipoCombo(null);
     private final ComboBox<CentroBean> centroComboBuscador = new CombosUi().getCentroCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, null, null, CentroTipoBean.CENTROTIPOCENTROSALUD, null, null);
-    private final DatePicker desde = new ObjetosComunes().getDatePicker("Desde", null, LocalDate.now());
+    private final DatePicker desde = new ObjetosComunes().getDatePicker("Desde", null, LocalDate.now().minusMonths(1));
     private final DatePicker hasta = new ObjetosComunes().getDatePicker("Hasta", null, LocalDate.now());
 
 
@@ -85,8 +85,7 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
 
     ArrayList<ViajeCentroBean> viajeCentrosArrayList = new ArrayList<>();
 
-    HorizontalLayout contenedorBotones2 = new HorizontalLayout();
-    Icon icon = new Icon(VaadinIcon.BUILDING);
+    Icon icon = new Icon(VaadinIcon.HOSPITAL);
     Button lanzarVentana = new ObjetosComunes().getBoton("Centros", ButtonVariant.LUMO_PRIMARY, icon);
     Icon tecnicosIcon = new Icon(VaadinIcon.USER);
     Button tecnicosButton = new ObjetosComunes().getBoton("Técnicos", ButtonVariant.LUMO_PRIMARY, tecnicosIcon);
@@ -360,11 +359,11 @@ public final class FrmViajesRegistrar extends FrmMasterPantalla {
         tabsToPages.put(centrosTab, page1);
         tabsToPages.put(tecnicosTab, page2);
 
-        contenedorIzquierda.add(contenedorBotones, contenedorBotones2, contenedorFormulario, tabs, page1, page2);
+        contenedorIzquierda.add(contenedorBotones, contenedorFormulario, tabs, page1, page2);
 
         lanzarVentana.setEnabled(false);
         tecnicosButton.setEnabled(false);
-        contenedorBotones2.add(lanzarVentana, tecnicosButton);
+        contenedorBotones.add(lanzarVentana, tecnicosButton);
 
         contenedorFormulario.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("150px", 1),

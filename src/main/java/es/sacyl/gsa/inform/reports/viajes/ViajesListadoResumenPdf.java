@@ -1,6 +1,7 @@
 package es.sacyl.gsa.inform.reports.viajes;
 
 import com.itextpdf.kernel.events.PdfDocumentEvent;
+import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
@@ -67,7 +68,7 @@ public class ViajesListadoResumenPdf extends MasterReport {
             float[] anchos = {90f, 250f, 260f};
             Table tabla = new Table(anchos);
             for (ViajeBean viaje : lista) {
-                tabla.addCell(new Cell((viaje.getListaCentros().size() * 2), 0).add(new Paragraph(
+                tabla.addCell(new Cell((viaje.getListaCentros().size() * 2), 0).setBorder(new SolidBorder(GRISCLARO, 1)).add(new Paragraph(
                         viaje.getId().toString() + "\n" + viaje.getSalidaString()).setFont(normal).setFontSize(fontSize)
                 ));
                 //     tabla.addCell(new Cell().add(new Paragraph(viaje.getSalidaString().toString()  ).setFont(normal).setFontSize(fontSize)));
@@ -83,13 +84,12 @@ public class ViajesListadoResumenPdf extends MasterReport {
                 for (ViajeCentroBean centro : viaje.getListaCentros()) {
 
                     if (contador == 0) {
-                        tabla.addCell(new Cell().add(new Paragraph(centro.getNombreCentro()).setFont(normal).setFontSize(fontSize)));
-                        tabla.addCell(new Cell().add(new Paragraph(cadenaTecnicos).setFont(normal).setFontSize(fontSize)));
+                        tabla.addCell(new Cell().setBorder(new SolidBorder(GRISCLARO, 1)).add(new Paragraph(centro.getNombreCentro()).setFont(normal).setFontSize(fontSize)));
+                        tabla.addCell(new Cell().setBorder(new SolidBorder(GRISCLARO, 1)).add(new Paragraph(cadenaTecnicos).setFont(normal).setFontSize(fontSize)));
                     } else {
-                        tabla.addCell(new Cell(0, 2).add(new Paragraph(centro.getNombreCentro()).setFont(normal).setFontSize(fontSize)));
+                        tabla.addCell(new Cell(0, 2).setBorder(new SolidBorder(GRISCLARO, 1)).add(new Paragraph(centro.getNombreCentro()).setFont(normal).setFontSize(fontSize)));
                     }
 
-                    //   tabla.addCell(new Cell().add(new Paragraph(" ").setFont(normal).setFontSize(fontSize)));
                     String cadena = "";
                     if (centro.getPreparacion() != null && !centro.getPreparacion().isEmpty()) {
                         cadena = "Preparación:" + centro.getPreparacion() + "\n";
@@ -97,10 +97,7 @@ public class ViajesListadoResumenPdf extends MasterReport {
                     if (centro.getActuacion() != null && !centro.getActuacion().isEmpty()) {
                         cadena = cadena.concat("Tareas Realizada:" + centro.getActuacion());
                     }
-                    tabla.addCell(new Cell(0, 2).add(new Paragraph(cadena).setFont(normal).setFontSize(fontSize)));
-                    //tabla.addCell(new Cell(0, 2).add(new Paragraph(centro.getPreparacion()).setFont(normal).setFontSize(fontSize)));
-                    //   tabla.addCell(new Cell().add(new Paragraph(" ").setFont(normal).setFontSize(fontSize)));
-                    // tabla.addCell(new Cell(0, 2).add(new Paragraph(centro.getActuacion()).setFont(normal).setFontSize(fontSize)));
+                    tabla.addCell(new Cell(0, 2).setBorder(new SolidBorder(GRISCLARO, 1)).add(new Paragraph(cadena).setFont(normal).setFontSize(fontSize)));
 
                     contador++;
                 }

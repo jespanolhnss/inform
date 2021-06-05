@@ -1,7 +1,6 @@
 package es.sacyl.gsa.inform.ui.viajes;
 
 import com.vaadin.flow.component.Html;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.Icon;
@@ -12,13 +11,13 @@ import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.bean.ViajeBean;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.dao.ViajesDao;
-import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
 import es.sacyl.gsa.inform.ui.FrmMasterConstantes;
 import es.sacyl.gsa.inform.ui.FrmMasterVentana;
 import es.sacyl.gsa.inform.ui.FrmMensajes;
 import es.sacyl.gsa.inform.ui.ObjetosComunes;
 import java.util.ArrayList;
+import org.vaadin.klaudeta.PaginatedGrid;
 
 /**
  *
@@ -28,9 +27,9 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
 
     /* Campos del formulario */
     TextField idViaje = new ObjetosComunes().getTextField("idViaje");
-    ComboBox<UsuarioBean> tecnicosComboBox = new CombosUi().getInformaticosCombo(null);
+    //    ComboBox<UsuarioBean> tecnicosComboBox = new CombosUi().getInformaticosCombo(null);
 
-    Grid<UsuarioBean> usuGrid = new Grid<>();
+    PaginatedGrid<UsuarioBean> usuGrid = new PaginatedGrid<>();
 
     Icon icon = new Icon(VaadinIcon.BUTTON);
 
@@ -66,7 +65,7 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
                 FrmMasterConstantes.AVISOCONFIRMACIONACCION,
                 FrmMasterConstantes.AVISOCONFIRMACIONACCIONSEGURO,
                 FrmMasterConstantes.AVISOCONFIRMACIONACCIONBORRAR, () -> {
-                    new ViajesDao().doBorraUnTecnico(viajeBean, tecnicosComboBox.getValue());
+                    //  new ViajesDao().doBorraUnTecnico(viajeBean, tecnicosComboBox.getValue());
                     Notification.show(FrmMasterConstantes.AVISODATOBORRADO);
                     doActualizaGrid();
                     doLimpiar();
@@ -98,10 +97,10 @@ public final class FrmViajesTecnicosRegistrar extends FrmMasterVentana {
 
     @Override
     public void doGrid() {
-
         usuGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         usuGrid.setHeightByRows(true);
-
+        usuGrid.setHeightByRows(true);
+        usuGrid.setPageSize(16);
         usuGrid.addColumn(UsuarioBean::getApellidosNombre).setWidth("300px").setHeader(new Html("<b>Usuario</b>"));
         usuGrid.setWidth("500px");
         ArrayList<UsuarioBean> lista = new UsuarioDao().getInformaticos();

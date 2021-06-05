@@ -1,6 +1,8 @@
 package es.sacyl.gsa.inform.reports;
 
 import com.itextpdf.io.font.FontConstants;
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.events.Event;
 import com.itextpdf.kernel.events.IEventHandler;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
@@ -23,6 +25,12 @@ import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinService;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -32,10 +40,28 @@ public class PdfEventoPagina implements IEventHandler {
 
     private final Document documento;
     private final String cabeceraString;
+    private String imageFile = null;
+    private final DateTimeFormatter fechadma = DateTimeFormatter.ofPattern("dd/MM/YYYY");
 
     public PdfEventoPagina(Document doc, String cabecera) {
         documento = doc;
         cabeceraString = cabecera;
+        imageFile = System.getProperty("catalina.home")
+                + System.getProperty("file.separator")
+                + "webapps"
+                + System.getProperty("file.separator")
+                + "inform"
+                + System.getProperty("file.separator")
+                + "WEB-INF"
+                + System.getProperty("file.separator")
+                + "images"
+                + System.getProperty("file.separator")
+                + "logosacyl.jpg";
+        imageFile = ((HttpServletRequest) VaadinRequest.getCurrent()).getPathTranslated().toString() + "WEB-INF"
+                + System.getProperty("file.separator")
+                + "images"
+                + System.getProperty("file.separator")
+                + "logosacyl.jpg";
     }
 
     /**
@@ -85,14 +111,30 @@ public class PdfEventoPagina implements IEventHandler {
      * @param mensaje Mensaje que desplegaremos
      * @return Tabla con el mensaje de encabezado
      */
-    private Table crearTablaEncabezado(String mensaje) {
-        float[] anchos = {1F};
+    private Table crearTablaEncabezado(String textoCabecera) {
+        float[] anchos = {50f, 400f, 77f};
         Table tablaEncabezado = new Table(anchos);
         tablaEncabezado.setWidth(527F);
 
-        tablaEncabezado.addCell(new Cell().setHorizontalAlignment(HorizontalAlignment.CENTER)
-                .add(new Paragraph(mensaje).setHorizontalAlignment(HorizontalAlignment.CENTER).setFontSize(14)));
+        ImageData data;
+        try {
+            if (new File(imageFile).exists()) {
+                data = ImageDataFactory.create(imageFile);
+                Image image = new Image(data);
+                tablaEncabezado.addCell(new Cell().add(image).setBorder(Border.NO_BORDER));
+            } else {
+                tablaEncabezado.addCell(new Cell().add(new Paragraph("\n")).setBorder(Border.NO_BORDER));
+            }
+            tablaEncabezado.addCell(new Cell().setBorder(Border.NO_BORDER).setHorizontalAlignment(HorizontalAlignment.CENTER)
+                    .add(new Paragraph(textoCabecera).setHorizontalAlignment(HorizontalAlignment.CENTER).setFontSize(12)));
 
+            tablaEncabezado.addCell(new Cell().setBorder(Border.NO_BORDER).setHorizontalAlignment(HorizontalAlignment.RIGHT)
+                    .add(new Paragraph(fechadma.format(LocalDate.now()))
+                            .setHorizontalAlignment(HorizontalAlignment.RIGHT).setFontSize(8)));
+
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(PdfEventoPagina.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return tablaEncabezado;
     }
 
@@ -116,7 +158,7 @@ public class PdfEventoPagina implements IEventHandler {
             e.printStackTrace();
         }
         Paragraph textopieParagraph = new Paragraph(
-                "Complejo Asistencial de Ávila. Avd. Juan Carlos Primero s/n. Ávila 05004. Tf: 920358000")
+                "Gerencia de Salud de Área. Servicio de Informática")
                 .setFontSize(7);
 
         textopieParagraph.setTextAlignment(TextAlignment.CENTER);// textopieParagraph.setFont("size=8");

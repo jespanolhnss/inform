@@ -25,6 +25,8 @@ import java.sql.Types;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -683,6 +685,12 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 listaUsuarios.add(usu);
             }
         }
+        Collections.sort(listaUsuarios, new Comparator<UsuarioBean>() {
+            @Override
+            public int compare(UsuarioBean p1, UsuarioBean p2) {
+                return new String(p1.getApellidosNombre()).compareTo(new String(p2.getApellidosNombre()));
+            }
+        });
         return listaUsuarios;
     }
 

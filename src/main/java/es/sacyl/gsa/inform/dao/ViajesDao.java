@@ -274,7 +274,6 @@ public class ViajesDao extends ConexionDao implements Serializable {
         return listaViajes;
     }
 
-
     /**
      *
      * @param id Id del viaje del cual se quieren recuperar los datos
@@ -633,7 +632,7 @@ public class ViajesDao extends ConexionDao implements Serializable {
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " UPDATE  viajescentros set  preparacion=?,actuacion=?  "
+            sql = " UPDATE  viajescentros set  preparacion=?,actuacion=?,idcentro=?  "
                     + " WHERE id=?  ";
             PreparedStatement statement = connection.prepareStatement(sql);
             if (viajeCentroBean.getPreparacion() != null) {
@@ -646,7 +645,8 @@ public class ViajesDao extends ConexionDao implements Serializable {
             } else {
                 statement.setString(2, "-");
             }
-            statement.setLong(3, viajeCentroBean.getId());
+            statement.setLong(3, viajeCentroBean.getCentroDestino().getId());
+            statement.setLong(4, viajeCentroBean.getId());
             insertadoBoolean = statement.executeUpdate() > 0;
             statement.close();
             LOGGER.debug(sql);

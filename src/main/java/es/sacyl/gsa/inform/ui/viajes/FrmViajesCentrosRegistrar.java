@@ -64,6 +64,7 @@ public final class FrmViajesCentrosRegistrar extends FrmMasterVentana {
         doComponenesAtributos();
         doCompentesEventos();
         doBinderPropiedades();
+        modificarButton.setVisible(false);
     }
 
     public FrmViajesCentrosRegistrar(String ancho, ViajeCentroBean viajeCentrosBean) {
@@ -78,6 +79,9 @@ public final class FrmViajesCentrosRegistrar extends FrmMasterVentana {
         doComponenesAtributos();
         doCompentesEventos();
         doBinderPropiedades();
+        provinciasCombo.setEnabled(false);
+        tipoCentroCombo.setEnabled(false);
+        //  centroCombo.setEnabled(false);
     }
 
     @Override

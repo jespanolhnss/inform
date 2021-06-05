@@ -87,9 +87,11 @@ public abstract class FrmMasterVentana extends Dialog {
         contenedorFiltros.setMargin(false);
         contenedorIzquierda.setMargin(false);
         contenedorIzquierda.setSpacing(false);
+        contenedorIzquierda.getStyle().set("overflow-y", "auto");
 
         contenedorDerecha.setMargin(false);
         contenedorDerecha.setSpacing(false);
+        contenedorDerecha.getStyle().set("overflow-y", "auto");
 
         contenedorIzquierda.add(titulo, contenedorBotones, contenedorFormulario);
         this.contenedorBotones.add(botonGrabar, tooltipGrabar, botonBorrar, tooltipBorrar, botonAyuda, tooltipAyuda,

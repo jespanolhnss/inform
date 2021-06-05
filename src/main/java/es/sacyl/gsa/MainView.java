@@ -96,14 +96,15 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         contenedorFormularios.setSizeFull();
 
         // doTimerDa0();
-        System.out.println(System.getProperty("user.dir"));
-        System.out.println(System.getProperty("catalina.base"));
-        System.out.println(VaadinServlet.getCurrent().getServletInfo());
-        System.out.println(((HttpServletRequest) VaadinRequest.getCurrent()).getPathTranslated());
+        System.out.println("user.dir" + System.getProperty("user.dir"));
+        System.out.println("catalina.base" + System.getProperty("catalina.base"));
+        System.out.println("VaadinServlet.getCurrent().getServletInfo()" + VaadinServlet.getCurrent().getServletInfo());
+        System.out.println("((HttpServletRequest) VaadinRequest.getCurrent()).getPathTranslated()"
+                + ((HttpServletRequest) VaadinRequest.getCurrent()).getPathTranslated());
 
-        System.out.println("addr" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalAddr());
-        System.out.println("name" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalName());
-        System.out.println("port" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalPort());
+        System.out.println("addr:" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalAddr());
+        System.out.println("name:" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalName());
+        System.out.println("port:" + ((HttpServletRequest) VaadinRequest.getCurrent()).getLocalPort());
 
         this.setMargin(false);
         this.setSpacing(false);
