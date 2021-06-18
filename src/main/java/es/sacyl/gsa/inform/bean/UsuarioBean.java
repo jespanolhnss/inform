@@ -43,11 +43,13 @@ public class UsuarioBean extends MasterBean implements Serializable {
 
     public UsuarioBean() {
         super();
+        this.apellido2 = "";  // no nulo en bbdd
     }
 
     public UsuarioBean(String dni) {
         super();
         this.dni = dni;
+        this.apellido2 = "";  // no nulo en bbdd
     }
 
     public UsuarioBean(Long id, String dni, String nombre, String apellido1, String apellido2) {
@@ -63,10 +65,12 @@ public class UsuarioBean extends MasterBean implements Serializable {
         super();
         this.dni = dni;
         this.nombre = nombre;
+        this.apellido2 = "";  // no nulo en bbdd
     }
 
     public String getDni() {
         return dni;
+
     }
 
     public void setDni(String dni) {

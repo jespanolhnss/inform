@@ -175,9 +175,6 @@ public class ConexionDao implements Serializable {
                     ResultSet resulSet = statement.executeQuery(sql);
                     if (resulSet.next()) {
                         id = resulSet.getLong("id");
-                        if (id.equals(new Long(0))) {
-                            id = new Long(1);
-                        }
                     }
                     statement.close();
                 }
@@ -187,9 +184,6 @@ public class ConexionDao implements Serializable {
                     ResultSet resulSet = statement.executeQuery(sql);
                     if (resulSet.next()) {
                         id = resulSet.getLong("id");
-                        if (id.equals(new Long(0))) {
-                            id = new Long(1);
-                        }
                     }
                     statement.close();
                 }

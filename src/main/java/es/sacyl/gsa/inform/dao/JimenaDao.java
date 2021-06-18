@@ -183,8 +183,17 @@ public class JimenaDao {
             /*
 			 * ID APELLIDOSNOMBRE NUMEROHC ESTADO FECHACAMBIO USUCAMBIO IDJIMENA
              */
-            String apellidosnombre = resulSet.getString("ape1").trim() + " " + resulSet.getString("ape2").trim() + ","
-                    + resulSet.getString("nombre").trim();
+            String apellidosnombre = "";
+            if (resulSet.getString("ape1") != null) {
+                apellidosnombre = apellidosnombre.concat(resulSet.getString("ape1").trim());
+            }
+            if (resulSet.getString("ape2") != null) {
+                apellidosnombre = apellidosnombre.concat(" " + resulSet.getString("ape2").trim());
+            }
+            if (resulSet.getString("nombre") != null) {
+                apellidosnombre = apellidosnombre.concat(", " + resulSet.getString("nombre").trim());
+            }
+
             paciente.setIdJimena(resulSet.getLong("id"));
             paciente.setApellidosnombre(apellidosnombre);
             paciente.setNumerohc(resulSet.getString("nhc"));
