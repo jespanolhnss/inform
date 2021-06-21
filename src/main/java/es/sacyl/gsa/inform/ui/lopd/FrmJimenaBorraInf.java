@@ -118,10 +118,10 @@ public final class FrmJimenaBorraInf extends Dialog {
     }
 
     public void doGrid() {
-        jimenaInformeGrid.setWidth("600px");
+        jimenaInformeGrid.setWidth("800px");
         jimenaInformeGrid.setPage(10);
         jimenaInformeGrid.setPageSize(10);
-        jimenaInformeGrid.addColumn(JimenaInformeBean::getFechaHoraInforme).setHeader("Fecha Hora Informe").setAutoWidth(true).setWidth("100px");
+        jimenaInformeGrid.addColumn(JimenaInformeBean::getFechaHoraInforme).setHeader("Fecha Hora Informe").setAutoWidth(true).setWidth("120px");
         jimenaInformeGrid.addColumn(JimenaInformeBean::getServicioBeanCodigo).setHeader("Serv").setWidth("60px").setAutoWidth(true);
         jimenaInformeGrid.addColumn(JimenaInformeBean::getDescripcion20).setHeader("Informe").setAutoWidth(true);
         jimenaInformeGrid.addColumn(JimenaInformeBean::getUsuarioBeanApellidosNombre).setHeader("Médico").setAutoWidth(true);
