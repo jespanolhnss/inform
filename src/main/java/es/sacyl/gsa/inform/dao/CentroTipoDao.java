@@ -103,7 +103,8 @@ public class CentroTipoDao extends ConexionDao implements Serializable, Conexion
     @Override
     public boolean doGrabaDatos(CentroTipoBean centroTipoBean) {
         boolean actualizado = false;
-        if (this.getPorId(centroTipoBean.getId()) == null) {
+        if (centroTipoBean.getId().equals(new Long(0)) || centroTipoBean.getId() == null || this.getPorId(centroTipoBean.getId()) == null) {
+            centroTipoBean.setId(new ConexionDao().getSiguienteId("CENTROSTIPO"));
             actualizado = this.doInsertaDatos(centroTipoBean);
         } else {
             actualizado = this.doActualizaDatos(centroTipoBean);
@@ -117,8 +118,8 @@ public class CentroTipoDao extends ConexionDao implements Serializable, Conexion
         Boolean insertadoBoolean = false;
         try {
             connection = super.getConexionBBDD();
-            sql = " INSERT INTO  centrostipo  (id,descripcion) " + " VALUES "
-                    + "(,'" + centroTipoBean.getId() + "','" + centroTipoBean.getDescripcion() + "')";
+            sql = " INSERT INTO  centrostipo  (id,descripcion,estado) " + " VALUES "
+                    + "('" + centroTipoBean.getId() + "','" + centroTipoBean.getDescripcion() + "'," + ConexionDao.BBDD_ACTIVOSI + ")";
             try (Statement statement = connection.createStatement()) {
                 insertadoBoolean = statement.execute(sql);
                 insertadoBoolean = true;

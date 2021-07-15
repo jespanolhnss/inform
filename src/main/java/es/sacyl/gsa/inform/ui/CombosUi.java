@@ -58,6 +58,23 @@ public class CombosUi {
         }
     };
 
+    public static ArrayList<String> USUARIOTIPOPETICION = new ArrayList<String>() {
+        {
+            add("Alta");
+            add("Baja");
+            add("Modificación");
+        }
+    };
+
+    public static ArrayList<String> DIVISIONES = new ArrayList<String>() {
+        {
+            add("Médica");
+            add("Gestión");
+            add("Enfermería");
+            add("Gerencia");
+        }
+    };
+
     /**
      *
      * @param valor
@@ -600,7 +617,7 @@ public class CombosUi {
     public ComboBox<CategoriaBean> getCategoriaCombo(String texto, CategoriaBean valor
     ) {
         ComboBox<CategoriaBean> combo = new ComboBox<>("Categoria  ");
-        combo.setItems(new CategoriaDao().getLista(texto));
+        combo.setItems(new CategoriaDao().getLista(texto, null));
         combo.setItemLabelGenerator(CategoriaBean::getNombre);
         if (valor != null) {
             combo.setValue(valor);
@@ -631,7 +648,7 @@ public class CombosUi {
      */
     public ComboBox<GfhBean> getServicioCombo(GfhBean valor, String texto) {
         ComboBox<GfhBean> combo = new ComboBox<>("Servicio");
-        ArrayList<GfhBean> lista = new GfhDao().getLista(texto, ConexionDao.BBDD_ACTIVOSI);
+        ArrayList<GfhBean> lista = new GfhDao().getLista(texto, ConexionDao.BBDD_ACTIVOSI, null);
         combo.setItems(lista);
         combo.setItemLabelGenerator(GfhBean::getDescripcion);
         if (valor != null) {
@@ -676,15 +693,25 @@ public class CombosUi {
      * @param valor
      * @return
      */
-    public ComboBox<CategoriaBean> getCategoriasUsuarios(CategoriaBean valor) {
+    public ComboBox<CategoriaBean> getCategoriasUsuarios(CategoriaBean valor, String grupo) {
         ComboBox<CategoriaBean> combo;
         combo = new ComboBox<>("Categorias");
         if (valor != null) {
-            combo.setItems(new CategoriaDao().getLista(valor.getNombre()));
+            combo.setItems(new CategoriaDao().getLista(valor.getNombre(), grupo));
         } else {
-            combo.setItems(new CategoriaDao().getLista(null));
+            combo.setItems(new CategoriaDao().getLista(null, grupo));
         }
         combo.setItemLabelGenerator(CategoriaBean::getNombre);
+        combo.setMinWidth("150px");
+        combo.setClearButtonVisible(true);
+        return combo;
+    }
+
+    public ComboBox<String> getCategoriasResumen() {
+        ComboBox<String> combo;
+        combo = new ComboBox<>("Grpos Categorias");
+        combo.setItems(new CategoriaDao().getResumenCategoria());
+        //combo.setItemLabelGenerator(CategoriaBean::getNombre);
         combo.setMinWidth("150px");
         combo.setClearButtonVisible(true);
         return combo;
@@ -700,9 +727,9 @@ public class CombosUi {
         ComboBox<GfhBean> combo;
         combo = new ComboBox<>("Gfhs");
         if (valor != null) {
-            combo.setItems(new GfhDao().getLista(valor.getCodigo(), ConexionDao.BBDD_ACTIVOSI));
+            combo.setItems(new GfhDao().getLista(valor.getCodigo(), ConexionDao.BBDD_ACTIVOSI, null));
         } else {
-            combo.setItems(new GfhDao().getLista(null, ConexionDao.BBDD_ACTIVOSI));
+            combo.setItems(new GfhDao().getLista(null, ConexionDao.BBDD_ACTIVOSI, null));
         }
         combo.setItemLabelGenerator(GfhBean::getDescripcion);
         combo.setMinWidth("150px");

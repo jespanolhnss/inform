@@ -172,7 +172,7 @@ public class ObjetosComunes {
 
         return checkboxGroup;
     }
-    
+
     /**
      *
      * @return
@@ -244,7 +244,7 @@ public class ObjetosComunes {
     public ComboBox<GfhBean> getServicioCombo(GfhBean valor, Boolean codigosolo) {
         ComboBox<GfhBean> combo;
         combo = new ComboBox<>("Servicos");
-        combo.setItems(new GfhDao().getLista(null, ConexionDao.BBDD_ACTIVOSI));
+        combo.setItems(new GfhDao().getLista(null, ConexionDao.BBDD_ACTIVOSI, null));
         if (codigosolo == true) {
             combo.setItemLabelGenerator(GfhBean::getCodigo);
             combo.setWidth("50px");

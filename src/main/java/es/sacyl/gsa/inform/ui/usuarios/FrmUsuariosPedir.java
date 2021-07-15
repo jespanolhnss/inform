@@ -31,9 +31,12 @@ import es.sacyl.gsa.inform.bean.ProvinciaBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionAppBean;
 import es.sacyl.gsa.inform.bean.UsuarioPeticionBean;
+import es.sacyl.gsa.inform.ctrl.NifCifNieValidator;
 import es.sacyl.gsa.inform.dao.AplicacionDao;
+import es.sacyl.gsa.inform.dao.CategoriaDao;
 import es.sacyl.gsa.inform.dao.CentroDao;
 import es.sacyl.gsa.inform.dao.ConexionDao;
+import es.sacyl.gsa.inform.dao.UsuarioDADao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.ui.CombosUi;
 import es.sacyl.gsa.inform.ui.ConfirmDialog;
@@ -75,9 +78,10 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
     TextField correoPrivadoUsuario = new ObjetosComunes().getMail("Correo Electrónico Privado", "Correo privado del usuario");
     TextField telefonoUsuario = new ObjetosComunes().getTelefono();
     TextField movilUsuario = new ObjetosComunes().getMovil();
-    ComboBox<CategoriaBean> categoriaUsuario = new CombosUi().getCategoriasUsuarios(null);
+    ComboBox<String> categoriaResumen = new CombosUi().getCategoriasResumen();
+    ComboBox<CategoriaBean> categoriaUsuario = new CombosUi().getCategoriasUsuarios(null, null);
     ComboBox<GfhBean> gfhUsuario = new CombosUi().getGfhPorCodigoUsuarios(null);
-    ComboBox<String> tipo = new ComboBox();
+    ComboBox<String> tipo = new CombosUi().getStringCombo("Tipo de Solicitud", "Alta", CombosUi.USUARIOTIPOPETICION, "100px");
     ComboBox<ProvinciaBean> provinciasCombo = new CombosUi().getProvinciaCombo(ProvinciaBean.PROVINCIA_DEFECTO, null,
             AutonomiaBean.AUTONOMIADEFECTO);
     CheckboxGroup<CentroTipoBean> tiposCentro = new ObjetosComunes().getTipoCentroCecheckboxGroup();
@@ -123,7 +127,7 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         doCompentesEventos();
         doBinderPropiedades();
         construirAccordion();
-
+        nifUsuario.focus();
     }
 
     @Override
@@ -261,9 +265,8 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         aplicacionesAccordion.close();
         idUsuario.setValue("0");
         centro.setVisible(false);
-        tipo.setItems("Alta", "Baja");
-        tipo.setLabel("Tipo");
-        tipo.setPlaceholder("Alta o Baja");
+        tipo.setPlaceholder("Alta, Baja, Modificación");
+
         comentario.setWidthFull();
         usuarioLabel.setText("DATOS DEL USUARIO: ");
         contenedorFormulario.setResponsiveSteps(
@@ -283,8 +286,16 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
         contenedorFormulario.add(correoUsuario, correoPrivadoUsuario, telefonoUsuario, movilUsuario);
         contenedorFormulario.add(tipo, gfhUsuario);
         //  contenedorFormulario.setColspan(gfhUsuario, 2);
-        contenedorFormulario.add(categoriaUsuario, 2);
+        contenedorFormulario.add(categoriaResumen, categoriaUsuario);
         contenedorFormulario.add(comentario, 3);
+        contenedorFormulario.add(tiposCentro, 3);
+        contenedorFormulario.add(centro, 3);
+        /*
+        VerticalLayout centrosLayout = new VerticalLayout();
+        centrosLayout.add(tiposCentro, centro);
+        aplicacionesAccordion.add("Centros", centrosLayout);
+         */
+
         contenedorDerecha.add(aplicacionesLabel);
 
         contenedorDerecha.add(aplicacionesAccordion);
@@ -319,27 +330,34 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
             if (usuarioBean.getGfh() == null) {
                 usuarioBean.setGfh(usuarioBeanHnss.getGfh());
             }
+
         }
     }
 
     @Override
     public void doCompentesEventos() {
+        /*
+        // si ha escrito 9 caracteres salta a bucar un usuario
+        nifUsuario.addValueChangeListener(event -> {
+            if (!nifUsuario.getValue().isEmpty() && nifUsuario.getValue() != null) {
+                if (nifUsuario.getValue().length() == 9) {
+                    doBuscaUsuario();
+                }
+            }
+
+        });
+         */
         nifUsuario.addBlurListener(event -> {
             if (!nifUsuario.getValue().isEmpty() && nifUsuario.getValue() != null) {
-                usuarioBean = new UsuarioDao().getUsuarioPersigo(nifUsuario.getValue());
-                if (usuarioBean.getDni() != null) {
-                    doCompletaDatosPersigo();
-                    usuarioBinder.readBean(usuarioBean);
-                    categoriaUsuario.setValue(usuarioBean.getCategoria());                    
+                if (NifCifNieValidator.isNIF(nifUsuario.getValue()) || NifCifNieValidator.isNIE(nifUsuario.getValue())) {
+                    doBuscaUsuario();
                 } else {
-                    usuarioBean = new UsuarioDao().getPorDni(nifUsuario.getValue());
-                    if (usuarioBean.getDni() != null) {
-                        usuarioBinder.readBean(usuarioBean);
-                        categoriaUsuario.setValue(usuarioBean.getCategoria());
-                    }
+                    Notification.show("Nif / Nie mal formado", 3000, Notification.Position.MIDDLE);
+                    nifUsuario.focus();
                 }
             } else {
-
+                // Notification.show("Dato requerido", 3000, Notification.Position.MIDDLE);
+                // nifUsuario.focus();
             }
         });
 
@@ -347,6 +365,12 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
             doCargaCentros(tiposCentro.getSelectedItems());
         });
 
+        /**
+         * cuando cambia el grupo de categoria actualiza el combo de categorias
+         */
+        categoriaResumen.addValueChangeListener(event -> {
+            categoriaUsuario.setItems(new CategoriaDao().getLista(null, event.getValue()));
+        });
         perfilesGaleno.addValueChangeListener(event -> {
             UsuarioPeticionAppBean perfil = new UsuarioPeticionAppBean();
             perfil.setAplicacion(galeno);
@@ -370,16 +394,45 @@ public final class FrmUsuariosPedir extends FrmMasterPantalla {
          */
     }
 
+    /**
+     * El proceso busqueda lo hace en
+     *
+     * persigo
+     *
+     * tabla usuarios hnss
+     *
+     * directorio activo
+     */
+    public void doBuscaUsuario() {
+        usuarioBean = new UsuarioDao().getUsuarioPersigo(nifUsuario.getValue());
+        if (usuarioBean != null && usuarioBean.getDni() != null) {
+            doCompletaDatosPersigo();
+            usuarioBinder.readBean(usuarioBean);
+            categoriaUsuario.setValue(usuarioBean.getCategoria());
+        } else {
+            usuarioBean = new UsuarioDao().getPorDni(nifUsuario.getValue());
+            if (usuarioBean != null && usuarioBean.getDni() != null) {
+                usuarioBinder.readBean(usuarioBean);
+                categoriaUsuario.setValue(usuarioBean.getCategoria());
+            } else {
+                usuarioBean = new UsuarioDADao().getPorDni(nifUsuario.getValue());
+                if (usuarioBean != null && usuarioBean != null) {
+                    usuarioBinder.readBean(usuarioBean);
+                    categoriaUsuario.setValue(usuarioBean.getCategoria());
+                } else {
+                    //  doLimpiar();
+                    Notification.show("No registrados. Registra datos manualmente", 3000, Notification.Position.MIDDLE);
+                }
+            }
+        }
+    }
+
     @Override
     public void doImprimir() {
 
     }
 
     public void construirAccordion() {
-
-        VerticalLayout centrosLayout = new VerticalLayout();
-        centrosLayout.add(tiposCentro, centro);
-        aplicacionesAccordion.add("Centros", centrosLayout);
 
         for (AplicacionBean app : listaAplicaciones) {
             VerticalLayout galenoLayout = new VerticalLayout();

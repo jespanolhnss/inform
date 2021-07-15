@@ -57,11 +57,10 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
                 + " JOIN PROVINCIA p ON p.codigo=l.codprov "
                 + " JOIN CAUTONOM a On a.codigo=p.CODAUTO  "
                 + " JOIN GERENCIA g ON g.codauto=a.codigo AND g.codigo=c.codgeren  "
-                + " JOIN ZONAS z ON z.codauto=c.codauto AND z.codgeren=g.codigo AND z.codigo=c.codzona "
+                + " LEFT JOIN ZONAS z ON z.codauto=c.codauto AND z.codgeren=g.codigo AND z.codigo=c.codzona "
                 + " JOIN centrostipo ct ON ct.id=c.tipocentro "
                 + " JOIN  NIVELESATENCIONTIPO na  ON na.id =n.tipo"
                 + " WHERE 1=1 ";
-
     }
 
     @Override
@@ -210,7 +209,7 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
                     + ",CALLECEN,NUMCALCEN,OTRDIRCEN,CODLOCAL "
                     + " ,CPCENTRO,TELEPREV,TIPOCENTRO,NIVATENCION,ESTADO,MAPGOOGLE,NOMCORTO ) "
                     + " VALUES "
-                    + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setLong(1, centroBean.getId());
             if (centroBean.getAutonomia() != null && centroBean.getAutonomia().getCodigo() != null) {
@@ -486,7 +485,7 @@ public class CentroDao extends ConexionDao implements Serializable, ConexionInte
                 sql = sql.concat(" AND c.codlocal='" + localidadBean.getCodigo() + "'");
             }
             if (texto != null && !texto.isEmpty()) {
-                sql = sql.concat(" AND  ( UPPER(c.NOMCEN) like'%" + texto.toUpperCase() + "%'  OR   UPPER(codigo) like'%" + texto.toUpperCase() + "%' )");
+                sql = sql.concat(" AND  ( UPPER(c.NOMCEN) like'%" + texto.toUpperCase() + "%'  OR   UPPER(C.codigo) like'%" + texto.toUpperCase() + "%' )");
             }
             if (centroTipoBean != null) {
                 sql = sql.concat(" AND tipocentro=" + centroTipoBean.getId());

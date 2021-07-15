@@ -55,7 +55,7 @@ public class IpDao extends ConexionDao implements Serializable, ConexionInterfac
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
                 + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo, gfh.division  as gfhdivision"
                 + " FROM ips   ip "
                 + " JOIN vlan ON vlan.id=ip.vlan "
                 + " LEFT JOIN equipos e ON e.id=ip.equipo "

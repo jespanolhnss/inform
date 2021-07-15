@@ -34,9 +34,11 @@ public final class FrmGfh extends FrmMasterPantalla {
     private final TextField idjimena = new ObjetosComunes().getTextField("IdJimena");
     private final TextField codigo = new ObjetosComunes().getTextField("Código", "codigo", 10, "150px", "50px");
     private final TextField descripcion = new ObjetosComunes().getTextField("Nombre", "nombre", 50, "300px", "50px");
+    private final ComboBox<String> divisionCombo = new CombosUi().getStringCombo("División", null, CombosUi.DIVISIONES, "100px");
     private final RadioButtonGroup<String> estadoRadio = new ObjetosComunes().getEstadoRadio();
     private final RadioButtonGroup<String> asistencialRadio = new ObjetosComunes().getSNRadio("Asistencial");
     private final ComboBox<DatoGenericoBean> gfhPersiog = new CombosUi().getGfhPersigo();
+
     private GfhBean servicioBean = null;
     private final Binder<GfhBean> servicioBinder = new Binder<>();
     private final PaginatedGrid<GfhBean> servicioGrid = new PaginatedGrid<>();
@@ -142,7 +144,7 @@ public final class FrmGfh extends FrmMasterPantalla {
 
     @Override
     public void doActualizaGrid() {
-        servicioLista = new GfhDao().getLista(buscador.getValue(), null);
+        servicioLista = new GfhDao().getLista(buscador.getValue(), null, null);
         servicioGrid.setItems(servicioLista);
     }
 
@@ -164,6 +166,10 @@ public final class FrmGfh extends FrmMasterPantalla {
                 .withValidator(new StringLengthValidator(
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 50))
                 .bind(GfhBean::getDescripcion, GfhBean::setDescripcion);
+
+        servicioBinder.forField(divisionCombo)
+                .asRequired()
+                .bind(GfhBean::getDivision, GfhBean::setDivision);
 
         servicioBinder.forField(estadoRadio)
                 .asRequired()
@@ -191,7 +197,7 @@ public final class FrmGfh extends FrmMasterPantalla {
 
     @Override
     public void doComponentesOrganizacion() {
-        this.contenedorFormulario.add(id, codigo, descripcion, estadoRadio, idjimena, gfhPersiog, asistencialRadio);
+        this.contenedorFormulario.add(id, codigo, descripcion, divisionCombo, estadoRadio, idjimena, gfhPersiog, asistencialRadio);
         this.contenedorBuscadores.add(buscador);
         this.contenedorDerecha.removeAll();
         this.contenedorDerecha.add(contenedorBuscadores, servicioGrid);

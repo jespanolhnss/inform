@@ -26,7 +26,11 @@ public class ZonaBean implements Serializable {
     }
 
     public String getNombre() {
-        return nombre;
+        if (nombre != null) {
+            return nombre;
+        } else {
+            return "";
+        }
     }
 
     public void setNombre(String nombre) {

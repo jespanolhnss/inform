@@ -17,6 +17,8 @@ import es.sacyl.gsa.inform.bean.UbicacionBean;
 import es.sacyl.gsa.inform.bean.UsuarioBean;
 import es.sacyl.gsa.inform.ctrl.SesionCtrl;
 import es.sacyl.gsa.inform.dao.ParametroDao;
+import es.sacyl.gsa.inform.dao.UsuarioDADao;
+import es.sacyl.gsa.inform.hilos.PersigoHilo;
 import es.sacyl.gsa.inform.ui.covid.FrmTarjetasCribado;
 import es.sacyl.gsa.inform.ui.indicadores.FrmIndicadoresCalcular;
 import es.sacyl.gsa.inform.ui.indicadores.FrmIndicadoresDefinir;
@@ -69,6 +71,7 @@ public class Menu extends MenuBar {
     private static final String RECURSOS = "Recursos";
     private static final String USUARIOS = "Usuarios";
     private static final String TABLAS = "Tablas";
+    private static final String UTILIDADES = "Util";
 
     public Menu(VerticalLayout contenedorFormularios, UsuarioBean usuarioBean) {
         this.contenedorFormularios = contenedorFormularios;
@@ -247,6 +250,17 @@ public class Menu extends MenuBar {
             tablasSubMenu.addItem("Zonas Básicas Salud", e -> {
                 this.contenedorFormularios.removeAll();
                 this.contenedorFormularios.add(new FrmZona());
+            });
+
+            MenuItem util = this.addItem(UTILIDADES);
+            SubMenu viajesSubmenu = util.getSubMenu();
+            viajesSubmenu.addItem("DA", e -> {
+                this.contenedorFormularios.removeAll();
+                new UsuarioDADao();
+            });
+            viajesSubmenu.addItem("Hilo pérsigo", e -> {
+                this.contenedorFormularios.removeAll();
+                PersigoHilo persigoHilo = PersigoHilo.getHiloPersigo();
             });
 
         }

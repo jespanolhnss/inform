@@ -17,7 +17,7 @@ public class CentroTipoBean implements Serializable {
     public static CentroTipoBean CENTROTIPODEFECTO = new CentroTipoBean(new Long(1), "HOSPITAL");
 
     public CentroTipoBean() {
-
+        this.id = new Long(0);
     }
 
     public CentroTipoBean(Long id, String descripcion) {

@@ -35,7 +35,8 @@ public class ParametroBean implements Serializable {
     public static String URL_CONEXION_GACELA = "url.conexion.gacela";
     public static String URL_CONEXION_JIMENA = "url.conexion.jimena";
     public static String URL_CONEXION_GALENO = "url.conexion.galeno";
-    public static String URL_CONEXION_CLINICA = "url.conexion.calinica";
+    public static String URL_CONEXION_CLINICA = "url.conexion.clinica";
+    public static String URL_CONEXION_PERSIGO = "url.conexion.persigo";
 
     // IP del servidor dodne está instalada la instancia de la app
     public static String URL_INSTANCIASERVIDOR = " url.instanciaservidor";
@@ -44,7 +45,9 @@ public class ParametroBean implements Serializable {
 
     public static String PRINT_ETIQUETAS = "print.etitquetas";
 
-    public static String VALORDEFECTO_TIPOCENTRO = " valordefecto.tipocentro";
+    public static String VALORDEFECTO_TIPOCENTRO = "valordefecto.tipocentro";
+
+    public static String MAIL_SISTEMAS_HNSS = "mail.sistemas.hnss";
 
     public Long getId() {
         return id;

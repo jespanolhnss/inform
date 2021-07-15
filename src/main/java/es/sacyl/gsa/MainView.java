@@ -29,6 +29,7 @@ import es.sacyl.gsa.inform.dao.ConexionDao;
 import es.sacyl.gsa.inform.dao.UsuarioDao;
 import es.sacyl.gsa.inform.exceptiones.CustomExceptionHandler;
 import es.sacyl.gsa.inform.exceptiones.LoginException;
+import es.sacyl.gsa.inform.hilos.PersigoHilo;
 import es.sacyl.gsa.inform.ui.Menu;
 import es.sacyl.gsa.inform.util.Constantes;
 import es.sacyl.gsa.inform.util.Ldap;
@@ -95,7 +96,8 @@ public class MainView extends VerticalLayout implements AttachNotifier, HasUrlPa
         contenedorFormularios.setPadding(false);
         contenedorFormularios.setSizeFull();
 
-        // doTimerDa0();
+        PersigoHilo persigoHilo = PersigoHilo.getHiloPersigo();
+
         System.out.println(System.getProperty("user.dir"));
         System.out.println(System.getProperty("catalina.base"));
         System.out.println(VaadinServlet.getCurrent().getServletInfo());

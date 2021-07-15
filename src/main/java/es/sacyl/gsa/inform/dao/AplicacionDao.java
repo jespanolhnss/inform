@@ -51,7 +51,7 @@ public class AplicacionDao extends ConexionDao implements Serializable, Conexion
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
                 + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo "
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo , gfh.division  as gfhdivision"
                 + " FROM aplicaciones ap "
                 + " LEFT  JOIN gfh  ON gfh.id=ap.gfh"
                 + " LEFT  JOIN proveedores prvee ON  prvee.id=ap.proveedor"

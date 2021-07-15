@@ -103,6 +103,11 @@ public abstract class MasterBean implements Serializable {
      */
     public void setValoresAut() {
         this.setFechacambio(LocalDate.now());
-        this.setUsucambio(((UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME)));
+        if (VaadinSession.getCurrent() != null) {
+            UsuarioBean usu = (UsuarioBean) VaadinSession.getCurrent().getAttribute(Constantes.SESSION_USERNAME);
+            if (usu != null) {
+                this.setUsucambio(usu);
+            }
+        }
     }
 }

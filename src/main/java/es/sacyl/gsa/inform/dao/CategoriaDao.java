@@ -204,13 +204,16 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         return insertadoBoolean;
     }
 
-    public ArrayList<CategoriaBean> getLista(String texto) {
+    public ArrayList<CategoriaBean> getLista(String texto, String gruporesumen) {
         Connection connection = null;
         ArrayList<CategoriaBean> lista = new ArrayList<>();
         try {
             connection = super.getConexionBBDD();
             if (texto != null && !texto.isEmpty()) {
                 sql = sql.concat(" AND  ( UPPER(uc.nombre) like'%" + texto.toUpperCase() + "%'  ");
+            }
+            if (gruporesumen != null && !gruporesumen.isEmpty()) {
+                sql = sql.concat(" AND  categoriaresumen='" + gruporesumen + "'");
             }
             sql = sql.concat(" ORDER BY uc.nombre  ");
             Statement statement = connection.createStatement();
@@ -229,4 +232,29 @@ public class CategoriaDao extends ConexionDao implements Serializable {
         }
         return lista;
     }
+
+    public ArrayList<String> getResumenCategoria() {
+        Connection connection = null;
+        ArrayList<String> lista = new ArrayList<>();
+        try {
+            connection = super.getConexionBBDD();
+
+            sql = "SELECT UNIQUE categoriaresumen FROM categorias ORDER BY  categoriaresumen";
+            Statement statement = connection.createStatement();
+            ResultSet resulSet = statement.executeQuery(sql);
+            while (resulSet.next()) {
+                lista.add(resulSet.getString("categoriaresumen"));
+            }
+            statement.close();
+            LOGGER.debug(sql);
+        } catch (SQLException e) {
+            LOGGER.error(sql + Utilidades.getStackTrace(e));
+        } catch (Exception e) {
+            LOGGER.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
+        return lista;
+    }
+
 }

@@ -107,6 +107,9 @@ public class MensajeDao extends ConexionDao implements Serializable, ConexionInt
                 statement.setNull(4, Types.CHAR);
             }
             if (mensajeBean.getContenido() != null && !mensajeBean.getContenido().isEmpty()) {
+                if (mensajeBean.getContenido().length() > 100) {
+                    mensajeBean.setContenido(mensajeBean.getContenido().substring(0, 99));
+                }
                 statement.setString(5, mensajeBean.getContenido());
             } else {
                 statement.setNull(5, Types.CHAR);

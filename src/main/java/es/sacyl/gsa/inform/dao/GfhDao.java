@@ -27,7 +27,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
     public GfhDao() {
         super();
         sql = " SELECT gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo "
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo, gfh.division  as gfhdivision"
                 + " FROM gfh gfh WHERE 1=1 ";
     }
 
@@ -47,6 +47,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
             gfh.setAsistencial(rs.getInt("gfhasistencial"));
             gfh.setEstado(rs.getInt("gfhestado"));
             gfh.setGfhpersigo(rs.getString("gfhpersigo"));
+            gfh.setDivision(rs.getString("gfhdivision"));
         } catch (SQLException e) {
             logger.error(Utilidades.getStackTrace(e));
         }
@@ -78,8 +79,8 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
         try {
             connection = super.getConexionBBDD();
 
-            sql = " INSERT INTO gfh (id,codigo,idjimena,descripcion,asistencial,estado,fechacambio,usucambio,gfhpersigo) "
-                    + " VALUES (?,?,?,?,?,?,?,?,?)  ";
+            sql = " INSERT INTO gfh (id,codigo,idjimena,descripcion,asistencial,estado,fechacambio,usucambio,gfhpersigo,division) "
+                    + " VALUES (?,?,?,?,?,?,?,?,?,?)  ";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setLong(1, gfhBean.getId());
                 statement.setString(2, gfhBean.getCodigo());
@@ -101,6 +102,11 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
                     statement.setString(9, gfhBean.getGfhpersigo());
                 } else {
                     statement.setNull(9, Types.VARCHAR);
+                }
+                if (gfhBean.getDivision() != null) {
+                    statement.setString(10, gfhBean.getDivision());
+                } else {
+                    statement.setNull(10, Types.VARCHAR);
                 }
                 insertado = statement.executeUpdate() > 0;
                 statement.close();
@@ -130,7 +136,7 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
         try {
             connection = super.getConexionBBDD();
             sql = " UPDATE   gfh SET "
-                    + " codigo=?,idjimena=?,descripcion=?,asistencial=?,estado=?,fechacambio=?,usucambio=?,gfhpersigo=?  "
+                    + " codigo=?,idjimena=?,descripcion=?,asistencial=?,estado=?,fechacambio=?,usucambio=?,gfhpersigo=?,division=?  "
                     + " WHERE id= ? ";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, gfhBean.getCodigo());
@@ -154,7 +160,12 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
                 } else {
                     statement.setNull(8, Types.VARCHAR);
                 }
-                statement.setLong(9, gfhBean.getId());
+                if (gfhBean.getDivision() != null) {
+                    statement.setString(9, gfhBean.getDivision());
+                } else {
+                    statement.setNull(9, Types.VARCHAR);
+                }
+                statement.setLong(10, gfhBean.getId());
                 insertado = statement.executeUpdate() > 0;
                 statement.close();
             }
@@ -211,10 +222,10 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
      */
     @Override
     public ArrayList<GfhBean> getLista(String texto) {
-        return getLista(texto, null);
+        return getLista(texto, null, null);
     }
 
-    public ArrayList<GfhBean> getLista(String texto, Integer estado) {
+    public ArrayList<GfhBean> getLista(String texto, Integer estado, String division) {
         Connection connection = null;
         ArrayList<GfhBean> lista = new ArrayList<GfhBean>();
         try {
@@ -224,6 +235,9 @@ public class GfhDao extends ConexionDao implements Serializable, ConexionInterfa
             }
             if (texto != null && !texto.isEmpty()) {
                 sql = sql.concat(" AND descripcion LIKE '%" + texto + "%'");
+            }
+            if (division != null && !division.isEmpty()) {
+                sql = sql.concat(" AND division ='" + division + "'");
             }
             sql = sql.concat(" ORDER BY descripcion	");
             Statement statement = connection.createStatement();

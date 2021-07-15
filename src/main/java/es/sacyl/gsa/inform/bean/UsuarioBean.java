@@ -1,6 +1,7 @@
 package es.sacyl.gsa.inform.bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,16 +26,20 @@ public class UsuarioBean extends MasterBean implements Serializable {
     private String telefono;
     private CategoriaBean categoria;
     private GfhBean gfh;
+    private String cpf;
+    private String colegiadonumero;
 
     private String comentario;
     private String solicita;
     private String movilUsuario;
     private String correoPrivadoUsuario;
     private String telegram;
+
     private Set<String> funcionalidadStrings = new HashSet<String>();
     private Map<String, FuncionalidadBean> fucionalidadesMap = new HashMap<>();
+    private ArrayList<String> gruposActiveDirectory = new ArrayList<>();
+    private ArrayList<String> appsActiveDirectory = new ArrayList<>();
 
-//    private ArrayList<FuncionalidadBean> fucionalidadesArrayList = new ArrayList<FuncionalidadBean>();
     public static String PASSWORD_DEFECTO = "murallas";
     public static int USUARIO_DEBAJA = 0;
     public static int USUARIO_ACTIVO = 1;
@@ -339,12 +344,44 @@ public class UsuarioBean extends MasterBean implements Serializable {
         this.telegram = telegram;
     }
 
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getColegiadonumero() {
+        return colegiadonumero;
+    }
+
+    public void setColegiadonumero(String colegiadonumero) {
+        this.colegiadonumero = colegiadonumero;
+    }
+
     public Map<String, FuncionalidadBean> getFucionalidadesMap() {
         return fucionalidadesMap;
     }
 
     public void setFucionalidadesMap(Map<String, FuncionalidadBean> fucionalidadesMap) {
         this.fucionalidadesMap = fucionalidadesMap;
+    }
+
+    public ArrayList<String> getGruposActiveDirectory() {
+        return gruposActiveDirectory;
+    }
+
+    public void setGruposActiveDirectory(ArrayList<String> gruposActiveDirectory) {
+        this.gruposActiveDirectory = gruposActiveDirectory;
+    }
+
+    public ArrayList<String> getAppsActiveDirectory() {
+        return appsActiveDirectory;
+    }
+
+    public void setAppsActiveDirectory(ArrayList<String> appsActiveDirectory) {
+        this.appsActiveDirectory = appsActiveDirectory;
     }
 
     /**

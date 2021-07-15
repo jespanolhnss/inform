@@ -11,6 +11,9 @@ public class GfhBean extends MasterBean implements Serializable {
     private String descripcion;
     private Integer asistencial;
     private String gfhpersigo;
+    private UsuarioBean jefe;
+    private String division;
+
     public static final Long SERVICIOIDTRAUMAJIMEAN = new Long(51);
     public static final Integer ASISTENCIASI = 1;
 
@@ -95,6 +98,22 @@ public class GfhBean extends MasterBean implements Serializable {
 
     public void setGfhpersigo(DatoGenericoBean gfhpersigo) {
         this.gfhpersigo = gfhpersigo.getTipoDato();
+    }
+
+    public UsuarioBean getJefe() {
+        return jefe;
+    }
+
+    public void setJefe(UsuarioBean jefe) {
+        this.jefe = jefe;
+    }
+
+    public String getDivision() {
+        return division;
+    }
+
+    public void setDivision(String division) {
+        this.division = division;
     }
 
     @Override

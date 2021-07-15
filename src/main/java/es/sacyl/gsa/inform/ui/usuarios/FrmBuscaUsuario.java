@@ -23,7 +23,7 @@ public final class FrmBuscaUsuario extends FrmMasterVentana {
     public final TextField apellido2 = new ObjetosComunes().getApeNoml("Apellido2", null);
     public final TextField apellido1 = new ObjetosComunes().getApeNoml("Apellido1", null);
     private final PaginatedGrid<UsuarioBean> usuarioGrid = new GridUi().getUsuarioGrid();
-    private final ComboBox<CategoriaBean> categoriaCombo = new CombosUi().getCategoriasUsuarios(null);
+    private final ComboBox<CategoriaBean> categoriaCombo = new CombosUi().getCategoriasUsuarios(null, null);
     private ArrayList<UsuarioBean> usuarioArrayList = new ArrayList<>();
     private UsuarioBean usuarioBean = null;
 

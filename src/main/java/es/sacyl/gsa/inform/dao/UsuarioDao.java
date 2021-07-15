@@ -59,7 +59,7 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 + ",uc.id as usuarioscategoriaid, uc.CODIGOPERSIGO as usuarioscategoriacodigo"
                 + ",uc.nombre as usuarioscategoriaanombre,uc.estado as usuarioscategoriaestado  "
                 + ",gfh.id as gfhId,gfh.codigo as gfhcodigo,gfh.descripcion as gfhdescripcion"
-                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo"
+                + ",gfh.asistencial as gfhasistencial,gfh.idjimena  as gfhidjimena, gfh.estado as gfhestado,gfh.gfhpersigo, gfh.division  as gfhdivision"
                 + " FROM usuarios usu  "
                 + " LEFT JOIN categorias uc ON uc.id=usu.idcategoria "
                 + " LEFT JOIN gfh gfh ON usu.idgfh = gfh.id"
@@ -649,6 +649,14 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 usuario.setApellido2(resulSet.getString("usuapellido2"));
                 usuario.setNombre(resulSet.getString("usunombre"));
                 usuario.setEstado(resulSet.getInt("usuestado"));
+                usuario.setMail(resulSet.getString("mail"));
+                usuario.setTelefono(resulSet.getString("tel1"));
+                if (resulSet.getString("codfunc") != null) {
+                    usuario.setCategoria(new CategoriaDao().getPorCodigo(resulSet.getString("codfunc").trim()));
+                }
+                if (resulSet.getString("gfh") != null) {
+                    usuario.setGfh(new GfhDao().getPorCodigoPersigo(resulSet.getString("gfh").trim()));
+                }
             } catch (SQLException e) {
                 logger.error(Utilidades.getStackTrace(e));
             }
@@ -678,14 +686,17 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
     public UsuarioBean getUsuarioPersigo(String value) {
 
         Connection connection = null;
-        UsuarioBean usuario = new UsuarioBean();
+        UsuarioBean usuario = null;
 
         try {
             connection = super.getConexionBBDD();
-            String select = " select nif,ape1,ape2,nombre,mail,tel1,codfunc,gfh FROM usuariospersigo where nif = '" + value + "'";
+            sql = sql.concat(" and  dni = '" + value + "'");
             try (Statement statement = connection.createStatement()) {
-                ResultSet resulSet = statement.executeQuery(select);
+                ResultSet resulSet = statement.executeQuery(sql);
                 while (resulSet.next()) {
+                    usuario = getRegistroResulset(resulSet, Boolean.FALSE);
+                    /*
+                    usuario = new UsuarioBean();
                     usuario.setDni(resulSet.getString("nif"));
                     usuario.setApellido1(resulSet.getString("ape1"));
                     usuario.setApellido2(resulSet.getString("ape2"));
@@ -698,9 +709,10 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                     if (resulSet.getString("gfh") != null) {
                         usuario.setGfh(new GfhDao().getPorCodigoPersigo(resulSet.getString("gfh").trim()));
                     }
+                     */
                 }
             }
-            logger.debug(select);
+            logger.debug(sql);
         } catch (SQLException e) {
             logger.error(sql + Utilidades.getStackTrace(e));
         } catch (Exception e) {
@@ -724,16 +736,6 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
                 ResultSet resulSet = statement.executeQuery(select);
                 while (resulSet.next()) {
                     usuario = getRegistroResulset(resulSet, Boolean.FALSE);
-                    /*
-                    usuario.setDni(resulSet.getString("dni"));
-                    usuario.setApellido1(resulSet.getString("apellido1"));
-                    usuario.setApellido2(resulSet.getString("apellido2"));
-                    usuario.setNombre(resulSet.getString("nombre"));
-                    usuario.setMail(resulSet.getString("mail"));
-                    usuario.setTelefono(resulSet.getString("telefono"));
-                    usuario.setMovilUsuario(resulSet.getString("movil"));
-                    usuario.setCorreoPrivadoUsuario(resulSet.getString("mailprivado"));
-                     */
                 }
             }
             logger.debug(select);
@@ -996,13 +998,13 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         }
         return lista;
     }
-    
+
     public ArrayList<GruposPaginasGalenoBean> getGruposPaginasGaleno() {
         Connection connection = null;
         ArrayList<GruposPaginasGalenoBean> lista = new ArrayList<>();
         String select;
         select = "select id, grupo from galeno_grupospg";
-        
+
         try {
             connection = super.getConexionBBDD();
             Statement statement = connection.createStatement();
@@ -1093,51 +1095,51 @@ public class UsuarioDao extends ConexionDao implements Serializable, ConexionInt
         }
         return lista;
     }
-    
+
     public boolean doGrabaAplicacion(UsuarioGalenoBean aplicacionBean, Map< Long, ArrayList<AplicacionPerfilBean>> listaMap) {
         GalenoDao galenoDao = new GalenoDao();
         Connection connection = null;
         boolean insertado = false;
 
-            try {
-                connection = galenoDao.conecta();
-                String insertarUsuario;
-                insertarUsuario = "insert into galeno_usuarios "
-                        + "(usuario,nombre,apellido1,apellido2) "
-                        + "values (?,?,?,?)";
-                PreparedStatement statement = connection.prepareStatement(insertarUsuario);
-                if (aplicacionBean.getDni() != null) {
-                    statement.setString(1, aplicacionBean.getDni());                    
-                } else {
-                    statement.setNull(1, Types.CHAR);
-                }                
-                if (aplicacionBean.getNombre() != null) {
-                    statement.setString(2, aplicacionBean.getNombre());
-                } else {
-                    statement.setNull(2, Types.CHAR);
-                }
-                if (aplicacionBean.getApellido1() != null) {
-                    statement.setString(3, aplicacionBean.getApellido1());
-                } else {
-                    statement.setNull(3, Types.CHAR);
-                }
-                if (aplicacionBean.getApellido2() != null) {
-                    statement.setString(4, aplicacionBean.getApellido2());
-                } else {
-                    statement.setNull(4, Types.CHAR);
-                }
-                insertado = statement.executeUpdate() > 0;
-                insertado = true;
-                statement.close();
-                logger.debug(insertarUsuario);
-            } catch (SQLException e) {
-                logger.error(Utilidades.getStackTrace(e));
-                logger.error(ConexionDao.ERROR_BBDD_SQL, e);
-            } catch (Exception e) {
-                logger.error(Utilidades.getStackTrace(e));
-            } finally {
-                this.doCierraConexion(connection);
-            }       
+        try {
+            connection = galenoDao.conecta();
+            String insertarUsuario;
+            insertarUsuario = "insert into galeno_usuarios "
+                    + "(usuario,nombre,apellido1,apellido2) "
+                    + "values (?,?,?,?)";
+            PreparedStatement statement = connection.prepareStatement(insertarUsuario);
+            if (aplicacionBean.getDni() != null) {
+                statement.setString(1, aplicacionBean.getDni());
+            } else {
+                statement.setNull(1, Types.CHAR);
+            }
+            if (aplicacionBean.getNombre() != null) {
+                statement.setString(2, aplicacionBean.getNombre());
+            } else {
+                statement.setNull(2, Types.CHAR);
+            }
+            if (aplicacionBean.getApellido1() != null) {
+                statement.setString(3, aplicacionBean.getApellido1());
+            } else {
+                statement.setNull(3, Types.CHAR);
+            }
+            if (aplicacionBean.getApellido2() != null) {
+                statement.setString(4, aplicacionBean.getApellido2());
+            } else {
+                statement.setNull(4, Types.CHAR);
+            }
+            insertado = statement.executeUpdate() > 0;
+            insertado = true;
+            statement.close();
+            logger.debug(insertarUsuario);
+        } catch (SQLException e) {
+            logger.error(Utilidades.getStackTrace(e));
+            logger.error(ConexionDao.ERROR_BBDD_SQL, e);
+        } catch (Exception e) {
+            logger.error(Utilidades.getStackTrace(e));
+        } finally {
+            this.doCierraConexion(connection);
+        }
 
         return insertado;
 

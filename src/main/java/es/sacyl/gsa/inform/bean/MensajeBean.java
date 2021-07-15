@@ -20,6 +20,10 @@ public class MensajeBean extends MasterBean implements Serializable {
     public final static String TIPOTELEGRAM = "Telegram";
     public final static String TIPOPUSH = "Push";
 
+    public MensajeBean() {
+        super();
+    }
+
     public String getTipo() {
         return tipo;
     }

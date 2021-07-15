@@ -132,7 +132,7 @@ public class FrmUsuarioCategoria extends FrmMasterPantalla {
 
     @Override
     public void doActualizaGrid() {
-        usuarioCategoriaArrayList = new CategoriaDao().getLista(buscador.getValue());
+        usuarioCategoriaArrayList = new CategoriaDao().getLista(buscador.getValue(), null);
         usuarioCategoriaGrid.setItems(usuarioCategoriaArrayList);
     }
 

@@ -87,6 +87,7 @@ public final class FrmCentro extends FrmMasterPantalla {
     private final ComboBox<ZonaBean> zonacombo = new CombosUi().getZonaCombo(AutonomiaBean.AUTONOMIADEFECTO, ProvinciaBean.PROVINCIA_DEFECTO, GERENCIADEFECTO, null);
     private final TextField codigo = new ObjetosComunes().getTextField("Código");
     private final TextField nomcen = new ObjetosComunes().getTextField("Nombre");
+    private final TextField nomcorto = new ObjetosComunes().getTextField("Alias");
     private final TextField tipovia = new ObjetosComunes().getTextField("Tipo de via");
     private final TextField callecen = new ObjetosComunes().getTextField("Nombre calle");
     private final IntegerField numcalcen = new ObjetosComunes().getIntegerField("Nº");
@@ -382,6 +383,12 @@ public final class FrmCentro extends FrmMasterPantalla {
                         FrmMensajes.AVISODATOABLIGATORIO, 1, 65))
                 .bind(CentroBean::getNomcen, CentroBean::setNomcen);
 
+        centroBinder.forField(nomcorto)
+                .withNullRepresentation("")
+                .withValidator(new StringLengthValidator(
+                        FrmMensajes.AVISODATOABLIGATORIO, 0, 19))
+                .bind(CentroBean::getNomcenCorto, CentroBean::setNomcorto);
+
         centroBinder.forField(tipovia)
                 .withNullRepresentation("")
                 .asRequired()
@@ -443,6 +450,8 @@ public final class FrmCentro extends FrmMasterPantalla {
     public void doComponenesAtributos() {
         this.titulo.setText("Centros");
         buscador.setLabel(" Valores a buscar");
+        nomcorto.setMaxLength(20);
+        nomcorto.setMaxWidth("75px");
         // como se hace borrado lógico con modificar el registro el centro y poner activo=N es lo mismo
         botonBorrar.setVisible(false);
         miniaturasTab.setLabel("Miniatruas");
@@ -499,8 +508,8 @@ public final class FrmCentro extends FrmMasterPantalla {
         contenedorFormulario.add(zonacombo, 2);
         contenedorFormulario.add(localidadCombo, 2);
 
-        contenedorFormulario.add(nomcen, 2);
-        contenedorFormulario.add(teleprev, 2);
+        contenedorFormulario.add(nomcen, 3);
+        contenedorFormulario.add(nomcorto, teleprev);
 
         contenedorFormulario.add(tipovia);
         contenedorFormulario.add(callecen, 3);
@@ -532,6 +541,9 @@ public final class FrmCentro extends FrmMasterPantalla {
             doActualizaComboProvinicas(provinciaCombo, autonomiaBean);
         });
 
+        buscador.addBlurListener(event -> {
+            doActualizaGrid();
+        });
         autonomiaComboBuscador.addValueChangeListener(event -> {
             AutonomiaBean autonomiaBean = event.getValue();
             doActualizaComboProvinicas(provinciaComboBuscador, autonomiaBean);
